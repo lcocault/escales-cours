@@ -1,0 +1,82 @@
+name: CI / Deploy to AlwaysData
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+permissions:
+  contents: read
+
+jobs:
+  # ──────────────────────────────────────────────────────────────────────────
+  # Job 1 – Run PHPUnit tests
+  # ──────────────────────────────────────────────────────────────────────────
+  test:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.2'
+          extensions: pdo, pdo_pgsql
+          coverage: none
+
+      - name: Install dependencies
+        run: composer install --prefer-dist --no-progress --no-interaction
+
+      - name: Run PHPUnit
+        run: ./vendor/bin/phpunit
+
+  # ──────────────────────────────────────────────────────────────────────────
+  # Job 2 – Deploy to AlwaysData (only on push to main, after tests pass)
+  #
+  # Required repository secrets:
+  #   ALWAYSDATA_SSH_HOST        – SSH hostname, e.g. ssh-username.alwaysdata.net
+  #   ALWAYSDATA_SSH_USER        – SSH login username
+  #   ALWAYSDATA_SSH_KEY         – Private SSH key (PEM format, entire file content)
+  #   ALWAYSDATA_REMOTE_PATH     – Absolute remote path, e.g. /home/username/www
+  #   ALWAYSDATA_SSH_KNOWN_HOSTS – Verified host key line from `ssh-keyscan <host>`
+  #                                Run once locally and store the output as a secret.
+  # ──────────────────────────────────────────────────────────────────────────
+  deploy:
+    needs: test
+    runs-on: ubuntu-latest
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.2'
+          extensions: pdo, pdo_pgsql
+          coverage: none
+
+      - name: Install production dependencies
+        run: composer install --prefer-dist --no-progress --no-interaction --no-dev --optimize-autoloader
+
+      - name: Setup SSH key
+        run: |
+          mkdir -p ~/.ssh
+          printf '%s\n' "${{ secrets.ALWAYSDATA_SSH_KEY }}" > ~/.ssh/id_rsa
+          chmod 600 ~/.ssh/id_rsa
+          printf '%s\n' "${{ secrets.ALWAYSDATA_SSH_KNOWN_HOSTS }}" >> ~/.ssh/known_hosts
+
+      - name: Deploy via rsync
+        run: |
+          rsync -az --delete \
+            --exclude='.git/' \
+            --exclude='.github/' \
+            --exclude='tests/' \
+            --exclude='phpunit.xml' \
+            --exclude='composer.json' \
+            --exclude='composer.lock' \
+            --exclude='config/config.php' \
+            -e "ssh -i ~/.ssh/id_rsa -o StrictHostKeyChecking=yes" \
+            ./ "${{ secrets.ALWAYSDATA_SSH_USER }}@${{ secrets.ALWAYSDATA_SSH_HOST }}:${{ secrets.ALWAYSDATA_REMOTE_PATH }}/"
