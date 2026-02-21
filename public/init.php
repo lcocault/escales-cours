@@ -4,12 +4,14 @@
 define('ROOT_DIR', dirname(__DIR__));
 
 require_once ROOT_DIR . '/config/config.php';
+require_once ROOT_DIR . '/vendor/autoload.php';
 require_once ROOT_DIR . '/src/Database.php';
 require_once ROOT_DIR . '/src/Auth.php';
 require_once ROOT_DIR . '/src/UserModel.php';
 require_once ROOT_DIR . '/src/SessionModel.php';
 require_once ROOT_DIR . '/src/BookingModel.php';
 require_once ROOT_DIR . '/src/Mailer.php';
+require_once ROOT_DIR . '/src/PaymentService.php';
 
 // Helper: escape output (accepts null, returns empty string for null)
 function e(?string $value): string

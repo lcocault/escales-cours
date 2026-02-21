@@ -1,5 +1,5 @@
 <?php
-// public/book.php – booking form (and Stripe Checkout redirect)
+// public/book.php – booking form (payment redirect via configured provider)
 require_once __DIR__ . '/init.php';
 Auth::requireLogin();
 
@@ -58,13 +58,21 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         exit;
     }
 
-    // Redirect to Stripe Checkout
-    $stripeUrl = APP_BASE_URL . '/payment_success.php?booking_id=' . $bookingId;
-    // In a real deployment, create a Stripe Checkout session here:
-    //   $checkout = \Stripe\Checkout\Session::create([...]);
-    //   header('Location: ' . $checkout->url);
-    // For now, redirect to a placeholder success page
-    header('Location: ' . APP_BASE_URL . '/payment_success.php?booking_id=' . $bookingId . '&_demo=1');
+    // Redirect to payment provider checkout
+    try {
+        $checkoutUrl = PaymentService::createCheckoutUrl(
+            $bookingId,
+            $session['title'],
+            (int) $session['price_cents'],
+            'eur'
+        );
+    } catch (RuntimeException $e) {
+        error_log('PaymentService error: ' . $e->getMessage());
+        flash('error', 'Une erreur est survenue lors de la création du paiement. Veuillez réessayer.');
+        header('Location: ' . APP_BASE_URL . '/session.php?id=' . $sessionId);
+        exit;
+    }
+    header('Location: ' . $checkoutUrl);
     exit;
 }
 
