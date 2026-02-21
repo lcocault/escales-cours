@@ -28,7 +28,7 @@ Use warm reds, sunny yellows, and kitchen greens with rounded, friendly typograp
 | Database | PostgreSQL (PDO driver) |
 | Hosting | AlwaysData shared hosting |
 | Email | PHP `mail()` or SMTP via PHPMailer |
-| Payment | Stripe (Checkout / Payment Intents) |
+| Payment | Stripe or Square – configured via `PAYMENT_PROVIDER` constant (`'stripe'` \| `'square'`) |
 | CSS | Plain CSS (no framework) – mobile-first |
 | Templating | Native PHP templates in `/templates/` |
 | Testing | PHPUnit 11+ |
@@ -74,7 +74,8 @@ Use warm reds, sunny yellows, and kitchen greens with rounded, friendly typograp
 │   ├── SessionModel.php          ← cooking-session CRUD
 │   ├── BookingModel.php          ← booking CRUD
 │   ├── UserModel.php             ← user CRUD
-│   └── Mailer.php                ← email helpers
+│   ├── Mailer.php                ← email helpers
+│   └── PaymentService.php        ← Stripe / Square abstraction (reads PAYMENT_PROVIDER)
 └── templates/
     ├── header.php
     ├── footer.php
@@ -121,7 +122,11 @@ Required constants:
 DB_HOST, DB_PORT, DB_NAME, DB_USER, DB_PASS
 SMTP_HOST, SMTP_PORT, SMTP_USER, SMTP_PASS, SMTP_FROM, SMTP_FROM_NAME
 ADMIN_EMAIL
+PAYMENT_PROVIDER          // 'stripe' | 'square'  (defaults to 'stripe')
+// If PAYMENT_PROVIDER = 'stripe':
 STRIPE_PUBLIC_KEY, STRIPE_SECRET_KEY, STRIPE_WEBHOOK_SECRET
+// If PAYMENT_PROVIDER = 'square':
+SQUARE_ACCESS_TOKEN, SQUARE_LOCATION_ID, SQUARE_ENVIRONMENT  // 'sandbox' | 'production'
 APP_BASE_URL          // e.g. https://escales-cours.alwaysdata.net
 APP_ENV               // 'production' | 'development'
 ```

@@ -21,3 +21,7 @@ Thumbs.db
 # PHPUnit
 .phpunit.cache/
 .phpunit.result.cache
+
+# Node (legacy – not used in this project)
+node_modules/
+npm-debug.log*

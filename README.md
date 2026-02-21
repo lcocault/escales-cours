@@ -5,7 +5,7 @@ Site web pour l'organisation d'ateliers de cuisine pour les enfants.
 ## Fonctionnalités
 
 - 🍳 **Séances publiques** – liste des séances à venir avec résumé
-- 🛒 **Réservation en ligne** – paiement via Stripe
+- 🛒 **Réservation en ligne** – paiement via Stripe ou Square (configurable)
 - 📚 **Contenu post-séance** – accessible uniquement aux participants confirmés
 - 📸 **Photos privées** – soumises au consentement renseigné à l'inscription
 - ⚙️ **Interface admin** – gestion des séances, participants, présences, crédits
@@ -28,7 +28,15 @@ psql -U <user> -d <dbname> -f database/schema.sql
 #    (sur AlwaysData : Sites > votre site > Répertoire racine = /public)
 ```
 
+## Paiement
+
+Le fournisseur de paiement est configurable via la constante `PAYMENT_PROVIDER` dans `config/config.php` :
+
+- `'stripe'` – Stripe Checkout (par défaut)
+- `'square'` – Square Payment Links
+
+Voir `config/config.example.php` pour les clés requises selon le fournisseur choisi.
+
 ## Développement
 
 Voir [`.github/copilot-instructions.md`](.github/copilot-instructions.md) pour les guidelines complètes destinées aux assistants IA et aux contributeurs.
-
