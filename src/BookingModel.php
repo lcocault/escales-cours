@@ -1,0 +1,122 @@
+<?php
+// src/BookingModel.php – booking CRUD
+
+class BookingModel
+{
+    private PDO $db;
+
+    public function __construct()
+    {
+        $this->db = Database::getInstance();
+    }
+
+    public function findById(int $id): ?array
+    {
+        $stmt = $this->db->prepare('SELECT * FROM bookings WHERE id = :id');
+        $stmt->execute([':id' => $id]);
+        $row = $stmt->fetch();
+        return $row ?: null;
+    }
+
+    public function findByUserAndSession(int $userId, int $sessionId): ?array
+    {
+        $stmt = $this->db->prepare(
+            'SELECT * FROM bookings WHERE user_id = :uid AND session_id = :sid'
+        );
+        $stmt->execute([':uid' => $userId, ':sid' => $sessionId]);
+        $row = $stmt->fetch();
+        return $row ?: null;
+    }
+
+    public function getByUser(int $userId): array
+    {
+        $stmt = $this->db->prepare(
+            'SELECT b.*, s.title, s.session_date, s.start_time, s.end_time, s.theme
+             FROM bookings b
+             JOIN sessions s ON s.id = b.session_id
+             WHERE b.user_id = :uid
+             ORDER BY s.session_date DESC'
+        );
+        $stmt->execute([':uid' => $userId]);
+        return $stmt->fetchAll();
+    }
+
+    public function getBySession(int $sessionId): array
+    {
+        $stmt = $this->db->prepare(
+            'SELECT b.*, u.first_name, u.last_name, u.email, u.phone, u.photo_consent
+             FROM bookings b
+             JOIN users u ON u.id = b.user_id
+             WHERE b.session_id = :sid
+             ORDER BY b.created_at ASC'
+        );
+        $stmt->execute([':sid' => $sessionId]);
+        return $stmt->fetchAll();
+    }
+
+    public function create(int $userId, int $sessionId, bool $usedCredit = false): int
+    {
+        $stmt = $this->db->prepare(
+            'INSERT INTO bookings (user_id, session_id, used_credit)
+             VALUES (:uid, :sid, :credit)
+             RETURNING id'
+        );
+        $stmt->execute([
+            ':uid'    => $userId,
+            ':sid'    => $sessionId,
+            ':credit' => ($usedCredit ? 'TRUE' : 'FALSE'),
+        ]);
+        return (int) $stmt->fetchColumn();
+    }
+
+    public function confirm(int $bookingId, string $paymentIntentId): void
+    {
+        $stmt = $this->db->prepare(
+            "UPDATE bookings SET status = 'confirmed', payment_intent_id = :pi, paid_at = NOW()
+             WHERE id = :id"
+        );
+        $stmt->execute([':pi' => $paymentIntentId, ':id' => $bookingId]);
+    }
+
+    public function markAttended(int $bookingId): void
+    {
+        $stmt = $this->db->prepare(
+            "UPDATE bookings SET status = 'attended', confirmed_by_admin = TRUE WHERE id = :id"
+        );
+        $stmt->execute([':id' => $bookingId]);
+    }
+
+    public function markAbsent(int $bookingId): void
+    {
+        $stmt = $this->db->prepare(
+            "UPDATE bookings SET status = 'absent' WHERE id = :id"
+        );
+        $stmt->execute([':id' => $bookingId]);
+    }
+
+    public function markCredited(int $bookingId): void
+    {
+        $stmt = $this->db->prepare(
+            "UPDATE bookings SET status = 'credited' WHERE id = :id"
+        );
+        $stmt->execute([':id' => $bookingId]);
+    }
+
+    public function cancel(int $bookingId): void
+    {
+        $stmt = $this->db->prepare(
+            "UPDATE bookings SET status = 'cancelled' WHERE id = :id"
+        );
+        $stmt->execute([':id' => $bookingId]);
+    }
+
+    public function hasAccessToContent(int $userId, int $sessionId): bool
+    {
+        $stmt = $this->db->prepare(
+            "SELECT COUNT(*) FROM bookings
+             WHERE user_id = :uid AND session_id = :sid AND status = 'attended'"
+        );
+        $stmt->execute([':uid' => $userId, ':sid' => $sessionId]);
+        return (int) $stmt->fetchColumn() > 0;
+    }
+}
