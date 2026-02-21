@@ -1,4 +1,27 @@
+# Environment & secrets
+config/config.php
+
+# PHP dependencies
+vendor/
+
+# Composer lock (keep if you want reproducible builds)
+# composer.lock
+
+# Uploaded media (stored outside web root in production)
+public/uploads/
+
+# Editor / OS artefacts
+.DS_Store
+Thumbs.db
+*.swp
+*.swo
+.idea/
+.vscode/
+
+# PHPUnit
+.phpunit.cache/
+.phpunit.result.cache
+
+# Node (legacy – not used in this project)
 node_modules/
-.env
-*.log
 npm-debug.log*
