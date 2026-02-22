@@ -44,6 +44,9 @@ Le workflow `.github/workflows/deploy.yml` s'exécute automatiquement à chaque 
 1. **Tests** – installe les dépendances PHP et lance la suite PHPUnit.
 2. **Déploiement** (sur push vers `main` uniquement, si les tests passent) – synchronise les fichiers vers AlwaysData via `rsync` over SSH.
 
+Vous pouvez aussi déclencher le déploiement **manuellement** depuis l'interface GitHub :
+> **Actions** › *CI / Deploy to AlwaysData* › **Run workflow** (bouton en haut à droite de la liste des exécutions).
+
 ### Secrets GitHub requis
 
 Renseignez ces quatre secrets dans **Settings › Secrets and variables › Actions** de votre dépôt :

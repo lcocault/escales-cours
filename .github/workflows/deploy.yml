@@ -5,6 +5,7 @@ on:
     branches: [main]
   pull_request:
     branches: [main]
+  workflow_dispatch:
 
 permissions:
   contents: read
@@ -49,7 +50,7 @@ jobs:
   deploy:
     needs: test
     runs-on: ubuntu-latest
-    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    if: (github.event_name == 'push' && github.ref == 'refs/heads/main') || github.event_name == 'workflow_dispatch'
 
     steps:
       - uses: actions/checkout@v4
@@ -71,9 +72,17 @@ jobs:
           chmod 600 ~/.ssh/id_rsa
           printf '%s\n' "${{ secrets.ALWAYSDATA_SSH_KNOWN_HOSTS }}" >> ~/.ssh/known_hosts
 
+      - name: Verify SSH connectivity
+        run: |
+          ssh -i ~/.ssh/id_rsa \
+              -o StrictHostKeyChecking=yes \
+              -o BatchMode=yes \
+              "${{ secrets.ALWAYSDATA_SSH_USER }}@${{ secrets.ALWAYSDATA_SSH_HOST }}" \
+              "echo 'SSH connection OK'"
+
       - name: Deploy via rsync
         run: |
-          rsync -az --delete \
+          rsync -azv --delete \
             --exclude='.git/' \
             --exclude='.github/' \
             --exclude='tests/' \
