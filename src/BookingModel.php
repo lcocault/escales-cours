@@ -110,6 +110,12 @@ class BookingModel
         $stmt->execute([':id' => $bookingId]);
     }
 
+    public function deleteById(int $id): void
+    {
+        $stmt = $this->db->prepare('DELETE FROM bookings WHERE id = :id');
+        $stmt->execute([':id' => $id]);
+    }
+
     public function hasAccessToContent(int $userId, int $sessionId): bool
     {
         $stmt = $this->db->prepare(

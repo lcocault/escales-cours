@@ -30,6 +30,24 @@ class Mailer
         self::send(ADMIN_EMAIL, $subject, $body);
     }
 
+    public static function sendCancellationConfirmationToAttendee(
+        array $user,
+        array $session
+    ): void {
+        $subject = 'Annulation de réservation – ' . $session['title'];
+        $body    = self::cancellationConfirmationBody($user, $session);
+        self::send($user['email'], $subject, $body);
+    }
+
+    public static function sendCancellationNotificationToAdmin(
+        array $user,
+        array $session
+    ): void {
+        $subject = '[Admin] Annulation de réservation – ' . $session['title'];
+        $body    = self::adminCancellationBody($user, $session);
+        self::send(ADMIN_EMAIL, $subject, $body);
+    }
+
     private static function bookingConfirmationBody(array $user, array $session): string
     {
         $name    = htmlspecialchars($user['first_name'] . ' ' . $user['last_name']);
@@ -59,6 +77,43 @@ class Mailer
 
         return <<<HTML
         <p>Nouvelle réservation reçue :</p>
+        <ul>
+          <li>Session : <strong>{$title}</strong> ({$date})</li>
+          <li>Participant : {$name} ({$email})</li>
+        </ul>
+        <p><a href="{$baseUrl}/admin/attendees.php?session_id={$session['id']}">Voir les participants</a></p>
+        HTML;
+    }
+
+    private static function cancellationConfirmationBody(array $user, array $session): string
+    {
+        $name    = htmlspecialchars($user['first_name'] . ' ' . $user['last_name']);
+        $title   = htmlspecialchars($session['title']);
+        $date    = htmlspecialchars($session['session_date']);
+        $start   = htmlspecialchars($session['start_time']);
+        $end     = htmlspecialchars($session['end_time']);
+        $baseUrl = APP_BASE_URL;
+
+        return <<<HTML
+        <p>Bonjour {$name},</p>
+        <p>Votre réservation pour la session <strong>{$title}</strong> a bien été annulée.</p>
+        <p>📅 Date : {$date}<br>🕐 Horaires : {$start} – {$end}</p>
+        <p>Le remboursement sera traité sous quelques jours ouvrés.</p>
+        <p>À bientôt aux Escales Culinaires !</p>
+        <p><a href="{$baseUrl}/my-sessions.php">Voir mes réservations</a></p>
+        HTML;
+    }
+
+    private static function adminCancellationBody(array $user, array $session): string
+    {
+        $name    = htmlspecialchars($user['first_name'] . ' ' . $user['last_name']);
+        $email   = htmlspecialchars($user['email']);
+        $title   = htmlspecialchars($session['title']);
+        $date    = htmlspecialchars($session['session_date']);
+        $baseUrl = APP_BASE_URL;
+
+        return <<<HTML
+        <p>Annulation de réservation reçue :</p>
         <ul>
           <li>Session : <strong>{$title}</strong> ({$date})</li>
           <li>Participant : {$name} ({$email})</li>
