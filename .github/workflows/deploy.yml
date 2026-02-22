@@ -42,6 +42,9 @@ jobs:
   #   ALWAYSDATA_REMOTE_PATH     – Absolute remote path, e.g. /home/username/www
   #   ALWAYSDATA_SSH_KNOWN_HOSTS – Verified host key line from `ssh-keyscan <host>`
   #                                Run once locally and store the output as a secret.
+  #   APP_BASE_URL               – Public HTTPS URL of the site (no trailing slash),
+  #                                e.g. https://escales-cours.alwaysdata.net
+  #                                Used by the post-deploy smoke test.
   # ──────────────────────────────────────────────────────────────────────────
   deploy:
     needs: test
@@ -80,3 +83,21 @@ jobs:
             --exclude='config/config.php' \
             -e "ssh -i ~/.ssh/id_rsa -o StrictHostKeyChecking=yes" \
             ./ "${{ secrets.ALWAYSDATA_SSH_USER }}@${{ secrets.ALWAYSDATA_SSH_HOST }}:${{ secrets.ALWAYSDATA_REMOTE_PATH }}/"
+
+      - name: Smoke test
+        run: |
+          url="${{ secrets.APP_BASE_URL }}/health.php"
+          for i in 1 2 3 4 5; do
+            response=$(curl -sf --max-time 10 "$url" 2>/dev/null) && break
+            echo "Attempt $i failed, retrying in 5 s…"
+            sleep 5
+          done
+          if [ -z "$response" ]; then
+            echo "Smoke test FAILED: $url did not respond after 5 attempts."
+            exit 1
+          fi
+          echo "$response" | grep -q '"status":"ok"' || {
+            echo "Smoke test FAILED: unexpected response: $response"
+            exit 1
+          }
+          echo "Smoke test passed ✓"

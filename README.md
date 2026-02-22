@@ -55,6 +55,7 @@ Renseignez ces quatre secrets dans **Settings › Secrets and variables › Acti
 | `ALWAYSDATA_SSH_KEY` | *(contenu du fichier `.pem`)* | Clé SSH privée (format PEM) |
 | `ALWAYSDATA_REMOTE_PATH` | `/home/username/www` | Chemin absolu sur le serveur |
 | `ALWAYSDATA_SSH_KNOWN_HOSTS` | *(sortie de `ssh-keyscan <host>`)* | Empreinte de l'hôte SSH vérifiée |
+| `APP_BASE_URL` | `https://escales-cours.alwaysdata.net` | URL publique du site (sans slash final) |
 
 Pour obtenir la valeur de `ALWAYSDATA_SSH_KNOWN_HOSTS`, exécutez **une seule fois** depuis votre poste :
 
@@ -65,6 +66,19 @@ ssh-keyscan ssh-username.alwaysdata.net
 Copiez la ligne affichée et enregistrez-la comme secret.
 
 > **Remarque** : `config/config.php` n'est jamais déployé par le workflow. Copiez-le manuellement sur le serveur lors de la première installation.
+
+### Vérifier que le déploiement fonctionne
+
+Après chaque push vers `main`, le workflow effectue automatiquement un **smoke test** : il interroge le point de contrôle `<APP_BASE_URL>/health.php` (jusqu'à 5 tentatives espacées de 5 s) et vérifie qu'il répond `{"status":"ok"}`.
+
+Vous pouvez aussi le tester manuellement dans un navigateur ou avec curl :
+
+```bash
+curl https://votre-site.alwaysdata.net/health.php
+# {"status":"ok"}
+```
+
+Si le smoke test échoue, le workflow se termine en erreur et vous en êtes notifié par GitHub.
 
 ## Développement
 
