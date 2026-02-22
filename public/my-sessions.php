@@ -25,6 +25,7 @@ include ROOT_DIR . '/templates/header.php';
                         <th>Date</th>
                         <th>Statut</th>
                         <th>Contenu</th>
+                        <th>Actions</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -39,6 +40,9 @@ include ROOT_DIR . '/templates/header.php';
                             'cancelled' => '❌ Annulé',
                         ];
                         $label = $statusLabels[$b['status']] ?? e($b['status']);
+                        $sessionStart = strtotime($b['session_date'] . ' ' . $b['start_time']);
+                        $cancellable  = $b['status'] === 'confirmed'
+                                     && ($sessionStart - time()) >= 48 * 3600;
                         ?>
                         <tr>
                             <td><a href="<?= APP_BASE_URL ?>/session.php?id=<?= (int) $b['session_id'] ?>"><?= e($b['title']) ?></a></td>
@@ -47,6 +51,18 @@ include ROOT_DIR . '/templates/header.php';
                             <td>
                                 <?php if ($b['status'] === 'attended'): ?>
                                     <a href="<?= APP_BASE_URL ?>/session-content.php?session_id=<?= (int) $b['session_id'] ?>" class="btn btn--success btn--sm">Voir le contenu</a>
+                                <?php else: ?>
+                                    –
+                                <?php endif; ?>
+                            </td>
+                            <td>
+                                <?php if ($cancellable): ?>
+                                    <form method="post" action="<?= APP_BASE_URL ?>/cancel-booking.php"
+                                          onsubmit="return confirm('Confirmer l\'annulation de cette réservation ?')">
+                                        <input type="hidden" name="csrf_token" value="<?= Auth::csrfToken() ?>">
+                                        <input type="hidden" name="booking_id" value="<?= (int) $b['id'] ?>">
+                                        <button type="submit" class="btn btn--danger btn--sm">Annuler</button>
+                                    </form>
                                 <?php else: ?>
                                     –
                                 <?php endif; ?>

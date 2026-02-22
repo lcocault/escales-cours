@@ -87,4 +87,66 @@ class PaymentServiceTest extends TestCase
         $this->assertStringContainsString('_demo=1', $url);
         $this->assertStringContainsString('booking_id=99', $url);
     }
+
+    // -------------------------------------------------------------------------
+    // Refund – Stripe demo mode (placeholder key → silent no-op)
+    // -------------------------------------------------------------------------
+
+    public function testStripeRefundDemoModeIsNoOp(): void
+    {
+        define('PAYMENT_PROVIDER', 'stripe');
+        define('STRIPE_SECRET_KEY', 'sk_test_...');
+
+        // Should complete without throwing an exception.
+        PaymentService::refund('pi_demo_12345');
+        $this->addToAssertionCount(1);
+    }
+
+    // -------------------------------------------------------------------------
+    // Refund – Square demo mode (placeholder token → silent no-op)
+    // -------------------------------------------------------------------------
+
+    public function testSquareRefundDemoModeIsNoOp(): void
+    {
+        define('PAYMENT_PROVIDER', 'square');
+        define('SQUARE_ACCESS_TOKEN', 'EAAAl...');
+        define('SQUARE_LOCATION_ID', 'test_loc');
+        define('SQUARE_ENVIRONMENT', 'sandbox');
+
+        // Should complete without throwing an exception.
+        PaymentService::refund('sq_payment_demo');
+        $this->addToAssertionCount(1);
+    }
+
+    // -------------------------------------------------------------------------
+    // Refund – unsupported provider
+    // -------------------------------------------------------------------------
+
+    public function testRefundWithUnsupportedProviderThrowsRuntimeException(): void
+    {
+        define('PAYMENT_PROVIDER', 'paypal');
+
+        $this->expectException(RuntimeException::class);
+        $this->expectExceptionMessageMatches('/Unsupported PAYMENT_PROVIDER/');
+
+        PaymentService::refund('some_payment_id');
+    }
+
+    // -------------------------------------------------------------------------
+    // isRealPaymentRef – helper logic
+    // -------------------------------------------------------------------------
+
+    public function testIsRealPaymentRefReturnsFalseForDemoRefs(): void
+    {
+        $this->assertFalse(PaymentService::isRealPaymentRef(''));
+        $this->assertFalse(PaymentService::isRealPaymentRef('credit'));
+        $this->assertFalse(PaymentService::isRealPaymentRef('demo_42'));
+        $this->assertFalse(PaymentService::isRealPaymentRef('paid_42'));
+    }
+
+    public function testIsRealPaymentRefReturnsTrueForRealRefs(): void
+    {
+        $this->assertTrue(PaymentService::isRealPaymentRef('pi_3AbCdEfGhIjKlMnO'));
+        $this->assertTrue(PaymentService::isRealPaymentRef('sq_payment_abc123'));
+    }
 }
