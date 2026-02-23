@@ -30,6 +30,8 @@ CREATE TABLE IF NOT EXISTS sessions (
     max_attendees       INTEGER         NOT NULL CHECK (max_attendees > 0),
     remaining_seats     INTEGER         NOT NULL CHECK (remaining_seats >= 0),
     price_cents         INTEGER         NOT NULL CHECK (price_cents >= 0),  -- price in euro cents
+    status              VARCHAR(20)     NOT NULL DEFAULT 'pending'
+                            CHECK (status IN ('pending', 'confirmed', 'cancelled')),
     summary             TEXT,           -- public teaser
     objectives          TEXT,           -- pedagogic objectives (shown post-session)
     theoretical_content TEXT,           -- theoretical part (shown post-session)

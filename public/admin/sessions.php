@@ -29,6 +29,7 @@ include ROOT_DIR . '/templates/header.php';
                         <th>Thème</th>
                         <th>Places</th>
                         <th>Prix</th>
+                        <th>Statut</th>
                         <th>Actions</th>
                     </tr>
                 </thead>
@@ -40,6 +41,16 @@ include ROOT_DIR . '/templates/header.php';
                             <td><?= e($s['theme']) ?></td>
                             <td><?= (int) $s['remaining_seats'] ?> / <?= (int) $s['max_attendees'] ?></td>
                             <td><?= e(formatPrice((int) $s['price_cents'])) ?></td>
+                            <td>
+                                <?php
+                                $statusLabels = [
+                                    'pending'   => '⏳ En attente',
+                                    'confirmed' => '✅ Confirmée',
+                                    'cancelled' => '❌ Annulée',
+                                ];
+                                echo e($statusLabels[$s['status'] ?? 'pending'] ?? $s['status']);
+                                ?>
+                            </td>
                             <td>
                                 <div class="actions">
                                     <a href="<?= APP_BASE_URL ?>/admin/session-edit.php?id=<?= (int) $s['id'] ?>" class="btn btn--warning btn--sm">Modifier</a>

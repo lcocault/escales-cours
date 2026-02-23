@@ -54,6 +54,23 @@ class BookingModel
         return $stmt->fetchAll();
     }
 
+    /**
+     * Returns confirmed bookings for a session, including the user info needed
+     * to send notification emails.
+     */
+    public function getConfirmedBySession(int $sessionId): array
+    {
+        $stmt = $this->db->prepare(
+            "SELECT b.*, u.first_name, u.last_name, u.email, u.phone
+             FROM bookings b
+             JOIN users u ON u.id = b.user_id
+             WHERE b.session_id = :sid AND b.status = 'confirmed'
+             ORDER BY b.created_at ASC"
+        );
+        $stmt->execute([':sid' => $sessionId]);
+        return $stmt->fetchAll();
+    }
+
     public function create(int $userId, int $sessionId, bool $usedCredit = false): int
     {
         $stmt = $this->db->prepare(
