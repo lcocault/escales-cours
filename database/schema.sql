@@ -74,6 +74,16 @@ CREATE TABLE IF NOT EXISTS credits (
     used_booking_id INTEGER     REFERENCES bookings(id) ON DELETE SET NULL
 );
 
+-- General messages (homepage news thread) --------------------
+CREATE TABLE IF NOT EXISTS general_messages (
+    id         SERIAL PRIMARY KEY,
+    body       TEXT        NOT NULL,
+    type       VARCHAR(20) NOT NULL DEFAULT 'info'
+                   CHECK (type IN ('info', 'warning', 'danger', 'success')),
+    created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+    deleted_at TIMESTAMPTZ
+);
+
 -- Password reset tokens ---------------------------------------
 CREATE TABLE IF NOT EXISTS password_resets (
     id          SERIAL PRIMARY KEY,

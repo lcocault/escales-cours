@@ -7,6 +7,7 @@ $db = Database::getInstance();
 $sessionCount  = (int) $db->query("SELECT COUNT(*) FROM sessions WHERE deleted_at IS NULL")->fetchColumn();
 $userCount     = (int) $db->query("SELECT COUNT(*) FROM users WHERE deleted_at IS NULL")->fetchColumn();
 $bookingCount  = (int) $db->query("SELECT COUNT(*) FROM bookings WHERE status IN ('confirmed','attended')")->fetchColumn();
+$messageCount  = (int) $db->query("SELECT COUNT(*) FROM general_messages WHERE deleted_at IS NULL")->fetchColumn();
 
 $pageTitle = 'Administration';
 include ROOT_DIR . '/templates/header.php';
@@ -31,6 +32,11 @@ include ROOT_DIR . '/templates/header.php';
             <div class="admin-card__icon">✅</div>
             <div class="admin-card__label">Réservations</div>
             <div style="color:var(--color-muted);font-size:.9rem;margin-top:.25rem"><?= $bookingCount ?> confirmée(s)</div>
+        </a>
+        <a href="<?= APP_BASE_URL ?>/admin/messages.php" class="admin-card" style="text-decoration:none;color:inherit">
+            <div class="admin-card__icon">📣</div>
+            <div class="admin-card__label">Messages</div>
+            <div style="color:var(--color-muted);font-size:.9rem;margin-top:.25rem"><?= $messageCount ?> message(s)</div>
         </a>
     </div>
 </div>
