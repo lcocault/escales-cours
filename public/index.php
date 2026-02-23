@@ -14,6 +14,7 @@ include ROOT_DIR . '/templates/header.php';
     <section class="hero">
         <h1>🍳 Les Escales Culinaires</h1>
         <p>Des ateliers de cuisine pour les petits explorateurs des saveurs !</p>
+        <a href="<?= APP_BASE_URL ?>/about.php" class="btn btn--secondary mt-2">✨ Découvrir le concept</a>
     </section>
 
     <?php if (empty($sessions)): ?>
