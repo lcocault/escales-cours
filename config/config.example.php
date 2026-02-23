@@ -36,6 +36,9 @@ define('SQUARE_ENVIRONMENT', 'sandbox'); // 'sandbox' | 'production'
 // Payment provider: 'stripe' | 'square'  (defaults to 'stripe' if omitted)
 define('PAYMENT_PROVIDER', 'square');
 
+// Session confirmation
+define('SESSION_MIN_ATTENDEES', 2); // minimum confirmed bookings required to hold a session
+
 // Application
 define('APP_BASE_URL', 'http://localhost');
 define('APP_ENV', 'development'); // 'production' | 'development'

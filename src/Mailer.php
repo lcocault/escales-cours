@@ -48,6 +48,62 @@ class Mailer
         self::send(ADMIN_EMAIL, $subject, $body);
     }
 
+    public static function sendSessionConfirmationToAttendee(
+        array $user,
+        array $session
+    ): void {
+        $subject = 'Séance confirmée – ' . $session['title'];
+        $body    = self::sessionConfirmationBody($user, $session);
+        self::send($user['email'], $subject, $body);
+    }
+
+    public static function sendSessionCancellationToAttendee(
+        array $user,
+        array $session
+    ): void {
+        $subject = 'Séance annulée – ' . $session['title'];
+        $body    = self::sessionCancellationBody($user, $session);
+        self::send($user['email'], $subject, $body);
+    }
+
+    private static function sessionConfirmationBody(array $user, array $session): string
+    {
+        $name    = htmlspecialchars($user['first_name'] . ' ' . $user['last_name']);
+        $title   = htmlspecialchars($session['title']);
+        $date    = htmlspecialchars($session['session_date']);
+        $start   = htmlspecialchars($session['start_time']);
+        $end     = htmlspecialchars($session['end_time']);
+        $baseUrl = APP_BASE_URL;
+
+        return <<<HTML
+        <p>Bonjour {$name},</p>
+        <p>Bonne nouvelle ! La séance <strong>{$title}</strong> est confirmée et aura bien lieu.</p>
+        <p>📅 Date : {$date}<br>🕐 Horaires : {$start} – {$end}</p>
+        <p>Nous avons hâte de vous accueillir !</p>
+        <p>À bientôt aux Escales Culinaires !</p>
+        <p><a href="{$baseUrl}/my-sessions.php">Voir mes réservations</a></p>
+        HTML;
+    }
+
+    private static function sessionCancellationBody(array $user, array $session): string
+    {
+        $name    = htmlspecialchars($user['first_name'] . ' ' . $user['last_name']);
+        $title   = htmlspecialchars($session['title']);
+        $date    = htmlspecialchars($session['session_date']);
+        $start   = htmlspecialchars($session['start_time']);
+        $end     = htmlspecialchars($session['end_time']);
+        $baseUrl = APP_BASE_URL;
+
+        return <<<HTML
+        <p>Bonjour {$name},</p>
+        <p>Nous sommes désolés de vous informer que la séance <strong>{$title}</strong> est annulée faute d'un nombre suffisant de participants.</p>
+        <p>📅 Date : {$date}<br>🕐 Horaires : {$start} – {$end}</p>
+        <p>Votre paiement sera intégralement remboursé sous quelques jours ouvrés.</p>
+        <p>À bientôt aux Escales Culinaires !</p>
+        <p><a href="{$baseUrl}/my-sessions.php">Voir mes réservations</a></p>
+        HTML;
+    }
+
     private static function bookingConfirmationBody(array $user, array $session): string
     {
         $name    = htmlspecialchars($user['first_name'] . ' ' . $user['last_name']);
