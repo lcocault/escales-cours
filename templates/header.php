@@ -22,6 +22,7 @@ Auth::start();
         <nav class="site-nav" aria-label="Navigation principale">
             <ul class="site-nav__list">
                 <li><a href="<?= APP_BASE_URL ?>/">Séances</a></li>
+                <li><a href="<?= APP_BASE_URL ?>/about.php">Le concept</a></li>
                 <?php if (Auth::isLoggedIn()): ?>
                     <li><a href="<?= APP_BASE_URL ?>/my-sessions.php">Mes réservations</a></li>
                     <?php if (Auth::isAdmin()): ?>
