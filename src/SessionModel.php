@@ -17,7 +17,7 @@ class SessionModel
             "SELECT id, title, theme, session_date, start_time, end_time,
                     max_attendees, remaining_seats, price_cents, summary
              FROM sessions
-             WHERE session_date >= CURRENT_DATE AND deleted_at IS NULL
+             WHERE session_date >= CURRENT_DATE AND deleted_at IS NULL AND status != 'cancelled'
              ORDER BY session_date ASC, start_time ASC"
         );
         return $stmt->fetchAll();
