@@ -366,6 +366,30 @@ td .actions { display: flex; gap: .5rem; flex-wrap: wrap; }
     .about-list--grid { grid-template-columns: 1fr; }
 }
 
+/* ─── News / general messages thread ─── */
+.news-thread {
+    display: flex;
+    flex-direction: column;
+    gap: .75rem;
+    margin-bottom: 2rem;
+}
+.news-item {
+    display: flex;
+    gap: 1rem;
+    align-items: flex-start;
+    padding: .9rem 1.25rem;
+    border-radius: var(--radius);
+    border-left: 4px solid transparent;
+}
+.news-item--info    { background: #d6eaf8; border-color: #2980b9; }
+.news-item--warning { background: #fef9e7; border-color: var(--color-yellow-dark); }
+.news-item--danger  { background: #fadbd8; border-color: #c0392b; }
+.news-item--success { background: #d5f5e3; border-color: var(--color-green); }
+.news-item__icon { font-size: 1.4rem; line-height: 1; flex-shrink: 0; }
+.news-item__body { flex: 1; }
+.news-item__date { font-size: .8rem; font-weight: 700; color: var(--color-muted); margin-bottom: .2rem; }
+.news-item__text { font-size: .95rem; }
+
 /* ─── Footer ─── */
 .site-footer { background: var(--color-red-dark); color: rgba(255,255,255,.8); text-align: center; padding: 1.25rem 0; margin-top: 3rem; font-size: .9rem; }
 

@@ -10,6 +10,7 @@ require_once ROOT_DIR . '/src/Auth.php';
 require_once ROOT_DIR . '/src/UserModel.php';
 require_once ROOT_DIR . '/src/SessionModel.php';
 require_once ROOT_DIR . '/src/BookingModel.php';
+require_once ROOT_DIR . '/src/GeneralMessageModel.php';
 require_once ROOT_DIR . '/src/Mailer.php';
 require_once ROOT_DIR . '/src/PaymentService.php';
 
