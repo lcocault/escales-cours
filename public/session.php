@@ -33,6 +33,9 @@ include ROOT_DIR . '/templates/header.php';
     <article class="session-detail">
         <header class="session-detail__header">
             <h1 class="session-detail__title">🍴 <?= e($session['title']) ?></h1>
+            <?php if (($session['status'] ?? '') === 'cancelled'): ?>
+                <p class="flash flash--error" style="margin-top:.75rem">❌ Cette séance a été annulée. Les participants inscrits ont été remboursés.</p>
+            <?php endif; ?>
             <div class="session-detail__meta">
                 <span class="session-detail__meta-item">📅 <?= e(formatDate($session['session_date'])) ?></span>
                 <span class="session-detail__meta-item">⏰ <?= e(substr($session['start_time'], 0, 5)) ?> – <?= e(substr($session['end_time'], 0, 5)) ?></span>
@@ -103,7 +106,9 @@ include ROOT_DIR . '/templates/header.php';
 
         <!-- Booking CTA -->
         <div class="mt-3" style="text-align:right">
-            <?php if ($booking && in_array($booking['status'], ['confirmed', 'attended', 'pending'])): ?>
+            <?php if (($session['status'] ?? '') === 'cancelled'): ?>
+                <?php /* session is cancelled – no booking button shown */ ?>
+            <?php elseif ($booking && in_array($booking['status'], ['confirmed', 'attended', 'pending'])): ?>
                 <p class="flash flash--info" style="display:inline-block">
                     ✅ Vous avez déjà réservé cette séance (statut : <?= e($booking['status']) ?>).
                 </p>
