@@ -27,6 +27,7 @@ include ROOT_DIR . '/templates/header.php';
                         <th>Date</th>
                         <th>Titre</th>
                         <th>Thème</th>
+                        <th>Tranche d'âge</th>
                         <th>Places</th>
                         <th>Prix</th>
                         <th>Statut</th>
@@ -39,6 +40,9 @@ include ROOT_DIR . '/templates/header.php';
                             <td><?= e($s['session_date']) ?></td>
                             <td><?= e($s['title']) ?></td>
                             <td><?= e($s['theme']) ?></td>
+                            <td><?php
+                                echo e(ageCategoryLabel($s['age_category'] ?? '6-12'));
+                            ?></td>
                             <td><?= (int) $s['remaining_seats'] ?> / <?= (int) $s['max_attendees'] ?></td>
                             <td><?= e(formatPrice((int) $s['price_cents'])) ?></td>
                             <td>

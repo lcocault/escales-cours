@@ -40,6 +40,7 @@ include ROOT_DIR . '/templates/header.php';
                 <span class="session-detail__meta-item">📅 <?= e(formatDate($session['session_date'])) ?></span>
                 <span class="session-detail__meta-item">⏰ <?= e(substr($session['start_time'], 0, 5)) ?> – <?= e(substr($session['end_time'], 0, 5)) ?></span>
                 <span class="session-detail__meta-item">🎨 <?= e($session['theme']) ?></span>
+                <span class="session-detail__meta-item">👶 <?= e(ageCategoryLabel($session['age_category'] ?? '6-12')) ?></span>
                 <span class="session-detail__meta-item">💶 <?= e(formatPrice((int) $session['price_cents'])) ?></span>
                 <span class="session-detail__meta-item">
                     <?php
