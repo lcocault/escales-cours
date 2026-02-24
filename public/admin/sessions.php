@@ -57,20 +57,20 @@ include ROOT_DIR . '/templates/header.php';
                             </td>
                             <td>
                                 <div class="actions">
-                                    <a href="<?= APP_BASE_URL ?>/admin/session-edit.php?id=<?= (int) $s['id'] ?>" class="btn btn--warning btn--sm">Modifier</a>
-                                    <a href="<?= APP_BASE_URL ?>/admin/session-edit.php?duplicate_from=<?= (int) $s['id'] ?>" class="btn btn--secondary btn--sm">Dupliquer</a>
-                                    <a href="<?= APP_BASE_URL ?>/admin/attendees.php?session_id=<?= (int) $s['id'] ?>" class="btn btn--secondary btn--sm">Participants</a>
+                                    <a href="<?= APP_BASE_URL ?>/admin/session-edit.php?id=<?= (int) $s['id'] ?>" class="btn btn--warning btn--icon" title="Modifier" aria-label="Modifier">✏️</a>
+                                    <a href="<?= APP_BASE_URL ?>/admin/session-edit.php?duplicate_from=<?= (int) $s['id'] ?>" class="btn btn--secondary btn--icon" title="Dupliquer" aria-label="Dupliquer">📋</a>
+                                    <a href="<?= APP_BASE_URL ?>/admin/attendees.php?session_id=<?= (int) $s['id'] ?>" class="btn btn--secondary btn--icon" title="Participants" aria-label="Participants">👥</a>
                                     <?php if (!in_array($s['status'] ?? 'pending', ['cancelled'], true)): ?>
                                     <form method="post" action="<?= APP_BASE_URL ?>/admin/session-cancel.php" onsubmit="return confirm('Annuler cette séance et rembourser tous les participants ?')">
                                         <input type="hidden" name="csrf_token" value="<?= Auth::csrfToken() ?>">
                                         <input type="hidden" name="id" value="<?= (int) $s['id'] ?>">
-                                        <button type="submit" class="btn btn--warning btn--sm">Annuler la séance</button>
+                                        <button type="submit" class="btn btn--warning btn--icon" title="Annuler la séance" aria-label="Annuler la séance">🚫</button>
                                     </form>
                                     <?php endif; ?>
                                     <form method="post" action="<?= APP_BASE_URL ?>/admin/session-delete.php" onsubmit="return confirm('Supprimer cette séance ?')">
                                         <input type="hidden" name="csrf_token" value="<?= Auth::csrfToken() ?>">
                                         <input type="hidden" name="id" value="<?= (int) $s['id'] ?>">
-                                        <button type="submit" class="btn btn--danger btn--sm">Supprimer</button>
+                                        <button type="submit" class="btn btn--danger btn--icon" title="Supprimer" aria-label="Supprimer">🗑️</button>
                                     </form>
                                 </div>
                             </td>

@@ -111,6 +111,14 @@ a:hover { text-decoration: underline; }
 .btn--secondary:hover { background: #d5dbdb; }
 .btn--link { background: none; border: none; color: #fff; cursor: pointer; font: inherit; padding: 0; text-decoration: underline; }
 .btn--sm { padding: .3rem .75rem; font-size: .9rem; }
+.btn--icon {
+    padding: .3rem .45rem;
+    font-size: 1.1rem;
+    line-height: 1;
+    border-radius: 8px;
+    min-width: 2rem;
+    text-align: center;
+}
 
 /* ─── Flash messages ─── */
 .flash {
