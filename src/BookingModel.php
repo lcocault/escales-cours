@@ -71,17 +71,30 @@ class BookingModel
         return $stmt->fetchAll();
     }
 
-    public function create(int $userId, int $sessionId, bool $usedCredit = false): int
-    {
+    public function create(
+        int $userId,
+        int $sessionId,
+        bool $usedCredit = false,
+        string $childFirstName = '',
+        string $childLastName = '',
+        int $childAge = 0,
+        string $childAllergies = ''
+    ): int {
         $stmt = $this->db->prepare(
-            'INSERT INTO bookings (user_id, session_id, used_credit)
-             VALUES (:uid, :sid, :credit)
+            'INSERT INTO bookings
+                 (user_id, session_id, used_credit,
+                  child_first_name, child_last_name, child_age, child_allergies)
+             VALUES (:uid, :sid, :credit, :cfn, :cln, :cage, :callergies)
              RETURNING id'
         );
         $stmt->execute([
-            ':uid'    => $userId,
-            ':sid'    => $sessionId,
-            ':credit' => ($usedCredit ? 'TRUE' : 'FALSE'),
+            ':uid'        => $userId,
+            ':sid'        => $sessionId,
+            ':credit'     => ($usedCredit ? 'TRUE' : 'FALSE'),
+            ':cfn'        => $childFirstName,
+            ':cln'        => $childLastName,
+            ':cage'       => $childAge > 0 ? $childAge : null,
+            ':callergies' => $childAllergies !== '' ? $childAllergies : null,
         ]);
         return (int) $stmt->fetchColumn();
     }

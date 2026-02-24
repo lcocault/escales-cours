@@ -63,6 +63,10 @@ CREATE TABLE IF NOT EXISTS bookings (
     paid_at             TIMESTAMPTZ,
     used_credit         BOOLEAN     NOT NULL DEFAULT FALSE,
     confirmed_by_admin  BOOLEAN     NOT NULL DEFAULT FALSE,
+    child_first_name    VARCHAR(100),           -- first name of the child attending
+    child_last_name     VARCHAR(100),           -- last name of the child attending
+    child_age           INTEGER,                -- age of the child (may differ from session age category)
+    child_allergies     TEXT,                   -- food allergies (optional)
     created_at          TIMESTAMPTZ NOT NULL DEFAULT NOW(),
     UNIQUE (user_id, session_id)
 );
