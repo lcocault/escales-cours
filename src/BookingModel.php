@@ -44,7 +44,7 @@ class BookingModel
     public function getBySession(int $sessionId): array
     {
         $stmt = $this->db->prepare(
-            'SELECT b.*, u.first_name, u.last_name, u.email, u.phone, u.photo_consent
+            'SELECT b.*, u.first_name, u.last_name, u.email, u.phone, u.phone2, u.photo_consent
              FROM bookings b
              JOIN users u ON u.id = b.user_id
              WHERE b.session_id = :sid

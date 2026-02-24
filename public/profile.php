@@ -18,7 +18,8 @@ include ROOT_DIR . '/templates/header.php';
         <p><strong>Prénom :</strong> <?= e($user['first_name']) ?></p>
         <p><strong>Nom :</strong> <?= e($user['last_name']) ?></p>
         <p><strong>E-mail :</strong> <?= e($user['email']) ?></p>
-        <p><strong>Téléphone :</strong> <?= e($user['phone'] ?? '–') ?></p>
+        <p><strong>Téléphone du 1er parent :</strong> <?= e($user['phone'] ?? '–') ?></p>
+        <p><strong>Téléphone du 2e parent :</strong> <?= e($user['phone2'] ?? '–') ?></p>
         <p><strong>Autorisation photos :</strong> <?= $user['photo_consent'] ? '✅ Oui' : '❌ Non' ?></p>
         <p><strong>Crédits disponibles :</strong> <?= (int) $user['credits'] ?></p>
 
