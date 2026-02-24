@@ -31,13 +31,29 @@ include ROOT_DIR . '/templates/header.php';
     <section class="about-section">
         <div class="about-section__icon">👧👦</div>
         <div class="about-section__content">
-            <h2>Pour les enfants de 6 à 12 ans</h2>
+            <h2>Pour les enfants de 3 à 12 ans et les ados</h2>
             <p>
-                Les ateliers sont conçus pour accueillir des enfants de <strong>6 à 12 ans</strong>,
-                avec des activités adaptées à leur âge. Que votre enfant soit un futur grand chef ou
-                qu'il n'ait jamais tenu une spatule, il trouvera sa place dans une ambiance bienveillante
-                et joyeuse. Les groupes sont volontairement petits pour garantir un accompagnement
-                personnalisé et un moment convivial.
+                Les ateliers sont conçus pour accueillir les enfants et adolescents en trois tranches d'âge,
+                chacune avec des activités adaptées :
+            </p>
+            <ul class="about-list">
+                <li>
+                    <span class="about-list__icon">🌱</span>
+                    <span><strong>3 à 5 ans</strong> : des activités simples et sensorielles pour éveiller la curiosité des tout-petits.</span>
+                </li>
+                <li>
+                    <span class="about-list__icon">⭐</span>
+                    <span><strong>6 à 12 ans</strong> : des recettes accessibles pour développer autonomie et créativité.</span>
+                </li>
+                <li>
+                    <span class="about-list__icon">🚀</span>
+                    <span><strong>13 ans et +</strong> : des techniques plus élaborées pour les ados passionnés de cuisine.</span>
+                </li>
+            </ul>
+            <p>
+                Que votre enfant soit un futur grand chef ou qu'il n'ait jamais tenu une spatule,
+                il trouvera sa place dans une ambiance bienveillante et joyeuse. Les groupes sont
+                volontairement petits pour garantir un accompagnement personnalisé et un moment convivial.
             </p>
         </div>
     </section>
