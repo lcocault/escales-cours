@@ -35,7 +35,10 @@ include ROOT_DIR . '/templates/header.php';
             <table>
                 <thead>
                     <tr>
-                        <th>Participant</th>
+                        <th>Parent</th>
+                        <th>Enfant</th>
+                        <th>Âge</th>
+                        <th>Allergies</th>
                         <th>E-mail</th>
                         <th>Téléphone</th>
                         <th>Photos</th>
@@ -47,6 +50,9 @@ include ROOT_DIR . '/templates/header.php';
                     <?php foreach ($bookings as $b): ?>
                         <tr>
                             <td><?= e($b['first_name'] . ' ' . $b['last_name']) ?></td>
+                            <td><?= e(trim(($b['child_first_name'] ?? '') . ' ' . ($b['child_last_name'] ?? ''))) ?: '–' ?></td>
+                            <td><?= $b['child_age'] !== null ? (int) $b['child_age'] . ' ans' : '–' ?></td>
+                            <td><?= e($b['child_allergies'] ?? '–') ?></td>
                             <td><?= e($b['email']) ?></td>
                             <td><?= e($b['phone'] ?? '–') ?></td>
                             <td><?= $b['photo_consent'] ? '✅' : '❌' ?></td>
