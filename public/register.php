@@ -8,7 +8,7 @@ if (Auth::isLoggedIn()) {
 }
 
 $errors = [];
-$values = ['first_name' => '', 'last_name' => '', 'email' => '', 'phone' => ''];
+$values = ['first_name' => '', 'last_name' => '', 'email' => '', 'phone' => '', 'phone2' => ''];
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     Auth::verifyCsrf();
@@ -17,6 +17,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $values['last_name']    = trim($_POST['last_name']    ?? '');
     $values['email']        = trim($_POST['email']        ?? '');
     $values['phone']        = trim($_POST['phone']        ?? '');
+    $values['phone2']       = trim($_POST['phone2']       ?? '');
     $password               = $_POST['password']          ?? '';
     $passwordConfirm        = $_POST['password_confirm']  ?? '';
     $photoConsent           = isset($_POST['photo_consent']);
@@ -40,6 +41,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 'first_name'    => $values['first_name'],
                 'last_name'     => $values['last_name'],
                 'phone'         => $values['phone'] ?: null,
+                'phone2'        => $values['phone2'] ?: null,
                 'photo_consent' => $photoConsent,
             ]);
             flash('success', 'Compte créé ! Vous pouvez maintenant vous connecter.');
@@ -82,8 +84,12 @@ include ROOT_DIR . '/templates/header.php';
                 <input type="email" id="email" name="email" required value="<?= e($values['email']) ?>">
             </div>
             <div class="form-group">
-                <label for="phone">Téléphone</label>
+                <label for="phone">Téléphone du 1er parent</label>
                 <input type="tel" id="phone" name="phone" value="<?= e($values['phone']) ?>">
+            </div>
+            <div class="form-group">
+                <label for="phone2">Téléphone du 2e parent</label>
+                <input type="tel" id="phone2" name="phone2" value="<?= e($values['phone2']) ?>">
             </div>
             <div class="form-group">
                 <label for="password">Mot de passe *</label>

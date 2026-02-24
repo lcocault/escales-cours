@@ -33,8 +33,8 @@ class UserModel
     public function create(array $data): int
     {
         $stmt = $this->db->prepare(
-            'INSERT INTO users (email, password_hash, first_name, last_name, phone, photo_consent)
-             VALUES (:email, :password_hash, :first_name, :last_name, :phone, :photo_consent)
+            'INSERT INTO users (email, password_hash, first_name, last_name, phone, phone2, photo_consent)
+             VALUES (:email, :password_hash, :first_name, :last_name, :phone, :phone2, :photo_consent)
              RETURNING id'
         );
         $stmt->execute([
@@ -43,6 +43,7 @@ class UserModel
             ':first_name'    => $data['first_name'],
             ':last_name'     => $data['last_name'],
             ':phone'         => $data['phone'] ?? null,
+            ':phone2'        => $data['phone2'] ?? null,
             ':photo_consent' => ($data['photo_consent'] ? 'TRUE' : 'FALSE'),
         ]);
         return (int) $stmt->fetchColumn();

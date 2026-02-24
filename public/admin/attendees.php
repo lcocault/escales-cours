@@ -40,7 +40,8 @@ include ROOT_DIR . '/templates/header.php';
                         <th>Âge</th>
                         <th>Allergies</th>
                         <th>E-mail</th>
-                        <th>Téléphone</th>
+                        <th>Téléphone 1</th>
+                        <th>Téléphone 2</th>
                         <th>Photos</th>
                         <th>Statut</th>
                         <th>Actions</th>
@@ -55,6 +56,7 @@ include ROOT_DIR . '/templates/header.php';
                             <td><?= e($b['child_allergies'] ?? '–') ?></td>
                             <td><?= e($b['email']) ?></td>
                             <td><?= e($b['phone'] ?? '–') ?></td>
+                            <td><?= e($b['phone2'] ?? '–') ?></td>
                             <td><?= $b['photo_consent'] ? '✅' : '❌' ?></td>
                             <td><?= e($b['status']) ?></td>
                             <td>

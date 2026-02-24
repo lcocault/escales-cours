@@ -12,6 +12,7 @@ CREATE TABLE IF NOT EXISTS users (
     first_name      VARCHAR(100) NOT NULL,
     last_name       VARCHAR(100) NOT NULL,
     phone           VARCHAR(30),
+    phone2          VARCHAR(30),
     role            VARCHAR(20)  NOT NULL DEFAULT 'user' CHECK (role IN ('user', 'admin')),
     photo_consent   BOOLEAN      NOT NULL DEFAULT FALSE,
     credits         INTEGER      NOT NULL DEFAULT 0,
