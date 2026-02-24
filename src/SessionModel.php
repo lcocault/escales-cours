@@ -15,7 +15,7 @@ class SessionModel
     {
         $stmt = $this->db->query(
             "SELECT id, title, theme, session_date, start_time, end_time,
-                    max_attendees, remaining_seats, price_cents, summary
+                    max_attendees, remaining_seats, price_cents, summary, age_category
              FROM sessions
              WHERE session_date >= CURRENT_DATE AND deleted_at IS NULL AND status != 'cancelled'
              ORDER BY session_date ASC, start_time ASC"
@@ -48,11 +48,11 @@ class SessionModel
             'INSERT INTO sessions
                 (title, theme, session_date, start_time, end_time,
                  max_attendees, remaining_seats, price_cents,
-                 summary, objectives, theoretical_content, recipe)
+                 summary, objectives, theoretical_content, recipe, age_category)
              VALUES
                 (:title, :theme, :session_date, :start_time, :end_time,
                  :max_attendees, :max_attendees, :price_cents,
-                 :summary, :objectives, :theoretical_content, :recipe)
+                 :summary, :objectives, :theoretical_content, :recipe, :age_category)
              RETURNING id'
         );
         $stmt->execute([
@@ -67,6 +67,7 @@ class SessionModel
             ':objectives'          => $data['objectives'] ?? null,
             ':theoretical_content' => $data['theoretical_content'] ?? null,
             ':recipe'              => $data['recipe'] ?? null,
+            ':age_category'        => $data['age_category'] ?? '6-12',
         ]);
         return (int) $stmt->fetchColumn();
     }
@@ -79,7 +80,8 @@ class SessionModel
                 start_time = :start_time, end_time = :end_time,
                 max_attendees = :max_attendees, price_cents = :price_cents,
                 summary = :summary, objectives = :objectives,
-                theoretical_content = :theoretical_content, recipe = :recipe
+                theoretical_content = :theoretical_content, recipe = :recipe,
+                age_category = :age_category
              WHERE id = :id AND deleted_at IS NULL'
         );
         $stmt->execute([
@@ -94,6 +96,7 @@ class SessionModel
             ':objectives'          => $data['objectives'] ?? null,
             ':theoretical_content' => $data['theoretical_content'] ?? null,
             ':recipe'              => $data['recipe'] ?? null,
+            ':age_category'        => $data['age_category'] ?? '6-12',
             ':id'                  => $id,
         ]);
     }

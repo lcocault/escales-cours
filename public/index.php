@@ -65,6 +65,7 @@ include ROOT_DIR . '/templates/header.php';
                     </div>
                     <div class="session-card__body">
                         <p class="session-card__theme">🎨 <?= e($s['theme']) ?></p>
+                        <p class="session-card__age">👶 <?= e(ageCategoryLabel($s['age_category'] ?? '6-12')) ?></p>
                         <?php if ($s['summary']): ?>
                             <p class="session-card__summary"><?= e($s['summary']) ?></p>
                         <?php endif; ?>

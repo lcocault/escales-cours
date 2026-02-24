@@ -17,6 +17,7 @@ $defaults = [
     'end_time'            => '',
     'max_attendees'       => 10,
     'price_cents'         => 0,
+    'age_category'        => '6-12',
     'summary'             => '',
     'objectives'          => '',
     'theoretical_content' => '',
@@ -34,6 +35,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $values['end_time']            = trim($_POST['end_time']            ?? '');
     $values['max_attendees']       = (int) ($_POST['max_attendees']     ?? 0);
     $values['price_cents']         = (int) round((float) str_replace(',', '.', $_POST['price_euros'] ?? '0') * 100);
+    $values['age_category']        = trim($_POST['age_category']        ?? '6-12');
     $values['summary']             = trim($_POST['summary']             ?? '');
     $values['objectives']          = trim($_POST['objectives']          ?? '');
     $values['theoretical_content'] = trim($_POST['theoretical_content'] ?? '');
@@ -45,6 +47,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     if ($values['start_time'] === '')   $errors[] = 'L\'heure de début est obligatoire.';
     if ($values['end_time'] === '')     $errors[] = 'L\'heure de fin est obligatoire.';
     if ($values['max_attendees'] < 1)  $errors[] = 'Le nombre maximum de participants doit être ≥ 1.';
+    if (!in_array($values['age_category'], ['3-5', '6-12', '13+'], true)) $errors[] = 'La tranche d\'âge est invalide.';
 
     if (empty($errors)) {
         if ($isEdit) {
@@ -87,6 +90,14 @@ include ROOT_DIR . '/templates/header.php';
         <div class="form-group">
             <label for="theme">Thème *</label>
             <input type="text" id="theme" name="theme" required value="<?= e($values['theme']) ?>">
+        </div>
+        <div class="form-group">
+            <label for="age_category">Tranche d'âge *</label>
+            <select id="age_category" name="age_category" required>
+                <option value="3-5"  <?= $values['age_category'] === '3-5'  ? 'selected' : '' ?>>3 à 5 ans</option>
+                <option value="6-12" <?= $values['age_category'] === '6-12' ? 'selected' : '' ?>>6 à 12 ans</option>
+                <option value="13+"  <?= $values['age_category'] === '13+'  ? 'selected' : '' ?>>13 ans et +</option>
+            </select>
         </div>
         <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:1rem">
             <div class="form-group">

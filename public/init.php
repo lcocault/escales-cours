@@ -50,3 +50,14 @@ function formatDate(string $date): string
          . $months[(int) date('n', $ts)] . ' '
          . date('Y', $ts);
 }
+
+// Helper: convert an age_category value to a French label
+function ageCategoryLabel(string $category): string
+{
+    $labels = [
+        '3-5'  => '3 à 5 ans',
+        '6-12' => '6 à 12 ans',
+        '13+'  => '13 ans et +',
+    ];
+    return $labels[$category] ?? $category;
+}
