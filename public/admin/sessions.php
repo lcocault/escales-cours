@@ -58,6 +58,7 @@ include ROOT_DIR . '/templates/header.php';
                             <td>
                                 <div class="actions">
                                     <a href="<?= APP_BASE_URL ?>/admin/session-edit.php?id=<?= (int) $s['id'] ?>" class="btn btn--warning btn--sm">Modifier</a>
+                                    <a href="<?= APP_BASE_URL ?>/admin/session-edit.php?duplicate_from=<?= (int) $s['id'] ?>" class="btn btn--secondary btn--sm">Dupliquer</a>
                                     <a href="<?= APP_BASE_URL ?>/admin/attendees.php?session_id=<?= (int) $s['id'] ?>" class="btn btn--secondary btn--sm">Participants</a>
                                     <?php if (!in_array($s['status'] ?? 'pending', ['cancelled'], true)): ?>
                                     <form method="post" action="<?= APP_BASE_URL ?>/admin/session-cancel.php" onsubmit="return confirm('Annuler cette séance et rembourser tous les participants ?')">

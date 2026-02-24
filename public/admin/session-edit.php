@@ -5,8 +5,11 @@ Auth::requireAdmin();
 
 $sessionModel = new SessionModel();
 $id = isset($_GET['id']) ? (int) $_GET['id'] : 0;
+$duplicateFromId = isset($_GET['duplicate_from']) ? (int) $_GET['duplicate_from'] : 0;
 $session = $id ? $sessionModel->findById($id) : null;
+$sourceSession = (!$session && $duplicateFromId) ? $sessionModel->findById($duplicateFromId) : null;
 $isEdit  = (bool) $session;
+$isDuplicate = (bool) $sourceSession;
 $errors  = [];
 
 $defaults = [
@@ -23,7 +26,18 @@ $defaults = [
     'theoretical_content' => '',
     'recipe'              => '',
 ];
-$values = $isEdit ? array_merge($defaults, $session) : $defaults;
+if ($isEdit) {
+    $values = array_merge($defaults, $session);
+} elseif ($isDuplicate) {
+    $values = array_merge($defaults, $sourceSession, [
+        'session_date' => '',
+        'start_time'   => '',
+        'end_time'     => '',
+        'age_category' => $defaults['age_category'],
+    ]);
+} else {
+    $values = $defaults;
+}
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     Auth::verifyCsrf();
@@ -55,20 +69,20 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             flash('success', 'Séance modifiée avec succès.');
         } else {
             $sessionModel->create($values);
-            flash('success', 'Séance créée avec succès.');
+            flash('success', $isDuplicate ? 'Séance dupliquée avec succès.' : 'Séance créée avec succès.');
         }
         header('Location: ' . APP_BASE_URL . '/admin/sessions.php');
         exit;
     }
 }
 
-$pageTitle = $isEdit ? 'Modifier la séance' : 'Nouvelle séance';
+$pageTitle = $isEdit ? 'Modifier la séance' : ($isDuplicate ? 'Dupliquer la séance' : 'Nouvelle séance');
 include ROOT_DIR . '/templates/header.php';
 ?>
 <div class="container">
     <?php include ROOT_DIR . '/templates/flash.php'; ?>
 
-    <h1 class="page-title"><?= $isEdit ? '✏️ Modifier la séance' : '➕ Nouvelle séance' ?></h1>
+    <h1 class="page-title"><?= $isEdit ? '✏️ Modifier la séance' : ($isDuplicate ? '📋 Dupliquer la séance' : '➕ Nouvelle séance') ?></h1>
 
     <?php if ($errors): ?>
         <div class="flash flash--error">
@@ -142,7 +156,7 @@ include ROOT_DIR . '/templates/header.php';
         </div>
 
         <div style="display:flex;gap:1rem;margin-top:1.5rem">
-            <button type="submit" class="btn btn--primary"><?= $isEdit ? 'Enregistrer' : 'Créer la séance' ?></button>
+            <button type="submit" class="btn btn--primary"><?= $isEdit ? 'Enregistrer' : ($isDuplicate ? 'Créer la copie' : 'Créer la séance') ?></button>
             <a href="<?= APP_BASE_URL ?>/admin/sessions.php" class="btn btn--secondary">Annuler</a>
         </div>
     </form>
