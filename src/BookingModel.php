@@ -99,6 +99,14 @@ class BookingModel
         return (int) $stmt->fetchColumn();
     }
 
+    public function storePaymentRef(int $bookingId, string $ref): void
+    {
+        $stmt = $this->db->prepare(
+            'UPDATE bookings SET payment_intent_id = :ref WHERE id = :id'
+        );
+        $stmt->execute([':ref' => $ref, ':id' => $bookingId]);
+    }
+
     public function confirm(int $bookingId, string $paymentIntentId): void
     {
         $stmt = $this->db->prepare(

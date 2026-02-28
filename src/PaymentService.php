@@ -8,18 +8,21 @@ use Square\Checkout\PaymentLinks\Requests\CreatePaymentLinkRequest;
 use Square\Types\QuickPay;
 use Square\Types\Money;
 use Square\Payments\Requests\GetPaymentsRequest;
+use Square\Orders\Requests\GetOrdersRequest;
 use Square\Refunds\Requests\RefundPaymentRequest;
 
 class PaymentService
 {
     /**
-     * Creates a checkout URL for the given booking and redirects the user to it.
+     * Creates a checkout URL for the given booking.
      *
      * @param int    $bookingId     The booking record ID (used as reference and in return URLs).
      * @param string $itemName      Human-readable name of the item being paid for.
      * @param int    $amountCents   Price in the smallest currency unit (e.g. euro cents).
      * @param string $currency      ISO 4217 currency code (e.g. "eur", "usd").
-     * @return string               The redirect URL of the hosted payment page.
+     * @return array{url: string, squareOrderId: ?string}
+     *              url           – The redirect URL of the hosted payment page.
+     *              squareOrderId – The Square Order ID created with the link (Square only), or null.
      * @throws RuntimeException     If the configured provider is unsupported or misconfigured.
      */
     public static function createCheckoutUrl(
@@ -27,7 +30,7 @@ class PaymentService
         string $itemName,
         int $amountCents,
         string $currency
-    ): string {
+    ): array {
         $provider = defined('PAYMENT_PROVIDER') ? strtolower(PAYMENT_PROVIDER) : 'stripe';
 
         return match ($provider) {
@@ -88,10 +91,10 @@ class PaymentService
         string $itemName,
         int $amountCents,
         string $currency
-    ): string {
+    ): array {
         if (!defined('STRIPE_SECRET_KEY') || STRIPE_SECRET_KEY === '' || STRIPE_SECRET_KEY === 'sk_test_...') {
             // Stripe is not configured – fall back to demo mode.
-            return APP_BASE_URL . '/payment_success.php?booking_id=' . $bookingId . '&_demo=1';
+            return ['url' => APP_BASE_URL . '/payment_success.php?booking_id=' . $bookingId . '&_demo=1', 'squareOrderId' => null];
         }
 
         \Stripe\Stripe::setApiKey(STRIPE_SECRET_KEY);
@@ -113,7 +116,7 @@ class PaymentService
             'metadata'    => ['booking_id' => $bookingId],
         ]);
 
-        return $session->url;
+        return ['url' => $session->url, 'squareOrderId' => null];
     }
 
     // -------------------------------------------------------------------------
@@ -125,10 +128,10 @@ class PaymentService
         string $itemName,
         int $amountCents,
         string $currency
-    ): string {
+    ): array {
         if (!defined('SQUARE_ACCESS_TOKEN') || SQUARE_ACCESS_TOKEN === '' || SQUARE_ACCESS_TOKEN === 'EAAAl...') {
             // Square is not configured – fall back to demo mode.
-            return APP_BASE_URL . '/payment_success.php?booking_id=' . $bookingId . '&_demo=1';
+            return ['url' => APP_BASE_URL . '/payment_success.php?booking_id=' . $bookingId . '&_demo=1', 'squareOrderId' => null];
         }
 
         $environment = (defined('SQUARE_ENVIRONMENT') && SQUARE_ENVIRONMENT === 'production')
@@ -163,7 +166,7 @@ class PaymentService
             throw new RuntimeException('Square did not return a payment link URL.');
         }
 
-        return $link->getUrl();
+        return ['url' => $link->getUrl(), 'squareOrderId' => $link->getOrderId()];
     }
 
     // -------------------------------------------------------------------------
@@ -198,6 +201,31 @@ class PaymentService
             token: SQUARE_ACCESS_TOKEN,
             options: ['baseUrl' => $environment],
         );
+
+        if (str_starts_with($paymentIntentId, 'sq_order_')) {
+            // Payment was tracked by Square order ID; resolve tender payment IDs from the order.
+            $orderId = substr($paymentIntentId, strlen('sq_order_'));
+            $orderResponse = $client->orders->get(
+                new GetOrdersRequest(['orderId' => $orderId])
+            );
+            $order = $orderResponse->getOrder();
+
+            if ($order === null) {
+                throw new RuntimeException('Square order not found: ' . $orderId);
+            }
+
+            foreach ($order->getTenders() ?? [] as $tender) {
+                $tenderPaymentId = $tender->getPaymentId();
+                if ($tenderPaymentId !== null) {
+                    $client->refunds->refundPayment(new RefundPaymentRequest([
+                        'idempotencyKey' => bin2hex(random_bytes(16)),
+                        'amountMoney'    => $tender->getAmountMoney(),
+                        'paymentId'      => $tenderPaymentId,
+                    ]));
+                }
+            }
+            return;
+        }
 
         // Retrieve the original payment to get the amount to refund.
         $paymentResponse = $client->payments->get(

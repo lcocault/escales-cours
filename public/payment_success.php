@@ -19,9 +19,13 @@ if (!$booking || (int) $booking['user_id'] !== Auth::currentUserId()) {
 if ($booking['status'] === 'pending') {
     // In production: validate via webhook (Stripe: payment_intent, Square: order.fulfillment.updated).
     // Here we confirm immediately, relying on the provider's hosted page having completed payment.
+    // If a Square order ID was pre-stored (set in book.php before redirecting), preserve it.
+    $preStoredRef = (string) ($booking['payment_intent_id'] ?? '');
     $paymentRef = $isDemo
         ? 'demo_' . $bookingId
-        : ($_GET['payment_intent'] ?? $_GET['referenceId'] ?? 'paid_' . $bookingId);
+        : ($preStoredRef !== ''
+            ? $preStoredRef
+            : ($_GET['payment_intent'] ?? $_GET['referenceId'] ?? 'paid_' . $bookingId));
     $bookingModel->confirm($bookingId, $paymentRef);
 
     $sessionModel = new SessionModel();
