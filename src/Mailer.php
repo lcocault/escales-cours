@@ -117,6 +117,9 @@ class Mailer
         <p>Bonjour {$name},</p>
         <p>Votre réservation pour la session <strong>{$title}</strong> est confirmée.</p>
         <p>📅 Date : {$date}<br>🕐 Horaires : {$start} – {$end}</p>
+        <p>📍 L'atelier se déroule au :<br>
+           <strong>Les Escales Culinaires</strong><br>
+           36 rue Boieldieu, 31300 Toulouse</p>
         <p>Vous recevrez le contenu détaillé après la session.</p>
         <p>À bientôt aux Escales Culinaires !</p>
         <p><a href="{$baseUrl}/my-sessions.php">Voir mes réservations</a></p>

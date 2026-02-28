@@ -131,6 +131,30 @@ include ROOT_DIR . '/templates/header.php';
         </div>
     </section>
 
+    <!-- Où nous trouver -->
+    <section class="about-section">
+        <div class="about-section__icon">📍</div>
+        <div class="about-section__content">
+            <h2>Où nous trouver ?</h2>
+            <p>Les ateliers se déroulent au :</p>
+            <address class="about-address">
+                <strong>Les Escales Culinaires</strong><br>
+                36 rue Boieldieu<br>
+                31300 Toulouse<br>
+                France
+            </address>
+            <p class="mt-1">
+                📞 <a href="tel:+33650071091">06 50 07 10 91</a><br>
+                ✉️ <a href="mailto:les.escales.culinaires@gmail.com">les.escales.culinaires@gmail.com</a>
+            </p>
+            <p class="mt-1 about-owner">
+                Les Escales Culinaires sont animées par <strong>Emmanuelle Du Puy De Goyne</strong>,
+                auto-entrepreneur. Les prix indiqués sur le site sont en euros TTC
+                (art.&nbsp;293&nbsp;B du CGI).
+            </p>
+        </div>
+    </section>
+
     <!-- Call to action -->
     <section class="about-cta">
         <h2>Prêt à embarquer ?</h2>
