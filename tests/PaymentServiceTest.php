@@ -34,11 +34,13 @@ class PaymentServiceTest extends TestCase
         define('PAYMENT_PROVIDER', 'stripe');
         define('STRIPE_SECRET_KEY', 'sk_test_...');
 
-        $url = PaymentService::createCheckoutUrl(42, 'Cours de Pain', 6500, 'eur');
+        $result = PaymentService::createCheckoutUrl(42, 'Cours de Pain', 6500, 'eur');
 
-        $this->assertStringContainsString('/payment_success.php', $url);
-        $this->assertStringContainsString('booking_id=42', $url);
-        $this->assertStringContainsString('_demo=1', $url);
+        $this->assertIsArray($result);
+        $this->assertStringContainsString('/payment_success.php', $result['url']);
+        $this->assertStringContainsString('booking_id=42', $result['url']);
+        $this->assertStringContainsString('_demo=1', $result['url']);
+        $this->assertNull($result['squareOrderId']);
     }
 
     // -------------------------------------------------------------------------
@@ -52,11 +54,13 @@ class PaymentServiceTest extends TestCase
         define('SQUARE_LOCATION_ID', 'test_loc');
         define('SQUARE_ENVIRONMENT', 'sandbox');
 
-        $url = PaymentService::createCheckoutUrl(7, 'Cours de Pâtisserie', 7500, 'eur');
+        $result = PaymentService::createCheckoutUrl(7, 'Cours de Pâtisserie', 7500, 'eur');
 
-        $this->assertStringContainsString('/payment_success.php', $url);
-        $this->assertStringContainsString('booking_id=7', $url);
-        $this->assertStringContainsString('_demo=1', $url);
+        $this->assertIsArray($result);
+        $this->assertStringContainsString('/payment_success.php', $result['url']);
+        $this->assertStringContainsString('booking_id=7', $result['url']);
+        $this->assertStringContainsString('_demo=1', $result['url']);
+        $this->assertNull($result['squareOrderId']);
     }
 
     // -------------------------------------------------------------------------
@@ -82,10 +86,12 @@ class PaymentServiceTest extends TestCase
         // PAYMENT_PROVIDER intentionally not defined.
         define('STRIPE_SECRET_KEY', 'sk_test_...');
 
-        $url = PaymentService::createCheckoutUrl(99, 'Cours', 8000, 'eur');
+        $result = PaymentService::createCheckoutUrl(99, 'Cours', 8000, 'eur');
 
-        $this->assertStringContainsString('_demo=1', $url);
-        $this->assertStringContainsString('booking_id=99', $url);
+        $this->assertIsArray($result);
+        $this->assertStringContainsString('_demo=1', $result['url']);
+        $this->assertStringContainsString('booking_id=99', $result['url']);
+        $this->assertNull($result['squareOrderId']);
     }
 
     // -------------------------------------------------------------------------
@@ -148,5 +154,6 @@ class PaymentServiceTest extends TestCase
     {
         $this->assertTrue(PaymentService::isRealPaymentRef('pi_3AbCdEfGhIjKlMnO'));
         $this->assertTrue(PaymentService::isRealPaymentRef('sq_payment_abc123'));
+        $this->assertTrue(PaymentService::isRealPaymentRef('sq_order_ORDER123XYZ'));
     }
 }

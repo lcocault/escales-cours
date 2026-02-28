@@ -140,4 +140,47 @@ class SessionCancelTest extends TestCase
     {
         $this->assertTrue(PaymentService::isRealPaymentRef('pi_3NxYj2CZ12345678'));
     }
+
+    // -------------------------------------------------------------------------
+    // BookingModel::storePaymentRef()
+    // -------------------------------------------------------------------------
+
+    public function testStorePaymentRefUpdatesPaymentIntentId(): void
+    {
+        $capturedSql    = '';
+        $capturedParams = [];
+
+        $stmt = $this->createMock(PDOStatement::class);
+        $stmt->method('execute')
+            ->willReturnCallback(function (array $params) use (&$capturedParams) {
+                $capturedParams = $params;
+                return true;
+            });
+
+        $pdo = $this->createMock(PDO::class);
+        $pdo->method('prepare')
+            ->willReturnCallback(function (string $sql) use (&$capturedSql, $stmt) {
+                $capturedSql = $sql;
+                return $stmt;
+            });
+
+        $this->injectPdo($pdo);
+
+        $model = new BookingModel();
+        $model->storePaymentRef(42, 'sq_order_ORDER123XYZ');
+
+        $this->assertStringContainsString('payment_intent_id', $capturedSql);
+        $this->assertStringContainsString('UPDATE bookings', $capturedSql);
+        $this->assertSame('sq_order_ORDER123XYZ', $capturedParams[':ref']);
+        $this->assertSame(42, $capturedParams[':id']);
+    }
+
+    // -------------------------------------------------------------------------
+    // PaymentService::isRealPaymentRef() – sq_order_ prefix
+    // -------------------------------------------------------------------------
+
+    public function testIsRealPaymentRefReturnsTrueForSquareOrderRef(): void
+    {
+        $this->assertTrue(PaymentService::isRealPaymentRef('sq_order_ORDER123XYZ'));
+    }
 }

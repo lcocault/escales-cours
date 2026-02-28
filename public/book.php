@@ -88,7 +88,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
         // Redirect to payment provider checkout
         try {
-            $checkoutUrl = PaymentService::createCheckoutUrl(
+            $checkout = PaymentService::createCheckoutUrl(
                 $bookingId,
                 $session['title'],
                 (int) $session['price_cents'],
@@ -100,7 +100,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             header('Location: ' . APP_BASE_URL . '/session.php?id=' . $sessionId);
             exit;
         }
-        header('Location: ' . $checkoutUrl);
+
+        // Store the Square order ID before redirecting so we can refund later if needed.
+        if (!empty($checkout['squareOrderId'])) {
+            $bookingModel->storePaymentRef($bookingId, 'sq_order_' . $checkout['squareOrderId']);
+        }
+
+        header('Location: ' . $checkout['url']);
         exit;
     }
 }
