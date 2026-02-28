@@ -120,6 +120,8 @@ class Mailer
         <p>📍 L'atelier se déroule au :<br>
            <strong>Les Escales Culinaires</strong><br>
            36 rue Boieldieu, 31300 Toulouse</p>
+        <p>⏰ Merci d'amener votre enfant <strong>10 minutes avant le début</strong> de la séance
+           et de le récupérer dans les <strong>10 minutes suivant la fin</strong>.</p>
         <p>Vous recevrez le contenu détaillé après la session.</p>
         <p>À bientôt aux Escales Culinaires !</p>
         <p><a href="{$baseUrl}/my-sessions.php">Voir mes réservations</a></p>

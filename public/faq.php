@@ -74,6 +74,18 @@ include ROOT_DIR . '/templates/header.php';
         </details>
 
         <details class="faq-item">
+            <summary class="faq-item__question">À quelle heure déposer et récupérer mon enfant ?</summary>
+            <div class="faq-item__answer">
+                <p>
+                    Merci d'amener votre enfant <strong>10 minutes avant le début de la séance</strong>
+                    afin que l'atelier puisse commencer à l'heure.
+                    Le parent (ou son représentant) doit récupérer l'enfant dans les
+                    <strong>10 minutes suivant la fin de la séance</strong>.
+                </p>
+            </div>
+        </details>
+
+        <details class="faq-item">
             <summary class="faq-item__question">Comment est structurée une séance ?</summary>
             <div class="faq-item__answer">
                 <p>Chaque atelier se déroule en deux temps :</p>

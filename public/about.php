@@ -152,6 +152,10 @@ include ROOT_DIR . '/templates/header.php';
                 auto-entrepreneur. Les prix indiqués sur le site sont en euros TTC
                 (art.&nbsp;293&nbsp;B du CGI).
             </p>
+            <p class="mt-1">
+                ⏰ Merci d'amener votre enfant <strong>10 minutes avant le début</strong> de la séance
+                et de le récupérer dans les <strong>10 minutes suivant la fin</strong>.
+            </p>
         </div>
     </section>
 
