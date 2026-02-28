@@ -2,9 +2,9 @@ name: CI / Deploy to AlwaysData
 
 on:
   push:
-    branches: [main]
+    branches: [main, develop]
   pull_request:
-    branches: [main]
+    branches: [main, develop]
   workflow_dispatch:
 
 permissions:
@@ -34,7 +34,7 @@ jobs:
         run: ./vendor/bin/phpunit
 
   # ──────────────────────────────────────────────────────────────────────────
-  # Job 2 – Deploy to AlwaysData (only on push to main, after tests pass)
+  # Job 2 – Deploy to AlwaysData production (only on push to main, after tests pass)
   #
   # Required repository secrets:
   #   ALWAYSDATA_SSH_HOST        – SSH hostname, e.g. ssh-username.alwaysdata.net
@@ -96,6 +96,81 @@ jobs:
       - name: Smoke test
         run: |
           url="${{ secrets.APP_BASE_URL }}/health.php"
+          for i in 1 2 3 4 5; do
+            response=$(curl -sf --max-time 10 "$url" 2>/dev/null) && break
+            echo "Attempt $i failed, retrying in 5 s…"
+            sleep 5
+          done
+          if [ -z "$response" ]; then
+            echo "Smoke test FAILED: $url did not respond after 5 attempts."
+            exit 1
+          fi
+          echo "$response" | grep -q '"status":"ok"' || {
+            echo "Smoke test FAILED: unexpected response: $response"
+            exit 1
+          }
+          echo "Smoke test passed ✓"
+
+  # ──────────────────────────────────────────────────────────────────────────
+  # Job 3 – Deploy to AlwaysData preproduction (only on push to develop, after tests pass)
+  #
+  # Reuses the same SSH credentials as production.
+  # Additional required repository secrets:
+  #   ALWAYSDATA_PREPROD_REMOTE_PATH – Absolute remote path for the preprod folder,
+  #                                    e.g. /home/username/preprod
+  #   PREPROD_APP_BASE_URL           – Public HTTPS URL of the preprod site (no trailing slash),
+  #                                    e.g. https://preprod.escales-cours.alwaysdata.net
+  #                                    Used by the post-deploy smoke test.
+  # ──────────────────────────────────────────────────────────────────────────
+  deploy_preprod:
+    needs: test
+    runs-on: ubuntu-latest
+    if: github.event_name == 'push' && github.ref == 'refs/heads/develop'
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.2'
+          extensions: pdo, pdo_pgsql
+          coverage: none
+
+      - name: Install production dependencies
+        run: composer install --prefer-dist --no-progress --no-interaction --no-dev --optimize-autoloader
+
+      - name: Setup SSH key
+        run: |
+          mkdir -p ~/.ssh
+          printf '%s\n' "${{ secrets.ALWAYSDATA_SSH_KEY }}" > ~/.ssh/id_rsa
+          chmod 600 ~/.ssh/id_rsa
+          printf '%s\n' "${{ secrets.ALWAYSDATA_SSH_KNOWN_HOSTS }}" >> ~/.ssh/known_hosts
+
+      - name: Verify SSH connectivity
+        run: |
+          ssh -i ~/.ssh/id_rsa \
+              -o StrictHostKeyChecking=yes \
+              -o BatchMode=yes \
+              "${{ secrets.ALWAYSDATA_SSH_USER }}@${{ secrets.ALWAYSDATA_SSH_HOST }}" \
+              "echo 'SSH connection OK'"
+
+      - name: Deploy via rsync
+        run: |
+          rsync -azv --delete \
+            --exclude='.git/' \
+            --exclude='.github/' \
+            --exclude='tests/' \
+            --exclude='phpunit.xml' \
+            --exclude='composer.json' \
+            --exclude='composer.lock' \
+            --exclude='config/config.php' \
+            -e "ssh -i ~/.ssh/id_rsa -o StrictHostKeyChecking=yes" \
+            ./ "${{ secrets.ALWAYSDATA_SSH_USER }}@${{ secrets.ALWAYSDATA_SSH_HOST }}:${{ secrets.ALWAYSDATA_PREPROD_REMOTE_PATH }}/"
+
+      - name: Smoke test
+        run: |
+          url="${{ secrets.PREPROD_APP_BASE_URL }}/health.php"
           for i in 1 2 3 4 5; do
             response=$(curl -sf --max-time 10 "$url" 2>/dev/null) && break
             echo "Attempt $i failed, retrying in 5 s…"
