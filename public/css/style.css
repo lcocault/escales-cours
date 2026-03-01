@@ -68,6 +68,19 @@ a:hover { text-decoration: underline; }
 }
 .logo-icon { font-size: 2rem; }
 
+/* Header logo image */
+.site-logo {
+    height: 56px;
+    max-height: 56px;
+    width: auto;
+    display: block;
+    border-radius: 6px;
+    object-fit: contain;
+}
+.site-header__logo .logo-text {
+    line-height: 1;
+}
+
 /* ─── Nav ─── */
 .site-nav__list {
     list-style: none;

@@ -2,9 +2,9 @@ name: CI / Deploy to AlwaysData
 
 on:
   push:
-    branches: [main]
+    branches: [main, develop]
   pull_request:
-    branches: [main]
+    branches: [main, develop]
   workflow_dispatch:
 
 permissions:
@@ -34,23 +34,27 @@ jobs:
         run: ./vendor/bin/phpunit
 
   # ──────────────────────────────────────────────────────────────────────────
-  # Job 2 – Deploy to AlwaysData (only on push to main, after tests pass)
+  # Job 2 – Deploy to AlwaysData production (only on push to main, after tests pass)
   #
   # Required repository secrets:
   #   ALWAYSDATA_SSH_HOST        – SSH hostname, e.g. ssh-username.alwaysdata.net
   #   ALWAYSDATA_SSH_USER        – SSH login username
   #   ALWAYSDATA_SSH_KEY         – Private SSH key (PEM format, entire file content)
   #   ALWAYSDATA_REMOTE_PATH     – Absolute remote path, e.g. /home/username/www
+  #   ALWAYSDATA_PREPROD_REMOTE_PATH – Absolute remote path for preprod (develop
+  #                                     branch), e.g. /home/username/preprod
   #   ALWAYSDATA_SSH_KNOWN_HOSTS – Verified host key line from `ssh-keyscan <host>`
   #                                Run once locally and store the output as a secret.
   #   APP_BASE_URL               – Public HTTPS URL of the site (no trailing slash),
   #                                e.g. https://escales-cours.alwaysdata.net
   #                                Used by the post-deploy smoke test.
+  #   PREPROD_APP_BASE_URL       – Public HTTPS URL of the preprod site (develop branch),
+  #                                e.g. https://preprod-escales-cours.alwaysdata.net/test
   # ──────────────────────────────────────────────────────────────────────────
   deploy:
     needs: test
     runs-on: ubuntu-latest
-    if: (github.event_name == 'push' && github.ref == 'refs/heads/main') || github.event_name == 'workflow_dispatch'
+    if: github.event_name == 'workflow_dispatch' || (github.event_name == 'push' && (github.ref == 'refs/heads/main' || github.ref == 'refs/heads/develop'))
 
     steps:
       - uses: actions/checkout@v4
@@ -80,6 +84,21 @@ jobs:
               "${{ secrets.ALWAYSDATA_SSH_USER }}@${{ secrets.ALWAYSDATA_SSH_HOST }}" \
               "echo 'SSH connection OK'"
 
+      - name: Determine deploy target
+        run: |
+          branch=${GITHUB_REF#refs/heads/}
+          echo "Detected branch: $branch"
+          if [ "$branch" = "main" ]; then
+            echo "REMOTE_PATH=${{ secrets.ALWAYSDATA_REMOTE_PATH }}" >> $GITHUB_ENV
+            echo "APP_URL=${{ secrets.APP_BASE_URL }}" >> $GITHUB_ENV
+          elif [ "$branch" = "develop" ]; then
+            echo "REMOTE_PATH=${{ secrets.ALWAYSDATA_PREPROD_REMOTE_PATH }}" >> $GITHUB_ENV
+            echo "APP_URL=${{ secrets.PREPROD_APP_BASE_URL }}" >> $GITHUB_ENV
+          else
+            echo "Ref $GITHUB_REF is not a deployable branch (main|develop)." >&2
+            exit 1
+          fi
+
       - name: Deploy via rsync
         run: |
           rsync -azv --delete \
@@ -91,11 +110,11 @@ jobs:
             --exclude='composer.lock' \
             --exclude='config/config.php' \
             -e "ssh -i ~/.ssh/id_rsa -o StrictHostKeyChecking=yes" \
-            ./ "${{ secrets.ALWAYSDATA_SSH_USER }}@${{ secrets.ALWAYSDATA_SSH_HOST }}:${{ secrets.ALWAYSDATA_REMOTE_PATH }}/"
+            ./ "${{ secrets.ALWAYSDATA_SSH_USER }}@${{ secrets.ALWAYSDATA_SSH_HOST }}:$REMOTE_PATH/"
 
       - name: Smoke test
         run: |
-          url="${{ secrets.APP_BASE_URL }}/health.php"
+          url="$APP_URL/health.php"
           for i in 1 2 3 4 5; do
             response=$(curl -sf --max-time 10 "$url" 2>/dev/null) && break
             echo "Attempt $i failed, retrying in 5 s…"
@@ -110,3 +129,5 @@ jobs:
             exit 1
           }
           echo "Smoke test passed ✓"
+
+  # End of jobs
