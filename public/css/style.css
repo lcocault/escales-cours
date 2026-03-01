@@ -70,8 +70,8 @@ a:hover { text-decoration: underline; }
 
 /* Header logo image */
 .site-logo {
-    height: 56px;
-    max-height: 56px;
+    height: 28px;
+    max-height: 28px;
     width: auto;
     display: block;
     border-radius: 6px;
