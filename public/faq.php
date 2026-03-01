@@ -67,8 +67,27 @@ include ROOT_DIR . '/templates/header.php';
             <div class="faq-item__answer">
                 <p>
                     Oui, vous pouvez annuler votre réservation depuis la rubrique
-                    « Mes réservations » de votre espace personnel. Le remboursement sera traité
-                    sous quelques jours ouvrés.
+                    « Mes réservations » de votre espace personnel,
+                    <strong>jusqu'à 48 heures avant le début de la séance</strong>.
+                    Passé ce délai, l'annulation n'est plus possible en ligne.
+                </p>
+                <p>
+                    En cas d'annulation, vous recevrez une confirmation par e-mail et le
+                    remboursement sera effectué sous quelques jours ouvrés.
+                </p>
+            </div>
+        </details>
+
+        <details class="faq-item">
+            <summary class="faq-item__question">La séance peut-elle être annulée par l'organisatrice ?</summary>
+            <div class="faq-item__answer">
+                <p>
+                    Si, <strong>24 heures avant une séance</strong>, le nombre de participants inscrits
+                    est inférieur à deux, l'organisatrice se réserve le droit d'annuler la séance.
+                </p>
+                <p>
+                    Dans ce cas, chaque participant est notifié par e-mail et intégralement remboursé
+                    dans un délai de quelques jours ouvrés.
                 </p>
             </div>
         </details>
