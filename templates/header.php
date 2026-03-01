@@ -16,7 +16,7 @@ Auth::start();
 <header class="site-header">
     <div class="site-header__inner container">
         <a class="site-header__logo" href="<?= APP_BASE_URL ?>/">
-            <span class="logo-icon" aria-hidden="true">🍳</span>
+            <img src="<?= APP_BASE_URL ?>/img/header.png" alt="Les Escales Culinaires" class="site-logo" onerror="this.style.display='none'">
             <span class="logo-text">Escales Culinaires</span>
         </a>
         <nav class="site-nav" aria-label="Navigation principale">
