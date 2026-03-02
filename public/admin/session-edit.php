@@ -21,6 +21,7 @@ $defaults = [
     'max_attendees'       => 10,
     'price_cents'         => 0,
     'age_category'        => '6-12',
+    'is_private'          => false,
     'summary'             => '',
     'objectives'          => '',
     'theoretical_content' => '',
@@ -50,6 +51,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $values['max_attendees']       = (int) ($_POST['max_attendees']     ?? 0);
     $values['price_cents']         = (int) round((float) str_replace(',', '.', $_POST['price_euros'] ?? '0') * 100);
     $values['age_category']        = trim($_POST['age_category']        ?? '6-12');
+    $values['is_private']          = isset($_POST['is_private']);
     $values['summary']             = trim($_POST['summary']             ?? '');
     $values['objectives']          = trim($_POST['objectives']          ?? '');
     $values['theoretical_content'] = trim($_POST['theoretical_content'] ?? '');
@@ -137,6 +139,10 @@ include ROOT_DIR . '/templates/header.php';
                 <input type="number" id="price_euros" name="price_euros" required min="0" step="0.01"
                        value="<?= number_format((int) $values['price_cents'] / 100, 2, '.', '') ?>">
             </div>
+        </div>
+        <div class="form-group form-group--checkbox">
+            <input type="checkbox" id="is_private" name="is_private" value="1" <?= !empty($values['is_private']) ? 'checked' : '' ?>>
+            <label for="is_private">🔒 Séance privée (réservée aux membres autorisés)</label>
         </div>
         <div class="form-group">
             <label for="summary">Résumé (public)</label>

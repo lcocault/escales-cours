@@ -66,6 +66,15 @@ class Mailer
         self::send($user['email'], $subject, $body);
     }
 
+    public static function sendPrivateSessionInvitation(
+        array $user,
+        array $session
+    ): void {
+        $subject = 'Invitation – ' . $session['title'];
+        $body    = self::privateSessionInvitationBody($user, $session);
+        self::send($user['email'], $subject, $body);
+    }
+
     private static function sessionConfirmationBody(array $user, array $session): string
     {
         $name    = htmlspecialchars($user['first_name'] . ' ' . $user['last_name']);
@@ -180,6 +189,26 @@ class Mailer
           <li>Participant : {$name} ({$email})</li>
         </ul>
         <p><a href="{$baseUrl}/admin/attendees.php?session_id={$session['id']}">Voir les participants</a></p>
+        HTML;
+    }
+
+    private static function privateSessionInvitationBody(array $user, array $session): string
+    {
+        $name    = htmlspecialchars($user['first_name'] . ' ' . $user['last_name']);
+        $title   = htmlspecialchars($session['title']);
+        $date    = htmlspecialchars($session['session_date']);
+        $start   = htmlspecialchars($session['start_time']);
+        $end     = htmlspecialchars($session['end_time']);
+        $baseUrl = APP_BASE_URL;
+        $sessionUrl = $baseUrl . '/session.php?id=' . (int) $session['id'];
+
+        return <<<HTML
+        <p>Bonjour {$name},</p>
+        <p>Vous avez été invité(e) à participer à la séance privée <strong>{$title}</strong>.</p>
+        <p>📅 Date : {$date}<br>🕐 Horaires : {$start} – {$end}</p>
+        <p>Pour réserver votre place, cliquez sur le lien ci-dessous :</p>
+        <p><a href="{$sessionUrl}">Voir la séance et réserver</a></p>
+        <p>À bientôt aux Escales Culinaires !</p>
         HTML;
     }
 }
