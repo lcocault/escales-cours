@@ -39,9 +39,19 @@ CREATE TABLE IF NOT EXISTS sessions (
     objectives          TEXT,           -- pedagogic objectives (shown post-session)
     theoretical_content TEXT,           -- theoretical part (shown post-session)
     recipe              TEXT,           -- practical recipe (shown post-session)
+    is_private          BOOLEAN         NOT NULL DEFAULT FALSE,
     created_at          TIMESTAMPTZ     NOT NULL DEFAULT NOW(),
     deleted_at          TIMESTAMPTZ,
     CONSTRAINT remaining_lte_max CHECK (remaining_seats <= max_attendees)
+);
+
+-- Session allowances (users allowed to register for private sessions) ----
+CREATE TABLE IF NOT EXISTS session_allowances (
+    id          SERIAL PRIMARY KEY,
+    session_id  INTEGER     NOT NULL REFERENCES sessions(id) ON DELETE CASCADE,
+    user_id     INTEGER     NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+    created_at  TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+    UNIQUE (session_id, user_id)
 );
 
 -- Session media (photos, post-session) ------------------------

@@ -4,7 +4,7 @@ require_once __DIR__ . '/init.php';
 
 $pageTitle      = 'Séances à venir';
 $sessionModel   = new SessionModel();
-$sessions       = $sessionModel->getUpcoming();
+$sessions       = $sessionModel->getUpcoming(Auth::isLoggedIn() ? Auth::currentUserId() : null);
 $messageModel   = new GeneralMessageModel();
 $generalMessages = $messageModel->getAll();
 
@@ -62,7 +62,7 @@ include ROOT_DIR . '/templates/header.php';
                 <article class="session-card">
                     <div class="session-card__header">
                         <p class="session-card__date"><?= e(formatDate($s['session_date'])) ?></p>
-                        <h2 class="session-card__title"><?= e($s['title']) ?></h2>
+                        <h2 class="session-card__title"><?= e($s['title']) ?><?php if (!empty($s['is_private'])): ?> <span style="font-size:.75em;vertical-align:middle">🔒</span><?php endif; ?></h2>
                     </div>
                     <div class="session-card__body">
                         <p class="session-card__theme">🎨 <?= e($s['theme']) ?></p>

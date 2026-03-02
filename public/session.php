@@ -15,6 +15,24 @@ if (!$session) {
     exit;
 }
 
+// Private session access check
+if (!empty($session['is_private']) && !Auth::isAdmin()) {
+    $allowed = false;
+    if (Auth::isLoggedIn()) {
+        $allowed = $sessionModel->isUserAllowed($id, Auth::currentUserId());
+    }
+    if (!$allowed) {
+        $pageTitle = 'Séance privée';
+        include ROOT_DIR . '/templates/header.php';
+        echo '<div class="container"><div class="flash flash--error" style="margin-top:2rem">
+            🔒 Cette séance est privée et n\'est pas accessible au public.
+            Si vous pensez avoir été invité(e), vérifiez votre e-mail ou connectez-vous.
+            </div></div>';
+        include ROOT_DIR . '/templates/footer.php';
+        exit;
+    }
+}
+
 $pageTitle = $session['title'];
 $hasAccess = false;
 $booking   = null;
