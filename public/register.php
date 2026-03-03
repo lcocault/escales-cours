@@ -44,6 +44,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 'phone2'        => $values['phone2'] ?: null,
                 'photo_consent' => $photoConsent,
             ]);
+            Mailer::sendRegistrationNotificationToAdmin($values);
             flash('success', 'Compte créé ! Vous pouvez maintenant vous connecter.');
             header('Location: ' . APP_BASE_URL . '/login.php');
             exit;
