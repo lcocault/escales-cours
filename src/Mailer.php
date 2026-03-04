@@ -139,6 +139,12 @@ class Mailer
            36 rue Boieldieu, 31300 Toulouse</p>
         <p>⏰ Merci d'amener votre enfant <strong>10 minutes avant le début</strong> de la séance
            et de le récupérer dans les <strong>10 minutes suivant la fin</strong>.</p>
+        <p>📋 Quelques consignes pratiques :</p>
+        <ul>
+          <li>Votre enfant peut apporter <strong>son propre tablier</strong> ; un tablier est fourni par l'organisatrice si besoin.</li>
+          <li>Merci de <strong>retirer les chaussures</strong> en entrant dans l'atelier.</li>
+          <li>Pensez à apporter <strong>une boîte et un sac</strong> pour ramener la préparation à la maison.</li>
+        </ul>
         <p>Vous recevrez le contenu détaillé après la session.</p>
         <p>À bientôt aux Escales Culinaires !</p>
         <p><a href="{$baseUrl}/my-sessions.php">Voir mes réservations</a></p>

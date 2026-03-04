@@ -59,6 +59,22 @@ include ROOT_DIR . '/templates/header.php';
                     euros <strong>TTC</strong> (art.&nbsp;293&nbsp;B du CGI).
                     Les Escales Culinaires relèvent du régime des auto-entrepreneurs.
                 </p>
+                <p>
+                    Le tarif proposé est <strong>très compétitif</strong> : il couvre le temps de
+                    l'animatrice, les ingrédients, l'énergie, le matériel (tablier inclus),
+                    le ménage et les taxes.
+                </p>
+            </div>
+        </details>
+
+        <details class="faq-item">
+            <summary class="faq-item__question">Que faut-il prévoir pour la séance ?</summary>
+            <div class="faq-item__answer">
+                <ul>
+                    <li>Votre enfant peut apporter <strong>son propre tablier</strong> ; un tablier est fourni par l'organisatrice si besoin.</li>
+                    <li>Merci de <strong>retirer les chaussures</strong> en entrant dans l'atelier.</li>
+                    <li>Pensez à apporter <strong>une boîte et un sac</strong> pour que votre enfant puisse ramener sa préparation à la maison.</li>
+                </ul>
             </div>
         </details>
 
