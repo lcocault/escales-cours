@@ -66,6 +66,14 @@ class Mailer
         self::send($user['email'], $subject, $body);
     }
 
+    public static function sendRegistrationNotificationToAdmin(array $user): void
+    {
+        $safeName = str_replace(["\r", "\n"], '', $user['first_name'] . ' ' . $user['last_name']);
+        $subject  = '[Admin] Nouvelle inscription – ' . $safeName;
+        $body     = self::adminRegistrationBody($user);
+        self::send(ADMIN_EMAIL, $subject, $body);
+    }
+
     public static function sendPrivateSessionInvitation(
         array $user,
         array $session
@@ -189,6 +197,22 @@ class Mailer
           <li>Participant : {$name} ({$email})</li>
         </ul>
         <p><a href="{$baseUrl}/admin/attendees.php?session_id={$session['id']}">Voir les participants</a></p>
+        HTML;
+    }
+
+    private static function adminRegistrationBody(array $user): string
+    {
+        $name    = htmlspecialchars($user['first_name'] . ' ' . $user['last_name']);
+        $email   = htmlspecialchars($user['email']);
+        $baseUrl = htmlspecialchars(APP_BASE_URL);
+
+        return <<<HTML
+        <p>Un nouveau compte vient d'être créé sur le site :</p>
+        <ul>
+          <li>Nom : <strong>{$name}</strong></li>
+          <li>E-mail : {$email}</li>
+        </ul>
+        <p><a href="{$baseUrl}/admin/index.php">Accéder à l'administration</a></p>
         HTML;
     }
 
