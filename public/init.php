@@ -68,6 +68,8 @@ function currentBasketCount(): int
     }
     return $count ?? 0;
 }
+
+// Helper: convert an age_category value to a French label
 function ageCategoryLabel(string $category): string
 {
     $labels = [
