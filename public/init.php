@@ -10,6 +10,7 @@ require_once ROOT_DIR . '/src/Auth.php';
 require_once ROOT_DIR . '/src/UserModel.php';
 require_once ROOT_DIR . '/src/SessionModel.php';
 require_once ROOT_DIR . '/src/BookingModel.php';
+require_once ROOT_DIR . '/src/BasketModel.php';
 require_once ROOT_DIR . '/src/GeneralMessageModel.php';
 require_once ROOT_DIR . '/src/Mailer.php';
 require_once ROOT_DIR . '/src/PaymentService.php';
@@ -49,6 +50,23 @@ function formatDate(string $date): string
          . (int) date('j', $ts) . ' '
          . $months[(int) date('n', $ts)] . ' '
          . date('Y', $ts);
+}
+
+// Helper: check whether a session row is in the past (after end_time)
+function sessionIsPast(array $session): bool
+{
+    return strtotime($session['session_date'] . ' ' . $session['end_time']) < time();
+}
+
+// Helper: returns the number of items in the current user's basket.
+// Uses a static variable so the DB is queried at most once per request.
+function currentBasketCount(): int
+{
+    static $count = null;
+    if ($count === null && Auth::isLoggedIn()) {
+        $count = (new BasketModel())->countByUser(Auth::currentUserId());
+    }
+    return $count ?? 0;
 }
 
 // Helper: convert an age_category value to a French label

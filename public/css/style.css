@@ -436,6 +436,46 @@ td .actions { display: flex; gap: .5rem; flex-wrap: wrap; }
 .about-address { font-style: normal; line-height: 1.7; margin: .5rem 0; }
 .about-owner { font-size: .9rem; color: var(--color-muted); }
 
+/* ─── Basket ─── */
+.basket-nav-link {
+    display: inline-flex;
+    align-items: center;
+    gap: .3rem;
+    position: relative;
+}
+.basket-badge {
+    background: var(--color-yellow);
+    color: var(--color-brown);
+    border-radius: 999px;
+    font-size: .72rem;
+    font-weight: 800;
+    padding: .1rem .45rem;
+    line-height: 1.4;
+    min-width: 1.3rem;
+    text-align: center;
+}
+.basket-empty {
+    background: #fff;
+    border-radius: var(--radius);
+    box-shadow: var(--shadow);
+    padding: 2.5rem 2rem;
+    text-align: center;
+    font-size: 1.1rem;
+    color: var(--color-muted);
+}
+.basket-row--invalid td { opacity: .55; }
+.basket-summary {
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+    gap: 1.5rem;
+    margin-top: 1.5rem;
+    flex-wrap: wrap;
+}
+.basket-summary__total {
+    font-size: 1.15rem;
+}
+
 /* ─── Responsive ─── */
 @media (max-width: 640px) {
     .hero h1 { font-size: 1.7rem; }

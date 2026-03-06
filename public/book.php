@@ -70,6 +70,23 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
     if (empty($errors)) {
         $useCredit = isset($_POST['use_credit']) && (int) $user['credits'] > 0;
+        $action    = $_POST['action'] ?? 'pay';
+
+        if ($action === 'basket') {
+            // Add to basket and redirect to basket page
+            $basketModel = new BasketModel();
+            $basketModel->addItem(
+                Auth::currentUserId(),
+                $sessionId,
+                $childFirstName,
+                $childLastName,
+                (int) $childAge,
+                $childAllergies
+            );
+            flash('success', '🛒 Séance ajoutée au panier !');
+            header('Location: ' . APP_BASE_URL . '/basket.php');
+            exit;
+        }
 
         // Create the booking record (status = pending)
         $bookingId = $bookingModel->create(
@@ -185,8 +202,11 @@ include ROOT_DIR . '/templates/header.php';
             <?php endif; ?>
 
             <div class="mt-3">
-                <button type="submit" class="btn btn--primary">
+                <button type="submit" name="action" value="pay" class="btn btn--primary">
                     💳 Procéder au paiement (<?= e(formatPrice((int) $session['price_cents'])) ?>)
+                </button>
+                <button type="submit" name="action" value="basket" class="btn btn--warning" style="margin-left:.5rem">
+                    🛒 Ajouter au panier
                 </button>
                 <a href="<?= APP_BASE_URL ?>/session.php?id=<?= $sessionId ?>" class="btn btn--secondary" style="margin-left:.5rem">Annuler</a>
             </div>
