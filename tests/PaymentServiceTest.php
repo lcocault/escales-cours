@@ -156,4 +156,65 @@ class PaymentServiceTest extends TestCase
         $this->assertTrue(PaymentService::isRealPaymentRef('sq_payment_abc123'));
         $this->assertTrue(PaymentService::isRealPaymentRef('sq_order_ORDER123XYZ'));
     }
+
+    // -------------------------------------------------------------------------
+    // createBasketCheckoutUrl – Stripe demo mode
+    // -------------------------------------------------------------------------
+
+    public function testStripeBasketDemoFallbackWhenKeyIsPlaceholder(): void
+    {
+        define('PAYMENT_PROVIDER', 'stripe');
+        define('STRIPE_SECRET_KEY', 'sk_test_...');
+
+        $lineItems = [
+            ['name' => 'Séance 1', 'amount_cents' => 5000],
+            ['name' => 'Séance 2', 'amount_cents' => 7000],
+        ];
+
+        $result = PaymentService::createBasketCheckoutUrl($lineItems, 12000, 'eur');
+
+        $this->assertIsArray($result);
+        $this->assertStringContainsString('/payment_success.php', $result['url']);
+        $this->assertStringContainsString('basket=1', $result['url']);
+        $this->assertStringContainsString('_demo=1', $result['url']);
+        $this->assertNull($result['squareOrderId']);
+    }
+
+    // -------------------------------------------------------------------------
+    // createBasketCheckoutUrl – Square demo mode
+    // -------------------------------------------------------------------------
+
+    public function testSquareBasketDemoFallbackWhenTokenIsPlaceholder(): void
+    {
+        define('PAYMENT_PROVIDER', 'square');
+        define('SQUARE_ACCESS_TOKEN', 'EAAAl...');
+        define('SQUARE_LOCATION_ID', 'test_loc');
+        define('SQUARE_ENVIRONMENT', 'sandbox');
+
+        $lineItems = [
+            ['name' => 'Séance A', 'amount_cents' => 6500],
+        ];
+
+        $result = PaymentService::createBasketCheckoutUrl($lineItems, 6500, 'eur');
+
+        $this->assertIsArray($result);
+        $this->assertStringContainsString('/payment_success.php', $result['url']);
+        $this->assertStringContainsString('basket=1', $result['url']);
+        $this->assertStringContainsString('_demo=1', $result['url']);
+        $this->assertNull($result['squareOrderId']);
+    }
+
+    // -------------------------------------------------------------------------
+    // createBasketCheckoutUrl – unsupported provider
+    // -------------------------------------------------------------------------
+
+    public function testBasketUnsupportedProviderThrowsRuntimeException(): void
+    {
+        define('PAYMENT_PROVIDER', 'paypal');
+
+        $this->expectException(RuntimeException::class);
+        $this->expectExceptionMessageMatches('/Unsupported PAYMENT_PROVIDER/');
+
+        PaymentService::createBasketCheckoutUrl([['name' => 'Test', 'amount_cents' => 5000]], 5000, 'eur');
+    }
 }

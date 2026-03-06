@@ -25,6 +25,14 @@ Auth::start();
                 <li><a href="<?= APP_BASE_URL ?>/about.php">Le concept</a></li>
                 <li><a href="<?= APP_BASE_URL ?>/faq.php">FAQ</a></li>
                 <?php if (Auth::isLoggedIn()): ?>
+                    <?php $basketCount = currentBasketCount(); ?>
+                    <li>
+                        <a href="<?= APP_BASE_URL ?>/basket.php" class="basket-nav-link">
+                            🛒 Panier<?php if ($basketCount > 0): ?>
+                                <span class="basket-badge"><?= $basketCount ?></span>
+                            <?php endif; ?>
+                        </a>
+                    </li>
                     <li><a href="<?= APP_BASE_URL ?>/my-sessions.php">Mes réservations</a></li>
                     <?php if (Auth::isAdmin()): ?>
                         <li><a href="<?= APP_BASE_URL ?>/admin/">Administration</a></li>
