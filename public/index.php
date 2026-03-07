@@ -5,8 +5,9 @@ require_once __DIR__ . '/init.php';
 $pageTitle      = 'Séances à venir';
 $sessionModel   = new SessionModel();
 $sessions       = $sessionModel->getUpcoming(Auth::isLoggedIn() ? Auth::currentUserId() : null);
-$messageModel   = new GeneralMessageModel();
-$generalMessages = $messageModel->getAll();
+$messageModel    = new GeneralMessageModel();
+$latestMessage   = $messageModel->getLatest();
+$hasMoreMessages = $messageModel->countAll() > 1;
 
 include ROOT_DIR . '/templates/header.php';
 ?>
@@ -20,22 +21,25 @@ include ROOT_DIR . '/templates/header.php';
         <a href="<?= APP_BASE_URL ?>/about.php" class="btn btn--secondary mt-2">✨ Découvrir le concept</a>
     </section>
 
-    <?php if (!empty($generalMessages)): ?>
+    <?php if ($latestMessage !== null): ?>
         <section class="news-thread" aria-label="Actualités">
-            <?php foreach ($generalMessages as $gm): ?>
-                <div class="news-item news-item--<?= e($gm['type']) ?>">
-                    <span class="news-item__icon" aria-hidden="true"><?= [
-                        'info'    => '💬',
-                        'warning' => '⚠️',
-                        'danger'  => '🚨',
-                        'success' => '✅',
-                    ][$gm['type']] ?? '📢' ?></span>
-                    <div class="news-item__body">
-                        <p class="news-item__date"><?= e(date('d/m/Y', strtotime($gm['created_at']))) ?></p>
-                        <p class="news-item__text"><?= e($gm['body']) ?></p>
-                    </div>
+            <div class="news-item news-item--<?= e($latestMessage['type']) ?>">
+                <span class="news-item__icon" aria-hidden="true"><?= [
+                    'info'    => '💬',
+                    'warning' => '⚠️',
+                    'danger'  => '🚨',
+                    'success' => '✅',
+                ][$latestMessage['type']] ?? '📢' ?></span>
+                <div class="news-item__body">
+                    <p class="news-item__date"><?= e(date('d/m/Y', strtotime($latestMessage['created_at']))) ?></p>
+                    <p class="news-item__text"><?= e($latestMessage['body']) ?></p>
                 </div>
-            <?php endforeach; ?>
+            </div>
+            <?php if ($hasMoreMessages): ?>
+                <p class="news-thread__more">
+                    <a href="<?= APP_BASE_URL ?>/messages.php">📋 Voir tous les messages →</a>
+                </p>
+            <?php endif; ?>
         </section>
     <?php endif; ?>
 

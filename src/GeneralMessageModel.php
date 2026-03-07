@@ -10,6 +10,29 @@ class GeneralMessageModel
         $this->db = Database::getInstance();
     }
 
+    /** Return the single most-recent visible message, or null if none. */
+    public function getLatest(): ?array
+    {
+        $stmt = $this->db->query(
+            "SELECT id, body, type, created_at
+             FROM general_messages
+             WHERE deleted_at IS NULL
+             ORDER BY created_at DESC
+             LIMIT 1"
+        );
+        $row = $stmt->fetch();
+        return $row ?: null;
+    }
+
+    /** Return the total number of visible messages. */
+    public function countAll(): int
+    {
+        $stmt = $this->db->query(
+            "SELECT COUNT(*) FROM general_messages WHERE deleted_at IS NULL"
+        );
+        return (int) $stmt->fetchColumn();
+    }
+
     /** Return all visible messages, newest first. */
     public function getAll(): array
     {

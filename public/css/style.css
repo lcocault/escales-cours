@@ -411,6 +411,7 @@ td .actions { display: flex; gap: .5rem; flex-wrap: wrap; }
 .news-item__body { flex: 1; }
 .news-item__date { font-size: .8rem; font-weight: 700; color: var(--color-muted); margin-bottom: .2rem; }
 .news-item__text { font-size: .95rem; }
+.news-thread__more { text-align: right; font-size: .9rem; margin: 0; }
 
 /* ─── Footer ─── */
 .site-footer { background: var(--color-red-dark); color: rgba(255,255,255,.8); padding: 2rem 0 1rem; margin-top: 3rem; font-size: .9rem; }
