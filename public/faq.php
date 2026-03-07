@@ -114,8 +114,7 @@ include ROOT_DIR . '/templates/header.php';
                 <p>
                     Merci d'amener votre enfant <strong>10 minutes avant le début de la séance</strong>
                     afin que l'atelier puisse commencer à l'heure.
-                    Le parent (ou son représentant) doit récupérer l'enfant dans les
-                    <strong>10 minutes suivant la fin de la séance</strong>.
+                    Le parent (ou son représentant) doit récupérer l'enfant dès <strong>la fin de la séance</strong>.
                 </p>
             </div>
         </details>
