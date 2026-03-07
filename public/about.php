@@ -154,7 +154,7 @@ include ROOT_DIR . '/templates/header.php';
             </p>
             <p class="mt-1">
                 ⏰ Merci d'amener votre enfant <strong>10 minutes avant le début</strong> de la séance
-                et de le récupérer dans les <strong>10 minutes suivant la fin</strong>.
+                et de le récupérer dès <strong>la fin de la séance</strong>.
             </p>
         </div>
     </section>
