@@ -35,9 +35,30 @@ if (strtotime($session['session_date'] . ' ' . $session['end_time']) < time()) {
 
 $bookingModel = new BookingModel();
 $existing = $bookingModel->findByUserAndSession(Auth::currentUserId(), $sessionId);
-if ($existing && in_array($existing['status'], ['confirmed', 'attended', 'pending'])) {
+if ($existing && in_array($existing['status'], ['confirmed', 'attended'])) {
     flash('info', 'Vous avez déjà réservé cette séance.');
     header('Location: ' . APP_BASE_URL . '/my-sessions.php');
+    exit;
+}
+if ($existing && $existing['status'] === 'pending') {
+    // Resume payment for the existing pending booking
+    try {
+        $checkout = PaymentService::createCheckoutUrl(
+            (int) $existing['id'],
+            $session['title'],
+            (int) $session['price_cents'],
+            'eur'
+        );
+    } catch (RuntimeException $e) {
+        error_log('PaymentService error: ' . $e->getMessage());
+        flash('error', 'Une erreur est survenue lors de la création du paiement. Veuillez réessayer.');
+        header('Location: ' . APP_BASE_URL . '/session.php?id=' . $sessionId);
+        exit;
+    }
+    if (!empty($checkout['squareOrderId'])) {
+        $bookingModel->storePaymentRef((int) $existing['id'], 'sq_order_' . $checkout['squareOrderId']);
+    }
+    header('Location: ' . $checkout['url']);
     exit;
 }
 

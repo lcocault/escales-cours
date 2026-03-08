@@ -127,9 +127,16 @@ include ROOT_DIR . '/templates/header.php';
         <div class="mt-3" style="text-align:right">
             <?php if (($session['status'] ?? '') === 'cancelled'): ?>
                 <?php /* session is cancelled – no booking button shown */ ?>
-            <?php elseif ($booking && in_array($booking['status'], ['confirmed', 'attended', 'pending'])): ?>
+            <?php elseif ($booking && $booking['status'] === 'pending'): ?>
+                <p class="flash flash--warning" style="display:inline-block">
+                    ⚠️ Vous n'avez pas encore validé le paiement de cette réservation.
+                    <a href="<?= APP_BASE_URL ?>/book.php?session_id=<?= (int) $session['id'] ?>" class="btn btn--primary btn--sm" style="margin-left:.5rem">
+                        💳 Reprendre le paiement
+                    </a>
+                </p>
+            <?php elseif ($booking && in_array($booking['status'], ['confirmed', 'attended'])): ?>
                 <p class="flash flash--info" style="display:inline-block">
-                    ✅ Vous avez déjà réservé cette séance (statut : <?= e($booking['status']) ?>).
+                    ✅ Vous avez déjà réservé cette séance.
                 </p>
             <?php elseif ((int) $session['remaining_seats'] > 0 && strtotime($session['session_date'] . ' ' . $session['end_time']) >= time()): ?>
                 <a href="<?= APP_BASE_URL ?>/book.php?session_id=<?= (int) $session['id'] ?>" class="btn btn--primary">

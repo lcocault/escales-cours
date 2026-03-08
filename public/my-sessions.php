@@ -56,7 +56,11 @@ include ROOT_DIR . '/templates/header.php';
                                 <?php endif; ?>
                             </td>
                             <td>
-                                <?php if ($cancellable): ?>
+                                <?php if ($b['status'] === 'pending' && strtotime($b['session_date'] . ' ' . $b['end_time']) >= time()): ?>
+                                    <a href="<?= APP_BASE_URL ?>/book.php?session_id=<?= (int) $b['session_id'] ?>" class="btn btn--warning btn--sm">
+                                        💳 Reprendre le paiement
+                                    </a>
+                                <?php elseif ($cancellable): ?>
                                     <form method="post" action="<?= APP_BASE_URL ?>/cancel-booking.php"
                                           onsubmit="return confirm('Confirmer l\'annulation de cette réservation ?')">
                                         <input type="hidden" name="csrf_token" value="<?= Auth::csrfToken() ?>">
