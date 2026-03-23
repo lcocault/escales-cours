@@ -28,6 +28,30 @@ psql -U <user> -d <dbname> -f database/schema.sql
 #    (sur AlwaysData : Sites > votre site > Répertoire racine = /public)
 ```
 
+## Envoi d'e-mails (PHPMailer + Gmail)
+
+Le site utilise **PHPMailer** (SMTP) pour envoyer les e-mails transactionnels (confirmation de réservation, annulation, etc.).  
+La configuration se fait via les constantes `SMTP_*` dans `config/config.php`.
+
+### Utiliser Gmail comme serveur SMTP
+
+1. Activez la **validation en deux étapes** sur le compte Google expéditeur.
+2. Créez un **mot de passe d'application** :
+   - Accédez à <https://myaccount.google.com/apppasswords>
+   - Choisissez « Courrier » et votre appareil, puis copiez le mot de passe à 16 caractères généré.
+3. Renseignez les constantes suivantes dans `config/config.php` :
+
+```php
+define('SMTP_HOST',      'smtp.gmail.com');
+define('SMTP_PORT',      587);
+define('SMTP_USER',      'votre-adresse@gmail.com');
+define('SMTP_PASS',      'xxxx xxxx xxxx xxxx'); // mot de passe d'application
+define('SMTP_FROM',      'votre-adresse@gmail.com');
+define('SMTP_FROM_NAME', 'Escales Culinaires');
+```
+
+> **Remarque** : N'utilisez pas votre mot de passe Gmail habituel ; Gmail exige un *App Password* dédié lorsque la validation en deux étapes est activée.
+
 ## Paiement
 
 Le fournisseur de paiement est configurable via la constante `PAYMENT_PROVIDER` dans `config/config.php` :

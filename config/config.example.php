@@ -12,12 +12,17 @@ define('DB_NAME', 'escales_cours');
 define('DB_USER', 'your_db_user');
 define('DB_PASS', 'your_db_password');
 
-// SMTP
-define('SMTP_HOST', 'smtp.example.com');
+// SMTP – used by PHPMailer to send transactional emails
+// Gmail example (recommended):
+//   1. Enable 2-Step Verification on your Google account.
+//   2. Generate an App Password at https://myaccount.google.com/apppasswords
+//      (select "Mail" and your device, then copy the 16-character password).
+//   3. Fill in the values below.
+define('SMTP_HOST', 'smtp.gmail.com');
 define('SMTP_PORT', 587);
-define('SMTP_USER', 'your_smtp_user');
-define('SMTP_PASS', 'your_smtp_password');
-define('SMTP_FROM', 'noreply@escales-cours.fr');
+define('SMTP_USER', 'your-address@gmail.com');
+define('SMTP_PASS', 'your-gmail-app-password');
+define('SMTP_FROM', 'your-address@gmail.com');
 define('SMTP_FROM_NAME', 'Escales Culinaires');
 
 // Admin contact
