@@ -18,9 +18,10 @@ include ROOT_DIR . '/templates/header.php';
         <details class="faq-item">
             <summary class="faq-item__question">À qui s'adressent les ateliers ?</summary>
             <div class="faq-item__answer">
-                <p>Les ateliers sont ouverts aux enfants et adolescents, répartis en trois tranches d'âge :</p>
+                <p>Les ateliers sont ouverts aux enfants et adolescents, répartis en quatre tranches d'âge :</p>
                 <ul>
                     <li><strong>3 à 5 ans</strong> : activités simples et sensorielles pour les tout-petits.</li>
+                    <li><strong>3 à 10 ans</strong> : ateliers mixtes accessibles à tous les enfants, du tout-petit au grand.</li>
                     <li><strong>6 à 12 ans</strong> : recettes accessibles pour développer l'autonomie et la créativité.</li>
                     <li><strong>13 ans et +</strong> : techniques plus élaborées pour les ados passionnés de cuisine.</li>
                 </ul>

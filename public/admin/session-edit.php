@@ -111,6 +111,7 @@ include ROOT_DIR . '/templates/header.php';
             <label for="age_category">Tranche d'âge *</label>
             <select id="age_category" name="age_category" required>
                 <option value="3-5"  <?= $values['age_category'] === '3-5'  ? 'selected' : '' ?>>3 à 5 ans</option>
+                <option value="3-10" <?= $values['age_category'] === '3-10' ? 'selected' : '' ?>>3 à 10 ans</option>
                 <option value="6-12" <?= $values['age_category'] === '6-12' ? 'selected' : '' ?>>6 à 12 ans</option>
                 <option value="13+"  <?= $values['age_category'] === '13+'  ? 'selected' : '' ?>>13 ans et +</option>
             </select>
