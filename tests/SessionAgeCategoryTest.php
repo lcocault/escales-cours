@@ -94,6 +94,73 @@ class SessionAgeCategoryTest extends TestCase
     }
 
     // -------------------------------------------------------------------------
+    // New '3-10' age category tests
+    // -------------------------------------------------------------------------
+
+    public function testUpdateWith3To10AgeCategory(): void
+    {
+        $capturedParams = [];
+
+        $stmt = $this->createMock(PDOStatement::class);
+        $stmt->method('execute')
+            ->willReturnCallback(function (array $params) use (&$capturedParams) {
+                $capturedParams = $params;
+                return true;
+            });
+
+        $pdo = $this->createMock(PDO::class);
+        $pdo->method('prepare')->willReturn($stmt);
+
+        $this->injectPdo($pdo);
+
+        $model = new SessionModel();
+        $model->update(1, [
+            'title'         => 'Test',
+            'theme'         => 'Pâtisserie',
+            'session_date'  => '2026-03-01',
+            'start_time'    => '10:00',
+            'end_time'      => '12:00',
+            'max_attendees' => 8,
+            'price_cents'   => 1500,
+            'age_category'  => '3-10',
+        ]);
+
+        $this->assertSame('3-10', $capturedParams[':age_category']);
+    }
+
+    public function testCreateWith3To10AgeCategory(): void
+    {
+        $capturedParams = [];
+
+        $stmt = $this->createMock(PDOStatement::class);
+        $stmt->method('execute')
+            ->willReturnCallback(function (array $params) use (&$capturedParams) {
+                $capturedParams = $params;
+                return true;
+            });
+        $stmt->method('fetchColumn')->willReturn(1);
+
+        $pdo = $this->createMock(PDO::class);
+        $pdo->method('prepare')->willReturn($stmt);
+
+        $this->injectPdo($pdo);
+
+        $model = new SessionModel();
+        $model->create([
+            'title'         => 'Test',
+            'theme'         => 'Pâtisserie',
+            'session_date'  => '2026-03-01',
+            'start_time'    => '10:00',
+            'end_time'      => '12:00',
+            'max_attendees' => 8,
+            'price_cents'   => 1500,
+            'age_category'  => '3-10',
+        ]);
+
+        $this->assertSame('3-10', $capturedParams[':age_category']);
+    }
+
+    // -------------------------------------------------------------------------
     // SessionModel::update() includes age_category
     // -------------------------------------------------------------------------
 

@@ -33,13 +33,17 @@ include ROOT_DIR . '/templates/header.php';
         <div class="about-section__content">
             <h2>Pour les enfants de 3 à 12 ans et les ados</h2>
             <p>
-                Les ateliers sont conçus pour accueillir les enfants et adolescents en trois tranches d'âge,
+                Les ateliers sont conçus pour accueillir les enfants et adolescents en quatre tranches d'âge,
                 chacune avec des activités adaptées :
             </p>
             <ul class="about-list">
                 <li>
                     <span class="about-list__icon">🌱</span>
                     <span><strong>3 à 5 ans</strong> : des activités simples et sensorielles pour éveiller la curiosité des tout-petits.</span>
+                </li>
+                <li>
+                    <span class="about-list__icon">🌿</span>
+                    <span><strong>3 à 10 ans</strong> : des ateliers mixtes accessibles à tous les enfants, du tout-petit au grand.</span>
                 </li>
                 <li>
                     <span class="about-list__icon">⭐</span>

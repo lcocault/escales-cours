@@ -74,6 +74,7 @@ function ageCategoryLabel(string $category): string
 {
     $labels = [
         '3-5'  => '3 à 5 ans',
+        '3-10' => '3 à 10 ans',
         '6-12' => '6 à 12 ans',
         '13+'  => '13 ans et +',
     ];
