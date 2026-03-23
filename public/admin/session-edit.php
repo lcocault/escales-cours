@@ -63,7 +63,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     if ($values['start_time'] === '')   $errors[] = 'L\'heure de début est obligatoire.';
     if ($values['end_time'] === '')     $errors[] = 'L\'heure de fin est obligatoire.';
     if ($values['max_attendees'] < 1)  $errors[] = 'Le nombre maximum de participants doit être ≥ 1.';
-    if (!in_array($values['age_category'], ['3-5', '6-12', '13+'], true)) $errors[] = 'La tranche d\'âge est invalide.';
+    if (!in_array($values['age_category'], ['3-5', '3-10', '6-12', '13+'], true)) $errors[] = 'La tranche d\'âge est invalide.';
 
     if (empty($errors)) {
         if ($isEdit) {
