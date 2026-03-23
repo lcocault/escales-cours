@@ -1,15 +1,36 @@
 <?php
-// src/Mailer.php – email helpers (uses PHP mail() by default)
+// src/Mailer.php – email helpers (uses PHPMailer via SMTP)
+
+use PHPMailer\PHPMailer\PHPMailer;
+use PHPMailer\PHPMailer\Exception as PHPMailerException;
 
 class Mailer
 {
     private static function send(string $to, string $subject, string $bodyHtml): void
     {
-        $headers  = 'MIME-Version: 1.0' . "\r\n";
-        $headers .= 'Content-type: text/html; charset=UTF-8' . "\r\n";
-        $headers .= 'From: ' . SMTP_FROM_NAME . ' <' . SMTP_FROM . '>' . "\r\n";
+        $mail = new PHPMailer(true);
 
-        mail($to, $subject, $bodyHtml, $headers);
+        try {
+            $mail->isSMTP();
+            $mail->Host       = SMTP_HOST;
+            $mail->SMTPAuth   = true;
+            $mail->Username   = SMTP_USER;
+            $mail->Password   = SMTP_PASS;
+            $mail->SMTPSecure = PHPMailer::ENCRYPTION_STARTTLS;
+            $mail->Port       = SMTP_PORT;
+            $mail->CharSet    = 'UTF-8';
+
+            $mail->setFrom(SMTP_FROM, SMTP_FROM_NAME);
+            $mail->addAddress($to);
+
+            $mail->isHTML(true);
+            $mail->Subject = $subject;
+            $mail->Body    = $bodyHtml;
+
+            $mail->send();
+        } catch (PHPMailerException $e) {
+            error_log('Mailer error – could not send to ' . $to . ': ' . $e->getMessage());
+        }
     }
 
     public static function sendBookingConfirmationToAttendee(
