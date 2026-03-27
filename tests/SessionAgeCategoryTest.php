@@ -160,6 +160,38 @@ class SessionAgeCategoryTest extends TestCase
         $this->assertSame('3-10', $capturedParams[':age_category']);
     }
 
+    public function testCreateWith3To12AgeCategory(): void
+    {
+        $capturedParams = [];
+
+        $stmt = $this->createMock(PDOStatement::class);
+        $stmt->method('execute')
+            ->willReturnCallback(function (array $params) use (&$capturedParams) {
+                $capturedParams = $params;
+                return true;
+            });
+        $stmt->method('fetchColumn')->willReturn(1);
+
+        $pdo = $this->createMock(PDO::class);
+        $pdo->method('prepare')->willReturn($stmt);
+
+        $this->injectPdo($pdo);
+
+        $model = new SessionModel();
+        $model->create([
+            'title'         => 'Test',
+            'theme'         => 'Pâtisserie',
+            'session_date'  => '2026-03-01',
+            'start_time'    => '10:00',
+            'end_time'      => '12:00',
+            'max_attendees' => 8,
+            'price_cents'   => 1500,
+            'age_category'  => '3-12',
+        ]);
+
+        $this->assertSame('3-12', $capturedParams[':age_category']);
+    }
+
     // -------------------------------------------------------------------------
     // SessionModel::update() includes age_category
     // -------------------------------------------------------------------------

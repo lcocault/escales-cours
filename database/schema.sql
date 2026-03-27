@@ -34,7 +34,7 @@ CREATE TABLE IF NOT EXISTS sessions (
     status              VARCHAR(20)     NOT NULL DEFAULT 'pending'
                             CHECK (status IN ('pending', 'confirmed', 'cancelled')),
     age_category        VARCHAR(10)     NOT NULL DEFAULT '6-12'
-                            CHECK (age_category IN ('3-5', '3-10', '6-12', '13+')),
+                            CHECK (age_category IN ('3-5', '3-10', '3-12', '6-12', '13+')),
     summary             TEXT,           -- public teaser
     objectives          TEXT,           -- pedagogic objectives (shown post-session)
     theoretical_content TEXT,           -- theoretical part (shown post-session)
