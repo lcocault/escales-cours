@@ -52,6 +52,25 @@ function formatDate(string $date): string
          . date('Y', $ts);
 }
 
+// Helper: format a date string (Y-m-d) and time string (H:i:s) to French long format with hour
+function formatSessionDateTime(string $date, string $time): string
+{
+    $ts = strtotime($date . ' ' . $time);
+    if ($ts === false) {
+        return e($date);
+    }
+    $days   = ['Dimanche', 'Lundi', 'Mardi', 'Mercredi', 'Jeudi', 'Vendredi', 'Samedi'];
+    $months = [
+        1 => 'Janvier', 'Février', 'Mars', 'Avril', 'Mai', 'Juin',
+        'Juillet', 'Août', 'Septembre', 'Octobre', 'Novembre', 'Décembre',
+    ];
+    return $days[(int) date('w', $ts)] . ' '
+         . (int) date('j', $ts) . ' '
+         . $months[(int) date('n', $ts)] . ' '
+         . date('Y', $ts) . ' '
+         . (int) date('G', $ts) . 'h' . date('i', $ts);
+}
+
 // Helper: check whether a session row is in the past (after end_time)
 function sessionIsPast(array $session): bool
 {
