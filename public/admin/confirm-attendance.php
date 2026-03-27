@@ -26,6 +26,14 @@ if (!$booking) {
 switch ($action) {
     case 'attended':
         $bookingModel->markAttended($bookingId);
+        // Send email with links to session content and rating page
+        $sessionModel = new SessionModel();
+        $session = $sessionModel->findById((int) $booking['session_id']);
+        $userModel = new UserModel();
+        $attendee = $userModel->findById((int) $booking['user_id']);
+        if ($session && $attendee) {
+            Mailer::sendAttendanceConfirmationToAttendee($attendee, $session);
+        }
         flash('success', 'Participant marqué comme présent.');
         break;
 
