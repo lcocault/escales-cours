@@ -26,10 +26,8 @@ include ROOT_DIR . '/templates/header.php';
                     <tr>
                         <th>Date</th>
                         <th>Titre</th>
-                        <th>Thème</th>
                         <th>Tranche d'âge</th>
-                        <th>Places</th>
-                        <th>Prix</th>
+                        <th>Inscrits</th>
                         <th>Statut</th>
                         <th>Actions</th>
                     </tr>
@@ -37,14 +35,12 @@ include ROOT_DIR . '/templates/header.php';
                 <tbody>
                     <?php foreach ($sessions as $s): ?>
                         <tr>
-                            <td><?= e($s['session_date']) ?></td>
+                            <td><?= e(formatSessionDateTime($s['session_date'], $s['start_time'])) ?></td>
                             <td><?= e($s['title']) ?><?php if (!empty($s['is_private'])): ?> <span class="badge" style="background:#7c3aed;color:#fff;font-size:.7rem">🔒 Privée</span><?php endif; ?></td>
-                            <td><?= e($s['theme']) ?></td>
                             <td><?php
                                 echo e(ageCategoryLabel($s['age_category'] ?? '6-12'));
                             ?></td>
-                            <td><?= (int) $s['remaining_seats'] ?> / <?= (int) $s['max_attendees'] ?></td>
-                            <td><?= e(formatPrice((int) $s['price_cents'])) ?></td>
+                            <td><?= (int) $s['registered_count'] ?></td>
                             <td>
                                 <?php
                                 $statusLabels = [

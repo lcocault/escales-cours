@@ -38,11 +38,18 @@ class SessionModel
         return $stmt->fetchAll();
     }
 
-    // All sessions for admin
+    // Active (pending) sessions for admin – chronological order, with registered count
     public function getAll(): array
     {
         $stmt = $this->db->query(
-            "SELECT * FROM sessions WHERE deleted_at IS NULL ORDER BY session_date DESC"
+            "SELECT s.*,
+                    (SELECT COUNT(*) FROM bookings b
+                     WHERE b.session_id = s.id
+                       AND b.status IN ('confirmed', 'attended', 'absent', 'credited')) AS registered_count
+             FROM sessions s
+             WHERE s.deleted_at IS NULL
+               AND s.status NOT IN ('confirmed', 'cancelled')
+             ORDER BY s.session_date ASC, s.start_time ASC"
         );
         return $stmt->fetchAll();
     }
