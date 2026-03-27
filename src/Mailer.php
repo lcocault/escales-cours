@@ -87,6 +87,15 @@ class Mailer
         self::send($user['email'], $subject, $body);
     }
 
+    public static function sendAttendanceConfirmationToAttendee(
+        array $user,
+        array $session
+    ): void {
+        $subject = 'Merci pour votre participation – ' . $session['title'];
+        $body    = self::attendanceConfirmationBody($user, $session);
+        self::send($user['email'], $subject, $body);
+    }
+
     public static function sendRegistrationNotificationToAdmin(array $user): void
     {
         $safeName = str_replace(["\r", "\n"], '', $user['first_name'] . ' ' . $user['last_name']);
@@ -240,6 +249,27 @@ class Mailer
           <li>E-mail : {$email}</li>
         </ul>
         <p><a href="{$baseUrl}/admin/index.php">Accéder à l'administration</a></p>
+        HTML;
+    }
+
+    private static function attendanceConfirmationBody(array $user, array $session): string
+    {
+        $name       = htmlspecialchars($user['first_name'] . ' ' . $user['last_name']);
+        $title      = htmlspecialchars($session['title']);
+        $date       = htmlspecialchars($session['session_date']);
+        $baseUrl    = APP_BASE_URL;
+        $contentUrl = $baseUrl . '/session-content.php?session_id=' . (int) $session['id'];
+        $ratingUrl  = $baseUrl . '/rate-session.php?session_id=' . (int) $session['id'];
+
+        return <<<HTML
+        <p>Bonjour {$name},</p>
+        <p>Merci d'avoir participé à la séance <strong>{$title}</strong> du {$date} !</p>
+        <p>Vous pouvez maintenant :</p>
+        <ul>
+          <li>📚 <a href="{$contentUrl}">Accéder au contenu complet de la séance</a> (objectifs, recette, photos)</li>
+          <li>⭐ <a href="{$ratingUrl}">Donner votre avis sur la séance</a></li>
+        </ul>
+        <p>À bientôt aux Escales Culinaires !</p>
         HTML;
     }
 

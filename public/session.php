@@ -107,6 +107,10 @@ include ROOT_DIR . '/templates/header.php';
                 <a href="<?= APP_BASE_URL ?>/session-content.php?session_id=<?= (int) $session['id'] ?>" class="btn btn--success">
                     📸 Voir les photos &amp; contenus privés →
                 </a>
+                &nbsp;
+                <a href="<?= APP_BASE_URL ?>/rate-session.php?session_id=<?= (int) $session['id'] ?>" class="btn btn--warning">
+                    ⭐ Donner mon avis
+                </a>
             </p>
 
         <?php else: ?>
@@ -120,6 +124,27 @@ include ROOT_DIR . '/templates/header.php';
                         <a href="<?= APP_BASE_URL ?>/register.php" class="btn btn--secondary">Créer un compte</a>
                     </p>
                 <?php endif; ?>
+            </div>
+        <?php endif; ?>
+
+        <!-- Ratings link (always visible) -->
+        <?php
+        $ratingModel = new RatingModel();
+        $ratingsCount = $ratingModel->countBySession($id);
+        $ratingsAvg   = $ratingModel->getAverageBySession($id);
+        ?>
+        <?php if ($ratingsCount > 0): ?>
+            <div class="section-block">
+                <a href="<?= APP_BASE_URL ?>/session-ratings.php?session_id=<?= $id ?>" class="ratings-teaser-link">
+                    <span class="ratings-teaser-link__stars">
+                        <?php for ($i = 1; $i <= 5; $i++): ?>
+                            <span class="star <?= $i <= round((float)$ratingsAvg) ? 'star--full' : 'star--empty' ?>">★</span>
+                        <?php endfor; ?>
+                    </span>
+                    <span class="ratings-teaser-link__avg"><?= number_format((float)$ratingsAvg, 1, ',', '') ?>/5</span>
+                    <span class="ratings-teaser-link__count">(<?= $ratingsCount ?> avis)</span>
+                    <span class="ratings-teaser-link__cta">→ Voir les avis</span>
+                </a>
             </div>
         <?php endif; ?>
 

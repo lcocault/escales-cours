@@ -484,3 +484,97 @@ td .actions { display: flex; gap: .5rem; flex-wrap: wrap; }
     .site-nav__list { gap: .25rem .5rem; }
     .site-footer__grid { grid-template-columns: 1fr; }
 }
+
+/* ─── Star rating (input) ─── */
+.star-rating {
+    display: flex;
+    flex-direction: row-reverse;
+    justify-content: flex-end;
+    gap: .15rem;
+    margin-top: .25rem;
+}
+.star-rating input[type="radio"] {
+    display: none;
+}
+.star-rating label {
+    font-size: 2rem;
+    color: var(--color-border);
+    cursor: pointer;
+    transition: color .15s;
+    line-height: 1;
+}
+.star-rating label.star-zero {
+    font-size: 1.5rem;
+    margin-right: .4rem;
+    order: 1;
+    color: var(--color-muted);
+}
+/* highlight checked star and all stars before it (higher values come first in DOM) */
+.star-rating input[type="radio"]:checked ~ label,
+.star-rating label:hover,
+.star-rating label:hover ~ label {
+    color: var(--color-yellow-dark);
+}
+
+/* ─── Star display (read-only) ─── */
+.star {
+    font-size: 1.3rem;
+    line-height: 1;
+}
+.star--full  { color: var(--color-yellow-dark); }
+.star--half  { color: var(--color-yellow-dark); opacity: .6; }
+.star--empty { color: var(--color-border); }
+
+/* ─── Ratings summary ─── */
+.ratings-summary {
+    display: flex;
+    align-items: center;
+    gap: .75rem;
+    background: #fff;
+    border-radius: var(--radius);
+    box-shadow: var(--shadow);
+    padding: 1.25rem 1.5rem;
+    margin-bottom: 2rem;
+    flex-wrap: wrap;
+}
+.ratings-summary__stars { font-size: 1.6rem; line-height: 1; }
+.ratings-summary__avg   { font-size: 1.5rem; font-weight: 700; color: var(--color-text); }
+.ratings-summary__count { color: var(--color-muted); font-size: .95rem; }
+
+/* ─── Rating cards list ─── */
+.ratings-list {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+    margin-bottom: 2rem;
+}
+.rating-card {
+    background: #fff;
+    border-radius: var(--radius);
+    box-shadow: var(--shadow);
+    padding: 1.25rem 1.5rem;
+}
+.rating-card__header {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    flex-wrap: wrap;
+    margin-bottom: .5rem;
+}
+.rating-card__stars { font-size: 1.25rem; line-height: 1; }
+.rating-card__author { font-weight: 600; }
+.rating-card__date { color: var(--color-muted); font-size: .85rem; margin-left: auto; }
+.rating-card__comment { margin: 0; font-size: .95rem; }
+
+/* ─── Ratings teaser link (session detail page) ─── */
+.ratings-teaser-link {
+    display: inline-flex;
+    align-items: center;
+    gap: .5rem;
+    text-decoration: none;
+}
+.ratings-teaser-link:hover { text-decoration: underline; }
+.ratings-teaser-link__stars { font-size: 1.3rem; line-height: 1; }
+.ratings-teaser-link__avg { font-weight: 700; }
+.ratings-teaser-link__count { color: var(--color-muted); font-size: .9rem; }
+.ratings-teaser-link__cta { font-size: .9rem; }
