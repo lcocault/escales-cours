@@ -24,6 +24,7 @@ Auth::start();
                 <li><a href="<?= APP_BASE_URL ?>/">Séances</a></li>
                 <li><a href="<?= APP_BASE_URL ?>/about.php">Le concept</a></li>
                 <li><a href="<?= APP_BASE_URL ?>/faq.php">FAQ</a></li>
+                <li><a href="<?= APP_BASE_URL ?>/all-ratings.php">⭐ Avis</a></li>
                 <?php if (Auth::isLoggedIn()): ?>
                     <?php $basketCount = currentBasketCount(); ?>
                     <li>

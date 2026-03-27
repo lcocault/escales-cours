@@ -43,6 +43,10 @@ include ROOT_DIR . '/templates/header.php';
         </section>
     <?php endif; ?>
 
+    <p class="text-center mt-2">
+        <a href="<?= APP_BASE_URL ?>/all-ratings.php">⭐ Voir tous les avis des participants →</a>
+    </p>
+
     <?php if (empty($sessions)): ?>
         <p class="text-center mt-3" style="color:var(--color-muted)">
             Aucune séance prévue pour le moment. Revenez bientôt !
