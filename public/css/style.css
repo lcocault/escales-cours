@@ -565,6 +565,7 @@ td .actions { display: flex; gap: .5rem; flex-wrap: wrap; }
 .rating-card__author { font-weight: 600; }
 .rating-card__date { color: var(--color-muted); font-size: .85rem; margin-left: auto; }
 .rating-card__comment { margin: 0; font-size: .95rem; }
+.rating-card__session-link { margin: .5rem 0 0; font-size: .85rem; color: var(--color-muted); }
 
 /* ─── Ratings teaser link (session detail page) ─── */
 .ratings-teaser-link {

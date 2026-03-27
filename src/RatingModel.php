@@ -75,4 +75,34 @@ class RatingModel
         $stmt->execute([':sid' => $sessionId]);
         return (int) $stmt->fetchColumn();
     }
+
+    /**
+     * Return all ratings across all sessions, most recent first.
+     * Includes user name and session title/date.
+     */
+    public function getAll(): array
+    {
+        $stmt = $this->db->query(
+            'SELECT r.id, r.session_id, r.user_id, r.stars, r.comment,
+                    r.is_anonymous, r.created_at,
+                    u.first_name, u.last_name,
+                    s.title AS session_title, s.session_date
+             FROM ratings r
+             JOIN users    u ON u.id = r.user_id
+             JOIN sessions s ON s.id = r.session_id
+             ORDER BY r.created_at DESC'
+        );
+        return $stmt->fetchAll();
+    }
+
+    public function getOverallAverage(): ?float
+    {
+        $avg = $this->db->query('SELECT AVG(stars) FROM ratings')->fetchColumn();
+        return ($avg !== false && $avg !== null) ? (float) $avg : null;
+    }
+
+    public function countAll(): int
+    {
+        return (int) $this->db->query('SELECT COUNT(*) FROM ratings')->fetchColumn();
+    }
 }
