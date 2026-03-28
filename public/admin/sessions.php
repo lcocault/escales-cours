@@ -56,6 +56,7 @@ include ROOT_DIR . '/templates/header.php';
                                     <a href="<?= APP_BASE_URL ?>/admin/session-edit.php?id=<?= (int) $s['id'] ?>" class="btn btn--warning btn--icon" title="Modifier" aria-label="Modifier">✏️</a>
                                     <a href="<?= APP_BASE_URL ?>/admin/session-edit.php?duplicate_from=<?= (int) $s['id'] ?>" class="btn btn--secondary btn--icon" title="Dupliquer" aria-label="Dupliquer">📋</a>
                                     <a href="<?= APP_BASE_URL ?>/admin/attendees.php?session_id=<?= (int) $s['id'] ?>" class="btn btn--secondary btn--icon" title="Participants" aria-label="Participants">👥</a>
+                                    <a href="<?= APP_BASE_URL ?>/admin/session-photos.php?session_id=<?= (int) $s['id'] ?>" class="btn btn--secondary btn--icon" title="Photos" aria-label="Photos">📸</a>
                                     <?php if (!empty($s['is_private'])): ?>
                                     <a href="<?= APP_BASE_URL ?>/admin/session-allowances.php?session_id=<?= (int) $s['id'] ?>" class="btn btn--secondary btn--icon" title="Gérer les accès" aria-label="Gérer les accès">🔒</a>
                                     <?php endif; ?>

@@ -8,7 +8,8 @@ vendor/
 # composer.lock
 
 # Uploaded media (stored outside web root in production)
-public/uploads/
+public/uploads/*
+!public/uploads/.gitkeep
 
 # Editor / OS artefacts
 .DS_Store
