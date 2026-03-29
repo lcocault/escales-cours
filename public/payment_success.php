@@ -6,8 +6,49 @@ Auth::requireLogin();
 
 Auth::start();
 $isBasket = isset($_GET['basket']);
+$isPack   = isset($_GET['pack']);
 
 // ── Basket checkout ──────────────────────────────────────────────────────────
+if ($isPack) {
+    $bookingIds = $_SESSION['pack_checkout_booking_ids'] ?? [];
+    unset($_SESSION['pack_checkout_booking_ids'], $_SESSION['pack_checkout_pack_id']);
+
+    if (empty($bookingIds)) {
+        flash('success', 'Vos réservations ont été confirmées !');
+        header('Location: ' . APP_BASE_URL . '/my-sessions.php');
+        exit;
+    }
+
+    $isDemo       = isset($_GET['_demo']);
+    $bookingModel = new BookingModel();
+    $sessionModel = new SessionModel();
+    $userModel    = new UserModel();
+    $user         = $userModel->findById(Auth::currentUserId());
+
+    $paymentRef = $isDemo
+        ? 'demo_pack_' . implode('_', $bookingIds)
+        : ($_GET['payment_intent'] ?? $_GET['referenceId'] ?? 'paid_pack_' . implode('_', $bookingIds));
+
+    foreach ($bookingIds as $bookingId) {
+        $booking = $bookingModel->findById((int) $bookingId);
+        if (!$booking || $booking['status'] !== 'pending') {
+            continue;
+        }
+
+        $bookingModel->confirm((int) $bookingId, $paymentRef);
+        $session = $sessionModel->findById((int) $booking['session_id']);
+        $sessionModel->decrementSeats((int) $booking['session_id']);
+
+        Mailer::sendBookingConfirmationToAttendee($user, $session);
+        Mailer::sendBookingNotificationToAdmin($user, $session);
+    }
+
+    flash('success', 'Votre pack a été réglé ! Toutes vos réservations sont confirmées. Vous recevrez des e-mails de confirmation.');
+    header('Location: ' . APP_BASE_URL . '/my-sessions.php');
+    exit;
+}
+
+// ── Basket checkout ───────────────────────────────────────────────────────────
 if ($isBasket) {
     $bookingIds = $_SESSION['basket_checkout_booking_ids'] ?? [];
     unset($_SESSION['basket_checkout_booking_ids']);

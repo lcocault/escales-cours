@@ -150,6 +150,21 @@ include ROOT_DIR . '/templates/header.php';
 
         <!-- Booking CTA -->
         <div class="mt-3" style="text-align:right">
+            <?php
+            // Show pack offer when the session belongs to at least one available pack
+            $packModel    = new PackModel();
+            $sessionPacks = $packModel->getPacksForSessionWithAvailability($id);
+            $availablePacks = array_filter($sessionPacks, fn($p) => (int) $p['is_available'] === 1);
+            ?>
+            <?php if (!empty($availablePacks)): ?>
+                <div class="flash flash--info" style="display:inline-block;text-align:left;margin-bottom:.75rem">
+                    💡 Cette séance fait partie <?= count($availablePacks) === 1 ? 'd\'un pack' : 'de packs' ?> :
+                    <?php foreach ($availablePacks as $pk): ?>
+                        <strong><a href="<?= APP_BASE_URL ?>/pack.php?id=<?= (int) $pk['id'] ?>"><?= e($pk['title']) ?></a></strong>
+                        (<?= e(formatPrice((int) $pk['price_cents'])) ?>)<?= $pk !== end($availablePacks) ? ', ' : '' ?>
+                    <?php endforeach; ?>
+                </div>
+            <?php endif; ?>
             <?php if (($session['status'] ?? '') === 'cancelled'): ?>
                 <?php /* session is cancelled – no booking button shown */ ?>
             <?php elseif ($booking && $booking['status'] === 'pending'): ?>

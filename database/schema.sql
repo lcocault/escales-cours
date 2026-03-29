@@ -129,6 +129,23 @@ CREATE TABLE IF NOT EXISTS ratings (
     UNIQUE (user_id, session_id)
 );
 
+-- Packs (groups of sessions with a global price) ------------
+CREATE TABLE IF NOT EXISTS packs (
+    id          SERIAL PRIMARY KEY,
+    title       VARCHAR(255) NOT NULL,
+    description TEXT,
+    price_cents INTEGER     NOT NULL CHECK (price_cents >= 0),
+    created_at  TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+    deleted_at  TIMESTAMPTZ
+);
+
+-- Pack ↔ session join table ----------------------------------
+CREATE TABLE IF NOT EXISTS pack_sessions (
+    pack_id    INTEGER NOT NULL REFERENCES packs(id) ON DELETE CASCADE,
+    session_id INTEGER NOT NULL REFERENCES sessions(id) ON DELETE CASCADE,
+    PRIMARY KEY (pack_id, session_id)
+);
+
 -- Password reset tokens ---------------------------------------
 CREATE TABLE IF NOT EXISTS password_resets (
     id          SERIAL PRIMARY KEY,
