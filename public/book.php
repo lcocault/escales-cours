@@ -159,11 +159,27 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
 $pageTitle = 'Réserver – ' . $session['title'];
 include ROOT_DIR . '/templates/header.php';
+
+// Load packs for this session (to show a banner) – single query with availability
+$packModel      = new PackModel();
+$sessionPacks   = $packModel->getPacksForSessionWithAvailability($sessionId);
+$availablePacks = array_filter($sessionPacks, fn($p) => (int) $p['is_available'] === 1);
 ?>
 <div class="container">
     <?php include ROOT_DIR . '/templates/flash.php'; ?>
 
     <h1 class="page-title">🛒 Réserver une séance</h1>
+
+    <?php if (!empty($availablePacks)): ?>
+        <div class="flash flash--info" style="margin-bottom:1.5rem">
+            💡 Cette séance fait partie <?= count($availablePacks) === 1 ? 'd\'un pack' : 'de packs' ?> :
+            <?php foreach ($availablePacks as $pk): ?>
+                <strong><a href="<?= APP_BASE_URL ?>/pack.php?id=<?= (int) $pk['id'] ?>"><?= e($pk['title']) ?></a></strong>
+                (<?= e(formatPrice((int) $pk['price_cents'])) ?>)<?= $pk !== end($availablePacks) ? ', ' : '' ?>
+            <?php endforeach; ?>
+            — réserver le pack vous inscrit à toutes les séances incluses.
+        </div>
+    <?php endif; ?>
 
     <div class="booking-summary">
         <h2><?= e($session['title']) ?></h2>

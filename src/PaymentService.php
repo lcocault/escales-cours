@@ -48,19 +48,21 @@ class PaymentService
      * @param array  $lineItems    Array of ['name' => string, 'amount_cents' => int] entries.
      * @param int    $totalCents   Total amount in the smallest currency unit.
      * @param string $currency     ISO 4217 currency code (e.g. "eur").
+     * @param string $urlTag       Query parameter appended to success/cancel URLs (e.g. "basket" or "pack").
      * @return array{url: string, squareOrderId: ?string}
      * @throws RuntimeException   If the configured provider is unsupported or misconfigured.
      */
     public static function createBasketCheckoutUrl(
         array $lineItems,
         int $totalCents,
-        string $currency
+        string $currency,
+        string $urlTag = 'basket'
     ): array {
         $provider = defined('PAYMENT_PROVIDER') ? strtolower(PAYMENT_PROVIDER) : 'stripe';
 
         return match ($provider) {
-            'stripe' => self::stripeBasketCheckoutUrl($lineItems, $currency),
-            'square' => self::squareBasketCheckoutUrl($totalCents, $currency),
+            'stripe' => self::stripeBasketCheckoutUrl($lineItems, $currency, $urlTag),
+            'square' => self::squareBasketCheckoutUrl($totalCents, $currency, $urlTag),
             default  => throw new RuntimeException(
                 "Unsupported PAYMENT_PROVIDER \"$provider\". Must be \"stripe\" or \"square\"."
             ),
@@ -275,11 +277,12 @@ class PaymentService
 
     private static function stripeBasketCheckoutUrl(
         array $lineItems,
-        string $currency
+        string $currency,
+        string $urlTag = 'basket'
     ): array {
         if (!defined('STRIPE_SECRET_KEY') || STRIPE_SECRET_KEY === '' || STRIPE_SECRET_KEY === 'sk_test_...') {
             // Stripe is not configured – fall back to demo mode.
-            return ['url' => APP_BASE_URL . '/payment_success.php?basket=1&_demo=1', 'squareOrderId' => null];
+            return ['url' => APP_BASE_URL . '/payment_success.php?' . $urlTag . '=1&_demo=1', 'squareOrderId' => null];
         }
 
         \Stripe\Stripe::setApiKey(STRIPE_SECRET_KEY);
@@ -297,8 +300,8 @@ class PaymentService
             'payment_method_types' => ['card'],
             'line_items'           => $stripeLineItems,
             'mode'                 => 'payment',
-            'success_url'          => APP_BASE_URL . '/payment_success.php?basket=1&payment_intent={CHECKOUT_SESSION_ID}',
-            'cancel_url'           => APP_BASE_URL . '/payment_cancel.php?basket=1',
+            'success_url'          => APP_BASE_URL . '/payment_success.php?' . $urlTag . '=1&payment_intent={CHECKOUT_SESSION_ID}',
+            'cancel_url'           => APP_BASE_URL . '/payment_cancel.php?' . $urlTag . '=1',
         ]);
 
         return ['url' => $session->url, 'squareOrderId' => null];
@@ -310,11 +313,12 @@ class PaymentService
 
     private static function squareBasketCheckoutUrl(
         int $totalCents,
-        string $currency
+        string $currency,
+        string $urlTag = 'basket'
     ): array {
         if (!defined('SQUARE_ACCESS_TOKEN') || SQUARE_ACCESS_TOKEN === '' || SQUARE_ACCESS_TOKEN === 'EAAAl...') {
             // Square is not configured – fall back to demo mode.
-            return ['url' => APP_BASE_URL . '/payment_success.php?basket=1&_demo=1', 'squareOrderId' => null];
+            return ['url' => APP_BASE_URL . '/payment_success.php?' . $urlTag . '=1&_demo=1', 'squareOrderId' => null];
         }
 
         $environment = (defined('SQUARE_ENVIRONMENT') && SQUARE_ENVIRONMENT === 'production')
@@ -338,7 +342,7 @@ class PaymentService
                 ]),
             ]),
             'checkoutOptions' => new \Square\Types\CheckoutOptions([
-                'redirectUrl' => APP_BASE_URL . '/payment_success.php?basket=1',
+                'redirectUrl' => APP_BASE_URL . '/payment_success.php?' . $urlTag . '=1',
             ]),
         ]);
 
