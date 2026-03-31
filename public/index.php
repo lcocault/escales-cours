@@ -18,7 +18,13 @@ include ROOT_DIR . '/templates/header.php';
         <h1>🍳 Les Escales Culinaires</h1>
         <p>Des ateliers de cuisine pour les petits explorateurs des saveurs !</p>
         <p class="hero__location">📍 36 rue Boieldieu, 31300 Toulouse</p>
-        <a href="<?= APP_BASE_URL ?>/about.php" class="btn btn--secondary mt-2">✨ Découvrir le concept</a>
+        <div class="hero__actions">
+            <a href="<?= APP_BASE_URL ?>/about.php" class="btn btn--secondary">✨ Découvrir le concept</a>
+            <a href="https://www.instagram.com/les.escales.culinaires" target="_blank" rel="noopener noreferrer" class="btn btn--instagram" aria-label="Nous suivre sur Instagram">
+                <?php $instagramIconSize = 18; include ROOT_DIR . '/templates/instagram-icon.php'; ?>
+                Instagram
+            </a>
+        </div>
     </section>
 
     <?php if ($latestMessage !== null): ?>
