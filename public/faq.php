@@ -164,7 +164,11 @@ include ROOT_DIR . '/templates/header.php';
             <div class="faq-item__answer">
                 <p>
                     📞 <a href="tel:+33650071091">06 50 07 10 91</a><br>
-                    ✉️ <a href="mailto:les.escales.culinaires@gmail.com">les.escales.culinaires@gmail.com</a>
+                    ✉️ <a href="mailto:les.escales.culinaires@gmail.com">les.escales.culinaires@gmail.com</a><br>
+                    <a href="https://www.instagram.com/les.escales.culinaires" target="_blank" rel="noopener noreferrer" class="instagram-link">
+                        <?php include ROOT_DIR . '/templates/instagram-icon.php'; ?>
+                        @les.escales.culinaires
+                    </a>
                 </p>
                 <p>
                     Responsable : <strong>Emmanuelle Du Puy De Goyne</strong>

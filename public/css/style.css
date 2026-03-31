@@ -173,6 +173,7 @@ a:hover { text-decoration: underline; }
 .hero .hero__location { font-size: 1rem; opacity: .8; }
 .hero .btn--secondary { background: rgba(255,255,255,.15); color: #fff; border: 2px solid rgba(255,255,255,.5); display: inline-block; }
 .hero .btn--secondary:hover { background: rgba(255,255,255,.25); }
+.hero__actions { display: flex; flex-wrap: wrap; gap: .75rem; justify-content: center; margin-top: 1rem; }
 
 /* ─── Session cards ─── */
 .sessions-grid {
@@ -423,6 +424,27 @@ td .actions { display: flex; gap: .5rem; flex-wrap: wrap; }
 .site-footer__links { list-style: none; }
 .site-footer__links li { margin-bottom: .3rem; }
 .site-footer__legal { border-top: 1px solid rgba(255,255,255,.2); padding-top: .75rem; text-align: center; font-size: .8rem; opacity: .75; }
+
+/* ─── Instagram ─── */
+.instagram-icon { vertical-align: middle; display: inline-block; flex-shrink: 0; }
+.instagram-link { display: inline-flex; align-items: center; gap: .35rem; text-decoration: none; }
+.instagram-link:hover { text-decoration: underline; }
+.btn--instagram {
+    display: inline-flex;
+    align-items: center;
+    gap: .4rem;
+    background: linear-gradient(45deg, #f09433, #e6683c, #dc2743, #cc2366, #bc1888);
+    color: #fff;
+    border: none;
+    padding: .5rem 1.1rem;
+    border-radius: var(--radius);
+    font-weight: 700;
+    font-size: .95rem;
+    cursor: pointer;
+    text-decoration: none;
+    transition: opacity .2s;
+}
+.btn--instagram:hover { opacity: .85; text-decoration: none; color: #fff; }
 
 /* ─── FAQ ─── */
 .faq-list { display: flex; flex-direction: column; gap: .75rem; margin-bottom: 2rem; }
