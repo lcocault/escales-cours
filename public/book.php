@@ -109,7 +109,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $discountCents = $appliedPromo ? min((int) $appliedPromo['discount_cents'], (int) $session['price_cents']) : 0;
         $finalPrice    = (int) $session['price_cents'] - $discountCents;
 
-        if ($action === 'basket') {
+        if ($action === 'check_promo') {
+            // Just re-render the form with the discount information visible.
+            // Fall through to the HTML rendering below without creating a booking.
+        } elseif ($action === 'basket') {
             // Add to basket and redirect to basket page
             $basketModel = new BasketModel();
             $basketModel->addItem(
@@ -123,8 +126,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             flash('success', '🛒 Séance ajoutée au panier !');
             header('Location: ' . APP_BASE_URL . '/basket.php');
             exit;
-        }
-
+        } else {
         // Create the booking record (status = pending)
         $bookingId = $bookingModel->create(
             Auth::currentUserId(),
@@ -177,8 +179,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
         header('Location: ' . $checkout['url']);
         exit;
-    }
-}
+        } // end else (pay action)
+    } // end if (empty($errors))
+} // end if POST
 
 $pageTitle = 'Réserver – ' . $session['title'];
 include ROOT_DIR . '/templates/header.php';
@@ -257,10 +260,16 @@ $availablePacks = array_filter($sessionPacks, fn($p) => (int) $p['is_available']
 
             <div class="form-group mt-1">
                 <label for="promo_code">Code promo <span class="optional">(optionnel)</span></label>
-                <input type="text" id="promo_code" name="promo_code"
-                       value="<?= e($promoCode) ?>"
-                       placeholder="ex. : PROMO10"
-                       style="text-transform:uppercase">
+                <div style="display:flex;gap:.5rem;align-items:center">
+                    <input type="text" id="promo_code" name="promo_code"
+                           value="<?= e($promoCode) ?>"
+                           placeholder="ex. : PROMO10"
+                           style="text-transform:uppercase;flex:1"
+                           autocomplete="off">
+                    <button type="submit" name="action" value="check_promo" class="btn btn--secondary" style="white-space:nowrap">
+                        Vérifier
+                    </button>
+                </div>
             </div>
 
             <?php if ($appliedPromo): ?>
@@ -268,10 +277,12 @@ $availablePacks = array_filter($sessionPacks, fn($p) => (int) $p['is_available']
                     $discountCentsDisplay = min((int) $appliedPromo['discount_cents'], (int) $session['price_cents']);
                     $finalPriceDisplay    = (int) $session['price_cents'] - $discountCentsDisplay;
                 ?>
-                <div class="flash flash--success" style="margin-top:.5rem">
+                <div class="flash flash--success" style="margin-top:.5rem" id="promo-result">
                     🎉 Code promotionnel appliqué : –<?= e(formatPrice($discountCentsDisplay)) ?>.
                     Prix final : <strong><?= e(formatPrice($finalPriceDisplay)) ?></strong>
                 </div>
+            <?php else: ?>
+                <div id="promo-result" style="margin-top:.5rem;display:none"></div>
             <?php endif; ?>
 
             <?php if ((int) $user['credits'] > 0): ?>
@@ -289,8 +300,8 @@ $availablePacks = array_filter($sessionPacks, fn($p) => (int) $p['is_available']
                     : (int) $session['price_cents'];
             ?>
             <div class="mt-3">
-                <button type="submit" name="action" value="pay" class="btn btn--primary">
-                    💳 Procéder au paiement (<?= e(formatPrice($displayPrice)) ?>)
+                <button type="submit" name="action" value="pay" class="btn btn--primary" id="pay-btn">
+                    💳 Procéder au paiement (<span id="pay-btn-price"><?= e(formatPrice($displayPrice)) ?></span>)
                 </button>
                 <button type="submit" name="action" value="basket" class="btn btn--warning" style="margin-left:.5rem">
                     🛒 Ajouter au panier
@@ -300,4 +311,65 @@ $availablePacks = array_filter($sessionPacks, fn($p) => (int) $p['is_available']
         </form>
     </div>
 </div>
+<script>
+(function () {
+    var sessionPriceCents = <?= json_encode((int) $session['price_cents']) ?>;
+    var sessionId         = <?= json_encode($sessionId) ?>;
+    var validateUrl       = <?= json_encode(APP_BASE_URL . '/promo-validate.php') ?>;
+
+    var promoInput  = document.getElementById('promo_code');
+    var promoResult = document.getElementById('promo-result');
+    var payBtnPrice = document.getElementById('pay-btn-price');
+
+    if (!promoInput || !promoResult || !payBtnPrice) { return; }
+
+    function formatPrice(cents) {
+        return (cents / 100).toFixed(2).replace('.', ',') + '\u00a0€';
+    }
+
+    var debounceTimer = null;
+
+    function validatePromo() {
+        var code = promoInput.value.trim().toUpperCase();
+        if (code === '') {
+            promoResult.style.display = 'none';
+            promoResult.className     = '';
+            promoResult.innerHTML     = '';
+            payBtnPrice.textContent   = formatPrice(sessionPriceCents);
+            return;
+        }
+
+        fetch(validateUrl + '?code=' + encodeURIComponent(code) + '&session_id=' + sessionId)
+            .then(function (r) { return r.json(); })
+            .then(function (data) {
+                promoResult.style.display = '';
+                if (data.valid) {
+                    var discount   = Math.min(data.discount_cents, sessionPriceCents);
+                    var finalPrice = sessionPriceCents - discount;
+                    promoResult.className = 'flash flash--success';
+                    promoResult.innerHTML = '🎉 Code promotionnel appliqué\u00a0: \u2013' + formatPrice(discount) + '.'
+                        + ' Prix final\u00a0: <strong>' + formatPrice(finalPrice) + '</strong>';
+                    payBtnPrice.textContent = formatPrice(finalPrice);
+                } else {
+                    promoResult.className = 'flash flash--error';
+                    promoResult.innerHTML = '❌ ' + data.message;
+                    payBtnPrice.textContent = formatPrice(sessionPriceCents);
+                }
+            })
+            .catch(function () {
+                console.error('Promo validation request failed.');
+            });
+    }
+
+    promoInput.addEventListener('input', function () {
+        clearTimeout(debounceTimer);
+        debounceTimer = setTimeout(validatePromo, 400);
+    });
+
+    promoInput.addEventListener('blur', function () {
+        clearTimeout(debounceTimer);
+        validatePromo();
+    });
+}());
+</script>
 <?php include ROOT_DIR . '/templates/footer.php'; ?>
