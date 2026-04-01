@@ -198,18 +198,35 @@ class SessionModel
 
     /**
      * Returns all users (with allowance info) for a given private session.
-     * Each row includes user data plus an `is_allowed` flag and `has_booking` flag.
+     * Each row includes user data plus an `is_allowed` flag, `has_booking` flag,
+     * and participation counts for private and public sessions.
      */
     public function getAllowedUsers(int $sessionId): array
     {
         $stmt = $this->db->prepare(
             "SELECT u.id, u.first_name, u.last_name, u.email,
                     (sa.user_id IS NOT NULL) AS is_allowed,
-                    (SELECT COUNT(*) FROM bookings b
-                     WHERE b.user_id = u.id AND b.session_id = :sid2
-                       AND b.status NOT IN ('cancelled')) > 0 AS has_booking
+                    (bchk.user_id IS NOT NULL) AS has_booking,
+                    COALESCE(agg.private_sessions_attended, 0) AS private_sessions_attended,
+                    COALESCE(agg.public_sessions_attended, 0) AS public_sessions_attended
              FROM users u
-             LEFT JOIN session_allowances sa ON sa.session_id = :sid AND sa.user_id = u.id
+             LEFT JOIN session_allowances sa
+                    ON sa.session_id = :sid AND sa.user_id = u.id
+             LEFT JOIN (
+                 SELECT DISTINCT b.user_id
+                 FROM bookings b
+                 WHERE b.session_id = :sid2
+                   AND b.status NOT IN ('cancelled')
+             ) bchk ON bchk.user_id = u.id
+             LEFT JOIN (
+                 SELECT b.user_id,
+                        SUM(CASE WHEN s.is_private = TRUE  THEN 1 ELSE 0 END) AS private_sessions_attended,
+                        SUM(CASE WHEN s.is_private = FALSE THEN 1 ELSE 0 END) AS public_sessions_attended
+                 FROM bookings b
+                 JOIN sessions s ON s.id = b.session_id
+                 WHERE b.status IN ('attended', 'credited')
+                 GROUP BY b.user_id
+             ) agg ON agg.user_id = u.id
              WHERE u.deleted_at IS NULL AND u.role = 'user'
              ORDER BY u.last_name ASC, u.first_name ASC"
         );

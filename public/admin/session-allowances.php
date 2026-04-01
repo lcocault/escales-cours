@@ -83,6 +83,8 @@ include ROOT_DIR . '/templates/header.php';
                     <tr>
                         <th>Nom</th>
                         <th>E-mail</th>
+                        <th>Séances privées</th>
+                        <th>Séances publiques</th>
                         <th>Statut</th>
                         <th>Actions</th>
                     </tr>
@@ -92,6 +94,8 @@ include ROOT_DIR . '/templates/header.php';
                         <tr>
                             <td><?= e($u['last_name'] . ' ' . $u['first_name']) ?></td>
                             <td><?= e($u['email']) ?></td>
+                            <td style="text-align:center"><?= (int) $u['private_sessions_attended'] ?></td>
+                            <td style="text-align:center"><?= (int) $u['public_sessions_attended'] ?></td>
                             <td>
                                 <?php if ($u['is_allowed']): ?>
                                     <span class="badge badge--seats-ok">✅ Autorisé</span>
