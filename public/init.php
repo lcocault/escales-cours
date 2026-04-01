@@ -16,6 +16,7 @@ require_once ROOT_DIR . '/src/Mailer.php';
 require_once ROOT_DIR . '/src/PaymentService.php';
 require_once ROOT_DIR . '/src/RatingModel.php';
 require_once ROOT_DIR . '/src/PackModel.php';
+require_once ROOT_DIR . '/src/PromoCodeModel.php';
 
 // Helper: escape output (accepts null, returns empty string for null)
 function e(?string $value): string

@@ -41,12 +41,13 @@ if ($existing && in_array($existing['status'], ['confirmed', 'attended'])) {
     exit;
 }
 if ($existing && $existing['status'] === 'pending') {
-    // Resume payment for the existing pending booking
+    // Resume payment for the existing pending booking (using the stored discount)
+    $resumePrice = max(0, (int) $session['price_cents'] - (int) $existing['discount_cents']);
     try {
         $checkout = PaymentService::createCheckoutUrl(
             (int) $existing['id'],
             $session['title'],
-            (int) $session['price_cents'],
+            $resumePrice,
             'eur'
         );
     } catch (RuntimeException $e) {
@@ -70,6 +71,8 @@ $childFirstName = '';
 $childLastName  = $user['last_name'] ?? '';
 $childAge       = '';
 $childAllergies = '';
+$promoCode      = '';
+$appliedPromo   = null;
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     Auth::verifyCsrf();
@@ -78,6 +81,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $childLastName  = trim($_POST['child_last_name']  ?? '');
     $childAge       = trim($_POST['child_age']        ?? '');
     $childAllergies = trim($_POST['child_allergies']  ?? '');
+    $promoCode      = strtoupper(trim($_POST['promo_code'] ?? ''));
 
     if ($childFirstName === '') {
         $errors[] = 'Le prénom de l\'enfant est obligatoire.';
@@ -89,9 +93,21 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $errors[] = 'L\'âge de l\'enfant doit être un nombre entier entre 1 et 17.';
     }
 
+    // Validate promo code if provided
+    if ($promoCode !== '') {
+        $promoModel   = new PromoCodeModel();
+        $appliedPromo = $promoModel->validateForSession($promoCode, $sessionId);
+        if ($appliedPromo === null) {
+            $errors[] = 'Le code promotionnel est invalide ou n\'est pas applicable à cette séance.';
+        }
+    }
+
     if (empty($errors)) {
         $useCredit = isset($_POST['use_credit']) && (int) $user['credits'] > 0;
         $action    = $_POST['action'] ?? 'pay';
+
+        $discountCents = $appliedPromo ? min((int) $appliedPromo['discount_cents'], (int) $session['price_cents']) : 0;
+        $finalPrice    = (int) $session['price_cents'] - $discountCents;
 
         if ($action === 'basket') {
             // Add to basket and redirect to basket page
@@ -117,8 +133,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $childFirstName,
             $childLastName,
             (int) $childAge,
-            $childAllergies
+            $childAllergies,
+            $appliedPromo ? (int) $appliedPromo['id'] : null,
+            $discountCents
         );
+
+        // Increment promo code usage counter
+        if ($appliedPromo) {
+            (new PromoCodeModel())->incrementUsedCount((int) $appliedPromo['id']);
+        }
 
         if ($useCredit) {
             // Free booking via credit
@@ -137,7 +160,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $checkout = PaymentService::createCheckoutUrl(
                 $bookingId,
                 $session['title'],
-                (int) $session['price_cents'],
+                $finalPrice,
                 'eur'
             );
         } catch (RuntimeException $e) {
@@ -229,6 +252,28 @@ $availablePacks = array_filter($sessionPacks, fn($p) => (int) $p['is_available']
                 <textarea id="child_allergies" name="child_allergies" rows="2"><?= e($childAllergies) ?></textarea>
             </div>
 
+            <hr class="mt-2 mb-2">
+            <h3 class="form-section-title">Code promotionnel</h3>
+
+            <div class="form-group mt-1">
+                <label for="promo_code">Code promo <span class="optional">(optionnel)</span></label>
+                <input type="text" id="promo_code" name="promo_code"
+                       value="<?= e($promoCode) ?>"
+                       placeholder="ex. : PROMO10"
+                       style="text-transform:uppercase">
+            </div>
+
+            <?php if ($appliedPromo): ?>
+                <?php
+                    $discountCentsDisplay = min((int) $appliedPromo['discount_cents'], (int) $session['price_cents']);
+                    $finalPriceDisplay    = (int) $session['price_cents'] - $discountCentsDisplay;
+                ?>
+                <div class="flash flash--success" style="margin-top:.5rem">
+                    🎉 Code promotionnel appliqué : –<?= e(formatPrice($discountCentsDisplay)) ?>.
+                    Prix final : <strong><?= e(formatPrice($finalPriceDisplay)) ?></strong>
+                </div>
+            <?php endif; ?>
+
             <?php if ((int) $user['credits'] > 0): ?>
                 <div class="form-group form-group--checkbox mt-2">
                     <input type="checkbox" id="use_credit" name="use_credit" value="1">
@@ -238,9 +283,14 @@ $availablePacks = array_filter($sessionPacks, fn($p) => (int) $p['is_available']
                 </div>
             <?php endif; ?>
 
+            <?php
+                $displayPrice = $appliedPromo
+                    ? max(0, (int) $session['price_cents'] - min((int) $appliedPromo['discount_cents'], (int) $session['price_cents']))
+                    : (int) $session['price_cents'];
+            ?>
             <div class="mt-3">
                 <button type="submit" name="action" value="pay" class="btn btn--primary">
-                    💳 Procéder au paiement (<?= e(formatPrice((int) $session['price_cents'])) ?>)
+                    💳 Procéder au paiement (<?= e(formatPrice($displayPrice)) ?>)
                 </button>
                 <button type="submit" name="action" value="basket" class="btn btn--warning" style="margin-left:.5rem">
                     🛒 Ajouter au panier

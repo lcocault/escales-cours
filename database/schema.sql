@@ -63,6 +63,20 @@ CREATE TABLE IF NOT EXISTS session_media (
     created_at  TIMESTAMPTZ NOT NULL DEFAULT NOW()
 );
 
+-- Promotional codes ------------------------------------------
+CREATE TABLE IF NOT EXISTS promo_codes (
+    id              SERIAL PRIMARY KEY,
+    code            VARCHAR(50)  NOT NULL,
+    session_id      INTEGER      REFERENCES sessions(id) ON DELETE CASCADE,  -- NULL = valid for any session
+    discount_cents  INTEGER      NOT NULL CHECK (discount_cents > 0),
+    max_uses        INTEGER,                                                  -- NULL = unlimited
+    used_count      INTEGER      NOT NULL DEFAULT 0,
+    expires_at      TIMESTAMPTZ,
+    created_at      TIMESTAMPTZ  NOT NULL DEFAULT NOW(),
+    deleted_at      TIMESTAMPTZ,
+    UNIQUE (code)
+);
+
 -- Bookings ----------------------------------------------------
 CREATE TABLE IF NOT EXISTS bookings (
     id                  SERIAL PRIMARY KEY,
@@ -78,6 +92,8 @@ CREATE TABLE IF NOT EXISTS bookings (
     child_last_name     VARCHAR(100),           -- last name of the child attending
     child_age           INTEGER,                -- age of the child (may differ from session age category)
     child_allergies     TEXT,                   -- food allergies (optional)
+    promo_code_id       INTEGER     REFERENCES promo_codes(id) ON DELETE SET NULL,
+    discount_cents      INTEGER     NOT NULL DEFAULT 0,
     created_at          TIMESTAMPTZ NOT NULL DEFAULT NOW(),
     UNIQUE (user_id, session_id)
 );

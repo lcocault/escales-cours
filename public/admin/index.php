@@ -9,6 +9,7 @@ $userCount     = (int) $db->query("SELECT COUNT(*) FROM users WHERE deleted_at I
 $bookingCount  = (int) $db->query("SELECT COUNT(*) FROM bookings WHERE status IN ('confirmed','attended')")->fetchColumn();
 $messageCount  = (int) $db->query("SELECT COUNT(*) FROM general_messages WHERE deleted_at IS NULL")->fetchColumn();
 $packCount     = (int) $db->query("SELECT COUNT(*) FROM packs WHERE deleted_at IS NULL")->fetchColumn();
+$promoCount    = (int) $db->query("SELECT COUNT(*) FROM promo_codes WHERE deleted_at IS NULL")->fetchColumn();
 
 $pageTitle = 'Administration';
 include ROOT_DIR . '/templates/header.php';
@@ -43,6 +44,11 @@ include ROOT_DIR . '/templates/header.php';
             <div class="admin-card__icon">📦</div>
             <div class="admin-card__label">Packs</div>
             <div style="color:var(--color-muted);font-size:.9rem;margin-top:.25rem"><?= $packCount ?> pack(s)</div>
+        </a>
+        <a href="<?= APP_BASE_URL ?>/admin/promo-codes.php" class="admin-card" style="text-decoration:none;color:inherit">
+            <div class="admin-card__icon">🏷️</div>
+            <div class="admin-card__label">Codes promo</div>
+            <div style="color:var(--color-muted);font-size:.9rem;margin-top:.25rem"><?= $promoCount ?> code(s)</div>
         </a>
     </div>
 </div>
