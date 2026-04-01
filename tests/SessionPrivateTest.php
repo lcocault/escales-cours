@@ -312,4 +312,45 @@ class SessionPrivateTest extends TestCase
         $this->assertSame(3, $capturedParams[':sid']);
         $this->assertSame(7, $capturedParams[':uid']);
     }
+
+    // -------------------------------------------------------------------------
+    // SessionModel::getAllowedUsers() includes participation counts
+    // -------------------------------------------------------------------------
+
+    public function testGetAllowedUsersIncludesParticipationCounts(): void
+    {
+        $capturedSql = '';
+        $fakeRow = [
+            'id'                        => 1,
+            'first_name'                => 'Alice',
+            'last_name'                 => 'Dupont',
+            'email'                     => 'alice@example.com',
+            'is_allowed'                => true,
+            'has_booking'               => false,
+            'private_sessions_attended' => 3,
+            'public_sessions_attended'  => 5,
+        ];
+
+        $stmt = $this->createMock(PDOStatement::class);
+        $stmt->method('execute')->willReturn(true);
+        $stmt->method('fetchAll')->willReturn([$fakeRow]);
+
+        $pdo = $this->createMock(PDO::class);
+        $pdo->method('prepare')
+            ->willReturnCallback(function (string $sql) use (&$capturedSql, $stmt) {
+                $capturedSql = $sql;
+                return $stmt;
+            });
+
+        $this->injectPdo($pdo);
+
+        $model = new SessionModel();
+        $users = $model->getAllowedUsers(10);
+
+        $this->assertStringContainsString('private_sessions_attended', $capturedSql);
+        $this->assertStringContainsString('public_sessions_attended', $capturedSql);
+        $this->assertCount(1, $users);
+        $this->assertSame(3, $users[0]['private_sessions_attended']);
+        $this->assertSame(5, $users[0]['public_sessions_attended']);
+    }
 }
