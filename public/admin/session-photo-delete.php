@@ -29,12 +29,14 @@ if ($mediaId > 0) {
         // Use the media record's own session_id for the redirect target
         $sessionId = (int) $media['session_id'];
 
-        // Delete the physical file
-        $filePath = ROOT_DIR . '/public/uploads/' . $sessionId . '/' . $media['filename'];
-        if (is_file($filePath) && !unlink($filePath)) {
-            flash('error', 'Impossible de supprimer le fichier. La photo n\'a pas été supprimée.');
-            header('Location: ' . APP_BASE_URL . '/admin/session-photos.php?session_id=' . $sessionId);
-            exit;
+        // Only delete physical file for locally-uploaded photos
+        if (!empty($media['filename'])) {
+            $filePath = ROOT_DIR . '/public/uploads/' . $sessionId . '/' . $media['filename'];
+            if (is_file($filePath) && !unlink($filePath)) {
+                flash('error', 'Impossible de supprimer le fichier. La photo n\'a pas été supprimée.');
+                header('Location: ' . APP_BASE_URL . '/admin/session-photos.php?session_id=' . $sessionId);
+                exit;
+            }
         }
 
         // Delete the database record

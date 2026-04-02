@@ -56,11 +56,17 @@ CREATE TABLE IF NOT EXISTS session_allowances (
 
 -- Session media (photos, post-session) ------------------------
 CREATE TABLE IF NOT EXISTS session_media (
-    id          SERIAL PRIMARY KEY,
-    session_id  INTEGER     NOT NULL REFERENCES sessions(id) ON DELETE CASCADE,
-    filename    VARCHAR(255) NOT NULL,
-    is_private  BOOLEAN     NOT NULL DEFAULT TRUE,  -- requires photo_consent
-    created_at  TIMESTAMPTZ NOT NULL DEFAULT NOW()
+    id           SERIAL PRIMARY KEY,
+    session_id   INTEGER      NOT NULL REFERENCES sessions(id) ON DELETE CASCADE,
+    filename     VARCHAR(255) NULL,                  -- set for locally-uploaded files
+    external_url TEXT         NULL,                  -- set for external-URL photos
+    is_private   BOOLEAN      NOT NULL DEFAULT TRUE, -- requires photo_consent
+    created_at   TIMESTAMPTZ  NOT NULL DEFAULT NOW(),
+    CONSTRAINT chk_session_media_source CHECK (
+        (filename IS NOT NULL AND external_url IS NULL)
+        OR
+        (filename IS NULL AND external_url IS NOT NULL)
+    )
 );
 
 -- Promotional codes ------------------------------------------

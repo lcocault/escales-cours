@@ -75,7 +75,12 @@ include ROOT_DIR . '/templates/header.php';
                 <h2>📸 Photos de la séance</h2>
                 <div style="display:flex;flex-wrap:wrap;gap:1rem;margin-top:.75rem">
                     <?php foreach ($publicMedia as $media): ?>
-                        <img src="<?= APP_BASE_URL ?>/uploads/<?= e($session['id'] . '/' . $media['filename']) ?>"
+                        <?php
+                        $imgSrc = !empty($media['external_url'])
+                            ? $media['external_url']
+                            : APP_BASE_URL . '/uploads/' . e($session['id']) . '/' . e($media['filename']);
+                        ?>
+                        <img src="<?= e($imgSrc) ?>"
                              alt="Photo de la séance"
                              style="width:200px;height:150px;object-fit:cover;border-radius:8px">
                     <?php endforeach; ?>
@@ -89,7 +94,12 @@ include ROOT_DIR . '/templates/header.php';
                 <?php if ($user['photo_consent']): ?>
                     <div style="display:flex;flex-wrap:wrap;gap:1rem;margin-top:.75rem">
                         <?php foreach ($privateMedia as $media): ?>
-                            <img src="<?= APP_BASE_URL ?>/uploads/<?= e($session['id'] . '/' . $media['filename']) ?>"
+                            <?php
+                            $imgSrc = !empty($media['external_url'])
+                                ? $media['external_url']
+                                : APP_BASE_URL . '/uploads/' . e($session['id']) . '/' . e($media['filename']);
+                            ?>
+                            <img src="<?= e($imgSrc) ?>"
                                  alt="Photo privée de la séance"
                                  style="width:200px;height:150px;object-fit:cover;border-radius:8px">
                         <?php endforeach; ?>
