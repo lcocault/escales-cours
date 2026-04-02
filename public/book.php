@@ -19,7 +19,7 @@ if ((int) $session['remaining_seats'] <= 0) {
     exit;
 }
 
-if (!empty($session['is_private'])) {
+if (pgBool($session['is_private'])) {
     if (!Auth::isAdmin() && !$sessionModel->isUserAllowed($sessionId, Auth::currentUserId())) {
         flash('error', 'Vous n\'êtes pas autorisé(e) à réserver cette séance privée.');
         header('Location: ' . APP_BASE_URL . '/session.php?id=' . $sessionId);

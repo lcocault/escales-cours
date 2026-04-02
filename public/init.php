@@ -27,6 +27,17 @@ function e(?string $value): string
     return htmlspecialchars($value, ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8');
 }
 
+// Helper: cast a value to bool, correctly handling PostgreSQL boolean strings ('t'/'f')
+// PDO_PGSQL returns boolean columns as 't' (true) or 'f' (false) — both non-empty strings
+// that would be incorrectly truthy when used directly in PHP boolean context.
+function pgBool(mixed $value): bool
+{
+    if (is_bool($value)) {
+        return $value;
+    }
+    return $value === 't' || $value === '1' || strtolower((string) $value) === 'true';
+}
+
 // Helper: set a flash message
 function flash(string $type, string $message): void
 {

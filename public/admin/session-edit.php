@@ -143,7 +143,7 @@ include ROOT_DIR . '/templates/header.php';
             </div>
         </div>
         <div class="form-group form-group--checkbox">
-            <input type="checkbox" id="is_private" name="is_private" value="1" <?= !empty($values['is_private']) ? 'checked' : '' ?>>
+            <input type="checkbox" id="is_private" name="is_private" value="1" <?= pgBool($values['is_private']) ? 'checked' : '' ?>>
             <label for="is_private">🔒 Séance privée (réservée aux membres autorisés)</label>
         </div>
         <div class="form-group">

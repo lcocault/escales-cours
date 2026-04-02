@@ -16,7 +16,7 @@ if (!$session) {
 }
 
 // Private session access check
-if (!empty($session['is_private']) && !Auth::isAdmin()) {
+if (pgBool($session['is_private']) && !Auth::isAdmin()) {
     $allowed = false;
     if (Auth::isLoggedIn()) {
         $allowed = $sessionModel->isUserAllowed($id, Auth::currentUserId());

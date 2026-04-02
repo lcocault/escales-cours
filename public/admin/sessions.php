@@ -36,7 +36,7 @@ include ROOT_DIR . '/templates/header.php';
                     <?php foreach ($sessions as $s): ?>
                         <tr>
                             <td><?= e(formatSessionDateTime($s['session_date'], $s['start_time'])) ?></td>
-                            <td><?= e($s['title']) ?><?php if (!empty($s['is_private'])): ?> <span class="badge" style="background:#7c3aed;color:#fff;font-size:.7rem">🔒 Privée</span><?php endif; ?></td>
+                            <td><?= e($s['title']) ?><?php if (pgBool($s['is_private'])): ?> <span class="badge" style="background:#7c3aed;color:#fff;font-size:.7rem">🔒 Privée</span><?php endif; ?></td>
                             <td><?php
                                 echo e(ageCategoryLabel($s['age_category'] ?? '6-12'));
                             ?></td>
@@ -57,7 +57,7 @@ include ROOT_DIR . '/templates/header.php';
                                     <a href="<?= APP_BASE_URL ?>/admin/session-edit.php?duplicate_from=<?= (int) $s['id'] ?>" class="btn btn--secondary btn--icon" title="Dupliquer" aria-label="Dupliquer">📋</a>
                                     <a href="<?= APP_BASE_URL ?>/admin/attendees.php?session_id=<?= (int) $s['id'] ?>" class="btn btn--secondary btn--icon" title="Participants" aria-label="Participants">👥</a>
                                     <a href="<?= APP_BASE_URL ?>/admin/session-photos.php?session_id=<?= (int) $s['id'] ?>" class="btn btn--secondary btn--icon" title="Photos" aria-label="Photos">📸</a>
-                                    <?php if (!empty($s['is_private'])): ?>
+                                    <?php if (pgBool($s['is_private'])): ?>
                                     <a href="<?= APP_BASE_URL ?>/admin/session-allowances.php?session_id=<?= (int) $s['id'] ?>" class="btn btn--secondary btn--icon" title="Gérer les accès" aria-label="Gérer les accès">🔒</a>
                                     <?php endif; ?>
                                     <?php if (!in_array($s['status'] ?? 'pending', ['cancelled'], true)): ?>

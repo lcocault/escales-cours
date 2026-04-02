@@ -67,8 +67,8 @@ include ROOT_DIR . '/templates/header.php';
 
         <!-- Photos -->
         <?php
-        $publicMedia  = array_filter($mediaList, fn($m) => !$m['is_private']);
-        $privateMedia = array_filter($mediaList, fn($m) => (bool) $m['is_private']);
+        $publicMedia  = array_filter($mediaList, fn($m) => !pgBool($m['is_private']));
+        $privateMedia = array_filter($mediaList, fn($m) => pgBool($m['is_private']));
         ?>
         <?php if ($publicMedia): ?>
             <section class="section-block">
@@ -91,7 +91,7 @@ include ROOT_DIR . '/templates/header.php';
         <?php if ($privateMedia): ?>
             <section class="section-block">
                 <h2>🔒 Photos privées (enfants)</h2>
-                <?php if ($user['photo_consent']): ?>
+                <?php if (pgBool($user['photo_consent'])): ?>
                     <div style="display:flex;flex-wrap:wrap;gap:1rem;margin-top:.75rem">
                         <?php foreach ($privateMedia as $media): ?>
                             <?php

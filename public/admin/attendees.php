@@ -57,7 +57,7 @@ include ROOT_DIR . '/templates/header.php';
                             <td><?= e($b['email']) ?></td>
                             <td><?= e($b['phone'] ?? '–') ?></td>
                             <td><?= e($b['phone2'] ?? '–') ?></td>
-                            <td><?= $b['photo_consent'] ? '✅' : '❌' ?></td>
+                            <td><?= pgBool($b['photo_consent']) ? '✅' : '❌' ?></td>
                             <td><?= e($b['status']) ?></td>
                             <td>
                                 <div class="actions">

@@ -214,7 +214,7 @@ include ROOT_DIR . '/templates/header.php';
                          alt="Photo de la séance"
                          style="width:200px;height:150px;object-fit:cover;border-radius:8px;display:block;margin-bottom:.5rem">
                     <p style="font-size:.85rem;color:var(--color-muted);margin-bottom:.5rem">
-                        <?= $media['is_private'] ? '🔒 Privée' : '🌐 Publique' ?>
+                        <?= pgBool($media['is_private']) ? '🔒 Privée' : '🌐 Publique' ?>
                         <?= !empty($media['external_url']) ? ' · 🔗 URL' : '' ?>
                     </p>
                     <form method="post" action="<?= APP_BASE_URL ?>/admin/session-photo-delete.php"

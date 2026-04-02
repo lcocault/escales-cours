@@ -13,7 +13,7 @@ if (!$session) {
     exit;
 }
 
-if (!$session['is_private']) {
+if (!pgBool($session['is_private'])) {
     flash('error', 'Cette séance n\'est pas privée.');
     header('Location: ' . APP_BASE_URL . '/admin/sessions.php');
     exit;
