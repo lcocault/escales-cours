@@ -601,3 +601,8 @@ td .actions { display: flex; gap: .5rem; flex-wrap: wrap; }
 .ratings-teaser-link__avg { font-weight: 700; }
 .ratings-teaser-link__count { color: var(--color-muted); font-size: .9rem; }
 .ratings-teaser-link__cta { font-size: .9rem; }
+
+/* ─── Photo thumbnail (session-content lightbox) ─── */
+a.photo-thumb { display:inline-block; }
+a.photo-thumb img { cursor:zoom-in; transition: opacity .15s; }
+a.photo-thumb:hover img { opacity: .85; }

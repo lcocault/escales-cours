@@ -80,9 +80,11 @@ include ROOT_DIR . '/templates/header.php';
                             ? $media['external_url']
                             : APP_BASE_URL . '/uploads/' . e($session['id']) . '/' . e($media['filename']);
                         ?>
-                        <img src="<?= e($imgSrc) ?>"
-                             alt="Photo de la séance"
-                             style="width:200px;height:150px;object-fit:cover;border-radius:8px">
+                        <a href="<?= e($imgSrc) ?>" class="photo-thumb" aria-label="Agrandir la photo">
+                            <img src="<?= e($imgSrc) ?>"
+                                 alt="Photo de la séance"
+                                 style="width:200px;height:150px;object-fit:cover;border-radius:8px">
+                        </a>
                     <?php endforeach; ?>
                 </div>
             </section>
@@ -99,9 +101,11 @@ include ROOT_DIR . '/templates/header.php';
                                 ? $media['external_url']
                                 : APP_BASE_URL . '/uploads/' . e($session['id']) . '/' . e($media['filename']);
                             ?>
-                            <img src="<?= e($imgSrc) ?>"
-                                 alt="Photo privée de la séance"
-                                 style="width:200px;height:150px;object-fit:cover;border-radius:8px">
+                            <a href="<?= e($imgSrc) ?>" class="photo-thumb" aria-label="Agrandir la photo">
+                                <img src="<?= e($imgSrc) ?>"
+                                     alt="Photo privée de la séance"
+                                     style="width:200px;height:150px;object-fit:cover;border-radius:8px">
+                            </a>
                         <?php endforeach; ?>
                     </div>
                 <?php else: ?>
@@ -115,4 +119,55 @@ include ROOT_DIR . '/templates/header.php';
 
     <p class="mt-2"><a href="<?= APP_BASE_URL ?>/my-sessions.php">← Retour à mes réservations</a></p>
 </div>
+
+<!-- Lightbox overlay -->
+<div id="lightbox" role="dialog" aria-modal="true" aria-label="Visionneuse de photo" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.85);z-index:1000;align-items:center;justify-content:center;padding:1rem">
+    <button id="lightbox-close" aria-label="Fermer" style="position:absolute;top:1rem;right:1.25rem;background:none;border:none;color:#fff;font-size:2rem;cursor:pointer;line-height:1">&#x2715;</button>
+    <img id="lightbox-img" src="" alt="Photo agrandie" style="max-width:100%;max-height:90vh;border-radius:8px;box-shadow:0 8px 32px rgba(0,0,0,.5)">
+</div>
+
+<script>
+(function () {
+    const lightbox = document.getElementById('lightbox');
+    const lightboxImg = document.getElementById('lightbox-img');
+    const closeBtn = document.getElementById('lightbox-close');
+
+    function openLightbox(src, alt) {
+        lightboxImg.src = src;
+        lightboxImg.alt = alt || '';
+        lightbox.style.display = 'flex';
+        document.body.style.overflow = 'hidden';
+        closeBtn.focus();
+    }
+
+    function closeLightbox() {
+        lightbox.style.display = 'none';
+        lightboxImg.src = '';
+        document.body.style.overflow = '';
+    }
+
+    document.querySelectorAll('a.photo-thumb').forEach((link) => {
+        link.addEventListener('click', (e) => {
+            e.preventDefault();
+            const img = link.querySelector('img');
+            openLightbox(link.href, img ? img.alt : '');
+        });
+    });
+
+    closeBtn.addEventListener('click', closeLightbox);
+
+    lightbox.addEventListener('click', (e) => {
+        if (e.target === lightbox) {
+            closeLightbox();
+        }
+    });
+
+    document.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape' && lightbox.style.display === 'flex') {
+            closeLightbox();
+        }
+    });
+}());
+</script>
+
 <?php include ROOT_DIR . '/templates/footer.php'; ?>
