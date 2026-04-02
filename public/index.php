@@ -1,13 +1,8 @@
 <?php
-// public/index.php – homepage: upcoming cooking sessions
+// public/index.php – portal homepage: learning sessions & shop
 require_once __DIR__ . '/init.php';
 
-$pageTitle      = 'Séances à venir';
-$sessionModel   = new SessionModel();
-$sessions       = $sessionModel->getUpcoming(Auth::isLoggedIn() ? Auth::currentUserId() : null);
-$messageModel    = new GeneralMessageModel();
-$latestMessage   = $messageModel->getLatest();
-$hasMoreMessages = $messageModel->countAll() > 1;
+$pageTitle = 'Accueil';
 
 include ROOT_DIR . '/templates/header.php';
 ?>
@@ -16,90 +11,24 @@ include ROOT_DIR . '/templates/header.php';
 
     <section class="hero">
         <h1>🍳 Les Escales Culinaires</h1>
-        <p>Des ateliers de cuisine pour les petits explorateurs des saveurs !</p>
+        <p>Ateliers de cuisine &amp; boutique gourmande à Toulouse</p>
         <p class="hero__location">📍 36 rue Boieldieu, 31300 Toulouse</p>
-        <div class="hero__actions">
-            <a href="<?= APP_BASE_URL ?>/about.php" class="btn btn--secondary">✨ Découvrir le concept</a>
-            <a href="https://www.instagram.com/les.escales.culinaires" target="_blank" rel="noopener noreferrer" class="btn btn--instagram" aria-label="Nous suivre sur Instagram">
-                <?php $instagramIconSize = 18; include ROOT_DIR . '/templates/instagram-icon.php'; ?>
-                Instagram
-            </a>
-        </div>
     </section>
 
-    <?php if ($latestMessage !== null): ?>
-        <section class="news-thread" aria-label="Actualités">
-            <div class="news-item news-item--<?= e($latestMessage['type']) ?>">
-                <span class="news-item__icon" aria-hidden="true"><?= [
-                    'info'    => '💬',
-                    'warning' => '⚠️',
-                    'danger'  => '🚨',
-                    'success' => '✅',
-                ][$latestMessage['type']] ?? '📢' ?></span>
-                <div class="news-item__body">
-                    <p class="news-item__date"><?= e(date('d/m/Y', strtotime($latestMessage['created_at']))) ?></p>
-                    <p class="news-item__text"><?= e($latestMessage['body']) ?></p>
-                </div>
-            </div>
-            <?php if ($hasMoreMessages): ?>
-                <p class="news-thread__more">
-                    <a href="<?= APP_BASE_URL ?>/messages.php">📋 Voir tous les messages →</a>
-                </p>
-            <?php endif; ?>
-        </section>
-    <?php endif; ?>
+    <div class="portal-grid">
+        <a href="<?= APP_BASE_URL ?>/sessions.php" class="portal-card portal-card--sessions">
+            <span class="portal-card__icon">🍳</span>
+            <h2 class="portal-card__title">Ateliers de cuisine</h2>
+            <p class="portal-card__desc">Des cours de cuisine ludiques et pédagogiques pour les enfants. Réservez votre séance en ligne !</p>
+            <span class="btn btn--primary portal-card__cta">Voir les séances →</span>
+        </a>
 
-    <p class="text-center mt-2">
-        <a href="<?= APP_BASE_URL ?>/all-ratings.php">⭐ Voir tous les avis des participants →</a>
-    </p>
-
-    <?php if (empty($sessions)): ?>
-        <p class="text-center mt-3" style="color:var(--color-muted)">
-            Aucune séance prévue pour le moment. Revenez bientôt !
-        </p>
-    <?php else: ?>
-        <div class="sessions-grid">
-            <?php foreach ($sessions as $s): ?>
-                <?php
-                    $seats = (int) $s['remaining_seats'];
-                    if ($seats === 0) {
-                        $badgeClass = 'badge--seats-full';
-                        $badgeText  = 'Complet';
-                    } elseif ($seats <= 3) {
-                        $badgeClass = 'badge--seats-low';
-                        $badgeText  = $seats . ' place' . ($seats > 1 ? 's' : '') . ' restante' . ($seats > 1 ? 's' : '');
-                    } else {
-                        $badgeClass = 'badge--seats-ok';
-                        $badgeText  = $seats . ' places disponibles';
-                    }
-                ?>
-                <article class="session-card">
-                    <div class="session-card__header">
-                        <p class="session-card__date"><?= e(formatDate($s['session_date'])) ?></p>
-                        <h2 class="session-card__title"><?= e($s['title']) ?><?php if (!empty($s['is_private'])): ?> <span style="font-size:.75em;vertical-align:middle">🔒</span><?php endif; ?></h2>
-                    </div>
-                    <div class="session-card__body">
-                        <p class="session-card__theme">🎨 <?= e($s['theme']) ?></p>
-                        <p class="session-card__age">👶 <?= e(ageCategoryLabel($s['age_category'] ?? '6-12')) ?></p>
-                        <?php if ($s['summary']): ?>
-                            <p class="session-card__summary"><?= e($s['summary']) ?></p>
-                        <?php endif; ?>
-                    </div>
-                    <div class="session-card__footer">
-                        <div>
-                            <span class="badge <?= $badgeClass ?>"><?= e($badgeText) ?></span>
-                            <p class="session-card__meta mt-1">
-                                ⏰ <?= e(substr($s['start_time'], 0, 5)) ?> – <?= e(substr($s['end_time'], 0, 5)) ?>
-                                &nbsp;|&nbsp; 💶 <?= e(formatPrice((int) $s['price_cents'])) ?>
-                            </p>
-                        </div>
-                        <a href="<?= APP_BASE_URL ?>/session.php?id=<?= (int) $s['id'] ?>" class="btn btn--primary btn--sm">
-                            Détails →
-                        </a>
-                    </div>
-                </article>
-            <?php endforeach; ?>
+        <div class="portal-card portal-card--shop portal-card--coming-soon">
+            <span class="portal-card__icon">🛍️</span>
+            <h2 class="portal-card__title">Boutique</h2>
+            <p class="portal-card__desc">Retrouvez bientôt nos produits et équipements pour cuisiner en famille !</p>
+            <span class="badge badge--coming-soon">Bientôt disponible</span>
         </div>
-    <?php endif; ?>
+    </div>
 </div>
 <?php include ROOT_DIR . '/templates/footer.php'; ?>

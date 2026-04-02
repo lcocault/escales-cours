@@ -21,7 +21,7 @@ Auth::start();
         </a>
         <nav class="site-nav" aria-label="Navigation principale">
             <ul class="site-nav__list">
-                <li><a href="<?= APP_BASE_URL ?>/">Séances</a></li>
+                <li><a href="<?= APP_BASE_URL ?>/sessions.php">Séances</a></li>
                 <li><a href="<?= APP_BASE_URL ?>/about.php">Le concept</a></li>
                 <li><a href="<?= APP_BASE_URL ?>/faq.php">FAQ</a></li>
                 <li><a href="<?= APP_BASE_URL ?>/all-ratings.php">⭐ Avis</a></li>
