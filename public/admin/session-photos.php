@@ -79,6 +79,39 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
     }
 }
 
+/**
+ * Follow HTTP redirects and return the final effective URL.
+ * Falls back to the original URL if cURL is unavailable or the request fails.
+ */
+function resolveUrlRedirects(string $url): string
+{
+    if (!function_exists('curl_init')) {
+        return $url;
+    }
+
+    $ch = curl_init($url);
+    curl_setopt_array($ch, [
+        CURLOPT_FOLLOWLOCATION => true,
+        CURLOPT_MAXREDIRS      => 10,
+        CURLOPT_RETURNTRANSFER => true,
+        CURLOPT_NOBODY         => true,
+        CURLOPT_TIMEOUT        => 10,
+        CURLOPT_USERAGENT      => 'Mozilla/5.0',
+        CURLOPT_SSL_VERIFYPEER => true,
+    ]);
+    $result   = curl_exec($ch);
+    $finalUrl = curl_getinfo($ch, CURLINFO_EFFECTIVE_URL);
+    $httpCode  = (int) curl_getinfo($ch, CURLINFO_HTTP_CODE);
+    $curlError = curl_errno($ch);
+    curl_close($ch);
+
+    if ($result === false || $curlError !== 0) {
+        return $url;
+    }
+
+    return ($finalUrl && $httpCode >= 200 && $httpCode < 300) ? $finalUrl : $url;
+}
+
 // Handle external URL photo
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['action'] === 'add_url') {
     Auth::verifyCsrf();
@@ -93,6 +126,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
     } elseif (!preg_match('#^https?://#i', $externalUrl)) {
         $errors[] = 'L\'URL doit commencer par http:// ou https://.';
     } else {
+        $externalUrl = resolveUrlRedirects($externalUrl);
         $stmt = $db->prepare(
             'INSERT INTO session_media (session_id, external_url, is_private) VALUES (:sid, :url, :private)'
         );
