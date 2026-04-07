@@ -281,7 +281,7 @@ class Mailer
         $start   = htmlspecialchars($session['start_time']);
         $end     = htmlspecialchars($session['end_time']);
         $baseUrl = APP_BASE_URL;
-        $sessionUrl = $baseUrl . '/session.php?id=' . (int) $session['id'];
+        $sessionUrl = $baseUrl . '/ateliers/seance.php?id=' . (int) $session['id'];
 
         return <<<HTML
         <p>Bonjour {$name},</p>

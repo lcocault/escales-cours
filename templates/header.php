@@ -3,8 +3,8 @@
 // $pageTitle should be set before including this file
 // $navContext controls which nav links are shown:
 //   'home'     – auth links only (Connexion / S'inscrire)
-//   'sessions' – Séances + concept + FAQ + Avis + auth links
-//   'shop'     – concept + FAQ + Avis + auth links (no Séances)
+//   'sessions' – Séances + concept(/ateliers/concept.php) + FAQ(/ateliers/faq.php) + Avis + auth links
+//   'shop'     – concept(/boutique/concept.php) + FAQ(/boutique/faq.php) + Avis + auth links (no Séances)
 //   null       – full nav (all links, default behaviour)
 $pageTitle  = $pageTitle ?? 'Escales Culinaires';
 $navContext = $navContext ?? null;
@@ -29,10 +29,13 @@ Auth::start();
             <ul class="site-nav__list">
                 <?php if ($navContext !== 'home'): ?>
                     <?php if ($navContext !== 'shop'): ?>
-                        <li><a href="<?= APP_BASE_URL ?>/sessions.php">Séances</a></li>
+                        <li><a href="<?= APP_BASE_URL ?>/ateliers/">Séances</a></li>
+                        <li><a href="<?= APP_BASE_URL ?>/ateliers/concept.php">Le concept</a></li>
+                        <li><a href="<?= APP_BASE_URL ?>/ateliers/faq.php">FAQ</a></li>
+                    <?php else: ?>
+                        <li><a href="<?= APP_BASE_URL ?>/boutique/concept.php">Le concept</a></li>
+                        <li><a href="<?= APP_BASE_URL ?>/boutique/faq.php">FAQ</a></li>
                     <?php endif; ?>
-                    <li><a href="<?= APP_BASE_URL ?>/about.php">Le concept</a></li>
-                    <li><a href="<?= APP_BASE_URL ?>/faq.php">FAQ</a></li>
                     <li><a href="<?= APP_BASE_URL ?>/all-ratings.php">⭐ Avis</a></li>
                 <?php endif; ?>
                 <?php if (Auth::isLoggedIn()): ?>

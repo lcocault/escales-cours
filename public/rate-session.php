@@ -16,7 +16,7 @@ if (!$session) {
 $bookingModel = new BookingModel();
 if (!$bookingModel->hasAccessToContent(Auth::currentUserId(), $sessionId)) {
     flash('error', 'Vous devez avoir participé à cette séance pour laisser un avis.');
-    header('Location: ' . APP_BASE_URL . '/session.php?id=' . $sessionId);
+    header('Location: ' . APP_BASE_URL . '/ateliers/seance.php?id=' . $sessionId);
     exit;
 }
 

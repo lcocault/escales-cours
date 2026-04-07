@@ -69,7 +69,7 @@ include ROOT_DIR . '/templates/header.php';
                     <?php foreach ($sessions as $s): ?>
                         <li style="display:flex;align-items:center;gap:1rem;flex-wrap:wrap">
                             <span>
-                                <a href="<?= APP_BASE_URL ?>/session.php?id=<?= (int) $s['id'] ?>" style="font-weight:600">
+                                <a href="<?= APP_BASE_URL ?>/ateliers/seance.php?id=<?= (int) $s['id'] ?>" style="font-weight:600">
                                     <?= e($s['title']) ?>
                                 </a>
                                 <span style="color:var(--color-muted);font-size:.9rem">

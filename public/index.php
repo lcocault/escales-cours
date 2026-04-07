@@ -42,19 +42,19 @@ include ROOT_DIR . '/templates/header.php';
     <?php endif; ?>
 
     <div class="portal-grid">
-        <a href="<?= APP_BASE_URL ?>/sessions.php" class="portal-card portal-card--sessions">
+        <a href="<?= APP_BASE_URL ?>/ateliers/" class="portal-card portal-card--sessions">
             <span class="portal-card__icon">🍳</span>
             <h2 class="portal-card__title">Ateliers de cuisine</h2>
             <p class="portal-card__desc">Des cours de cuisine ludiques et pédagogiques pour les enfants. Réservez votre séance en ligne !</p>
             <span class="btn btn--primary portal-card__cta">Voir les séances →</span>
         </a>
 
-        <div class="portal-card portal-card--shop portal-card--coming-soon">
+        <a href="<?= APP_BASE_URL ?>/boutique/concept.php" class="portal-card portal-card--shop portal-card--coming-soon">
             <span class="portal-card__icon">🛍️</span>
             <h2 class="portal-card__title">Boutique</h2>
             <p class="portal-card__desc">Retrouvez bientôt nos produits et équipements pour cuisiner en famille !</p>
             <span class="badge badge--coming-soon">Bientôt disponible</span>
-        </div>
+        </a>
     </div>
 </div>
 <?php include ROOT_DIR . '/templates/footer.php'; ?>
