@@ -11,52 +11,76 @@ include ROOT_DIR . '/templates/header.php';
 
     <section class="hero">
         <h1>❓ Questions fréquentes – Boutique</h1>
-        <p>Tout ce que vous souhaitez savoir sur notre boutique en ligne.</p>
+        <p>Tout ce que vous souhaitez savoir sur notre boutique en ligne de plats préparés.</p>
     </section>
 
     <div class="faq-list">
 
         <details class="faq-item">
-            <summary class="faq-item__question">Quand la boutique en ligne sera-t-elle disponible ?</summary>
+            <summary class="faq-item__question">Quels produits propose la boutique ?</summary>
             <div class="faq-item__answer">
                 <p>
-                    La boutique en ligne est en cours de préparation et ouvrira très prochainement.
-                    Inscrivez-vous sur le site ou suivez-nous sur Instagram pour être informé(e) dès son ouverture !
+                    La boutique propose une sélection de <strong>plats préparés maison</strong> réalisés par
+                    Emmanuelle Du Puy De Goyne à partir d'ingrédients frais et locaux. Le catalogue est mis
+                    à jour régulièrement selon les saisons et les disponibilités.
                 </p>
             </div>
         </details>
 
         <details class="faq-item">
-            <summary class="faq-item__question">Quels types de produits seront proposés ?</summary>
+            <summary class="faq-item__question">Comment puis-je passer une commande ?</summary>
             <div class="faq-item__answer">
-                <p>La boutique proposera :</p>
+                <ol>
+                    <li>Parcourez le <a href="<?= APP_BASE_URL ?>/boutique/">catalogue</a> et ajoutez vos plats au panier.</li>
+                    <li>Accédez au panier et cliquez sur « Valider la commande ».</li>
+                    <li>Choisissez votre mode de retrait et la date souhaitée, puis payez en ligne.</li>
+                    <li>Vous recevrez une confirmation et récupérerez vos plats à la date convenue.</li>
+                </ol>
+            </div>
+        </details>
+
+        <details class="faq-item">
+            <summary class="faq-item__question">Quels sont les modes de retrait disponibles ?</summary>
+            <div class="faq-item__answer">
                 <ul>
-                    <li>Des équipements de cuisine adaptés aux enfants (tabliers, ustensiles, outils).</li>
-                    <li>Des livres et fiches recettes pour continuer à apprendre à la maison.</li>
-                    <li>Des kits de cuisine prêts à l'emploi, parfaits en cadeau.</li>
-                    <li>Des coffrets gourmands pour les petits et grands amateurs de cuisine.</li>
+                    <li>🏪 <strong>Retrait en boutique</strong> – 36 rue Boieldieu, 31300 Toulouse (gratuit)</li>
+                    <li>🥦 <strong>Marché Croix-de-Pierre</strong> – chaque mercredi et vendredi matin (gratuit)</li>
+                    <li>🚚 <strong>Livraison à domicile</strong> – sur Toulouse et agglomération (5 €)</li>
                 </ul>
             </div>
         </details>
 
         <details class="faq-item">
-            <summary class="faq-item__question">Les produits sont-ils adaptés aux enfants ?</summary>
+            <summary class="faq-item__question">Quand dois-je passer ma commande ?</summary>
             <div class="faq-item__answer">
                 <p>
-                    Oui, absolument. Chaque article est sélectionné avec soin pour sa sécurité, sa qualité
-                    et son caractère ludique. Les équipements de cuisine sont spécialement conçus pour les
-                    petites mains et respectent les normes de sécurité en vigueur.
+                    Les commandes doivent être passées <strong>au moins 2 jours avant</strong> la date de retrait
+                    ou de livraison souhaitée. Cette contrainte permet de préparer vos plats dans les meilleures
+                    conditions. Le site vous indiquera automatiquement la première date disponible lors de la
+                    validation de votre commande.
                 </p>
             </div>
         </details>
 
         <details class="faq-item">
-            <summary class="faq-item__question">Quels seront les modes de livraison ?</summary>
+            <summary class="faq-item__question">Comment fonctionne la livraison à domicile ?</summary>
             <div class="faq-item__answer">
                 <p>
-                    Les détails sur les modes de livraison (livraison à domicile, retrait en boutique à Toulouse,
-                    etc.) seront précisés lors de l'ouverture de la boutique. Restez connecté(e) pour les
-                    premières annonces !
+                    La livraison à domicile est proposée sur Toulouse et l'agglomération toulousaine pour
+                    <strong>5 €</strong>. Lors de la commande, vous indiquez votre adresse complète et choisissez
+                    la date de livraison (au moins 2 jours à l'avance). Nous prendrons contact avec vous si besoin
+                    pour préciser le créneau.
+                </p>
+            </div>
+        </details>
+
+        <details class="faq-item">
+            <summary class="faq-item__question">Puis-je annuler ou modifier ma commande ?</summary>
+            <div class="faq-item__answer">
+                <p>
+                    Une fois la commande payée, elle est transmise en préparation. Si vous souhaitez l'annuler,
+                    contactez-nous le plus tôt possible par téléphone ou e-mail. En cas d'annulation acceptée,
+                    vous serez intégralement remboursé(e).
                 </p>
             </div>
         </details>
@@ -68,16 +92,6 @@ include ROOT_DIR . '/templates/header.php';
                     Oui, tous les prix affichés sur le site sont en euros <strong>TTC</strong>
                     (art.&nbsp;293&nbsp;B du CGI). Les Escales Culinaires relèvent du régime des
                     auto-entrepreneurs.
-                </p>
-            </div>
-        </details>
-
-        <details class="faq-item">
-            <summary class="faq-item__question">Comment effectuer un retour ou un remboursement ?</summary>
-            <div class="faq-item__answer">
-                <p>
-                    Les conditions de retour et de remboursement seront précisées lors de l'ouverture de la
-                    boutique. Pour toute question, n'hésitez pas à nous contacter directement.
                 </p>
             </div>
         </details>
@@ -106,8 +120,9 @@ include ROOT_DIR . '/templates/header.php';
         <p>Contactez-nous, nous serons ravis de vous répondre !</p>
         <div class="about-cta__actions">
             <a href="mailto:les.escales.culinaires@gmail.com" class="btn btn--primary btn--lg">✉️ Nous écrire</a>
-            <a href="<?= APP_BASE_URL ?>/ateliers/" class="btn btn--secondary btn--lg">🍳 Voir les ateliers</a>
+            <a href="<?= APP_BASE_URL ?>/boutique/" class="btn btn--secondary btn--lg">🛍️ Voir le catalogue</a>
         </div>
     </div>
 </div>
 <?php include ROOT_DIR . '/templates/footer.php'; ?>
+

@@ -17,6 +17,8 @@ require_once ROOT_DIR . '/src/PaymentService.php';
 require_once ROOT_DIR . '/src/RatingModel.php';
 require_once ROOT_DIR . '/src/PackModel.php';
 require_once ROOT_DIR . '/src/PromoCodeModel.php';
+require_once ROOT_DIR . '/src/ShopProductModel.php';
+require_once ROOT_DIR . '/src/ShopOrderModel.php';
 
 // Helper: escape output (accepts null, returns empty string for null)
 function e(?string $value): string
@@ -102,4 +104,37 @@ function ageCategoryLabel(string $category): string
         '13+'  => '13 ans et +',
     ];
     return $labels[$category] ?? $category;
+}
+
+// Helper: returns the number of items in the current shop cart (session-based).
+function shopCartCount(): int
+{
+    Auth::start();
+    $cart = $_SESSION['shop_cart'] ?? [];
+    return array_sum($cart);
+}
+
+// Helper: label for a shop delivery method
+function shopDeliveryLabel(string $method): string
+{
+    $labels = [
+        'home'             => 'Livraison à domicile',
+        'market_wednesday' => 'Retrait marché Croix-de-Pierre (mercredi)',
+        'market_friday'    => 'Retrait marché Croix-de-Pierre (vendredi)',
+        'shop'             => 'Retrait en boutique',
+    ];
+    return $labels[$method] ?? $method;
+}
+
+// Helper: label for a shop order status
+function shopOrderStatusLabel(string $status): string
+{
+    $labels = [
+        'pending'   => '⏳ En attente de paiement',
+        'paid'      => '💳 Payée',
+        'prepared'  => '🍱 Préparée',
+        'delivered' => '✅ Livrée / Remise',
+        'cancelled' => '❌ Annulée',
+    ];
+    return $labels[$status] ?? $status;
 }

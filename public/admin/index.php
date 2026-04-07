@@ -10,6 +10,8 @@ $bookingCount  = (int) $db->query("SELECT COUNT(*) FROM bookings WHERE status IN
 $messageCount  = (int) $db->query("SELECT COUNT(*) FROM general_messages WHERE deleted_at IS NULL")->fetchColumn();
 $packCount     = (int) $db->query("SELECT COUNT(*) FROM packs WHERE deleted_at IS NULL")->fetchColumn();
 $promoCount    = (int) $db->query("SELECT COUNT(*) FROM promo_codes WHERE deleted_at IS NULL")->fetchColumn();
+$shopProductCount = (int) $db->query("SELECT COUNT(*) FROM shop_products WHERE deleted_at IS NULL")->fetchColumn();
+$shopOrderCount   = (int) $db->query("SELECT COUNT(*) FROM shop_orders WHERE status IN ('paid','prepared')")->fetchColumn();
 
 $pageTitle = 'Administration';
 include ROOT_DIR . '/templates/header.php';
@@ -49,6 +51,16 @@ include ROOT_DIR . '/templates/header.php';
             <div class="admin-card__icon">🏷️</div>
             <div class="admin-card__label">Codes promo</div>
             <div style="color:var(--color-muted);font-size:.9rem;margin-top:.25rem"><?= $promoCount ?> code(s)</div>
+        </a>
+        <a href="<?= APP_BASE_URL ?>/admin/shop-products.php" class="admin-card" style="text-decoration:none;color:inherit">
+            <div class="admin-card__icon">🛍️</div>
+            <div class="admin-card__label">Boutique – Catalogue</div>
+            <div style="color:var(--color-muted);font-size:.9rem;margin-top:.25rem"><?= $shopProductCount ?> produit(s)</div>
+        </a>
+        <a href="<?= APP_BASE_URL ?>/admin/shop-orders.php" class="admin-card" style="text-decoration:none;color:inherit">
+            <div class="admin-card__icon">📦</div>
+            <div class="admin-card__label">Boutique – Commandes</div>
+            <div style="color:var(--color-muted);font-size:.9rem;margin-top:.25rem"><?= $shopOrderCount ?> commande(s) active(s)</div>
         </a>
     </div>
 </div>

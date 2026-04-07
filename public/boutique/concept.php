@@ -11,66 +11,91 @@ include ROOT_DIR . '/templates/header.php';
 
     <section class="hero">
         <h1>🛍️ La Boutique Escales Culinaires</h1>
-        <p>Des produits gourmands et des équipements pour cuisiner en famille !</p>
+        <p>Des plats préparés maison à commander et récupérer près de chez vous !</p>
     </section>
 
     <!-- Pitch principal -->
     <section class="about-section about-section--highlight">
-        <div class="about-section__icon">🌟</div>
+        <div class="about-section__icon">🍽️</div>
         <div class="about-section__content">
-            <h2>Prolongez l'aventure culinaire à la maison</h2>
+            <h2>Nos plats préparés maison</h2>
             <p>
-                La boutique des Escales Culinaires, c'est l'extension naturelle de nos ateliers : une
-                sélection soigneuse de produits et d'équipements pour que vos enfants puissent continuer
-                à explorer les plaisirs de la cuisine dans leur propre cuisine. Chaque article est choisi
-                pour sa qualité, sa sécurité et son caractère ludique.
+                Emmanuelle Du Puy De Goyne, créatrice des Escales Culinaires, met son savoir-faire
+                culinaire à votre service en proposant une sélection de plats préparés maison.
+                Chaque recette est élaborée avec soin, à partir de produits frais et locaux, pour
+                vous régaler à la maison sans effort.
             </p>
         </div>
     </section>
 
-    <!-- Ce que vous trouverez -->
+    <!-- Comment commander -->
     <section class="about-section">
-        <div class="about-section__icon">🎁</div>
+        <div class="about-section__icon">🛒</div>
         <div class="about-section__content">
-            <h2>Ce que vous trouverez dans la boutique</h2>
+            <h2>Comment commander ?</h2>
+            <ol class="about-list" style="list-style:none;padding:0">
+                <li>
+                    <span class="about-list__icon">1️⃣</span>
+                    <span><strong>Choisissez vos plats</strong> dans notre catalogue et ajoutez-les à votre panier.</span>
+                </li>
+                <li>
+                    <span class="about-list__icon">2️⃣</span>
+                    <span><strong>Sélectionnez votre mode de retrait</strong> : marché, boutique ou livraison à domicile.</span>
+                </li>
+                <li>
+                    <span class="about-list__icon">3️⃣</span>
+                    <span><strong>Payez en ligne</strong> de façon sécurisée.</span>
+                </li>
+                <li>
+                    <span class="about-list__icon">4️⃣</span>
+                    <span><strong>Récupérez vos plats</strong> à la date choisie, frais et prêts à déguster !</span>
+                </li>
+            </ol>
+        </div>
+    </section>
+
+    <!-- Modes de retrait -->
+    <section class="about-section about-section--highlight">
+        <div class="about-section__icon">📍</div>
+        <div class="about-section__content">
+            <h2>Modes de retrait / livraison</h2>
             <ul class="about-list">
                 <li>
-                    <span class="about-list__icon">👨‍🍳</span>
-                    <span><strong>Équipements de cuisine</strong> : tabliers, ustensiles et outils adaptés aux petites mains.</span>
+                    <span class="about-list__icon">🏪</span>
+                    <span><strong>Retrait en boutique</strong> – 36 rue Boieldieu, 31300 Toulouse (gratuit)</span>
                 </li>
                 <li>
-                    <span class="about-list__icon">📚</span>
-                    <span><strong>Livres et fiches recettes</strong> : des recettes accessibles pour continuer à apprendre en s'amusant.</span>
+                    <span class="about-list__icon">🥦</span>
+                    <span><strong>Marché Croix-de-Pierre</strong> – chaque mercredi et vendredi matin (gratuit)</span>
                 </li>
                 <li>
-                    <span class="about-list__icon">🧑‍🍳</span>
-                    <span><strong>Kits de cuisine</strong> : tout le nécessaire pour réaliser une recette de A à Z, idéal en cadeau.</span>
-                </li>
-                <li>
-                    <span class="about-list__icon">🎀</span>
-                    <span><strong>Idées cadeaux</strong> : des coffrets gourmands pour les petits et grands amateurs de cuisine.</span>
+                    <span class="about-list__icon">🚚</span>
+                    <span><strong>Livraison à domicile</strong> – sur Toulouse et agglomération (5 €)</span>
                 </li>
             </ul>
+            <p class="mt-1" style="font-size:.9rem;color:var(--color-muted)">
+                ⏰ Les commandes doivent être passées au moins 2 jours avant la date de retrait / livraison souhaitée.
+            </p>
         </div>
     </section>
 
     <!-- Nos engagements -->
-    <section class="about-section about-section--highlight">
+    <section class="about-section">
         <div class="about-section__icon">💛</div>
         <div class="about-section__content">
             <h2>Nos engagements</h2>
             <ul class="about-list">
                 <li>
-                    <span class="about-list__icon">🛡️</span>
-                    <span><strong>Sécurité</strong> : des produits testés et approuvés, adaptés aux enfants.</span>
+                    <span class="about-list__icon">🌱</span>
+                    <span><strong>Produits frais</strong> : des ingrédients de qualité, sourcés localement autant que possible.</span>
                 </li>
                 <li>
-                    <span class="about-list__icon">🌱</span>
-                    <span><strong>Qualité</strong> : une sélection rigoureuse de produits durables et respectueux de l'environnement.</span>
+                    <span class="about-list__icon">👩‍🍳</span>
+                    <span><strong>Fait maison</strong> : chaque plat est préparé à la main avec amour.</span>
                 </li>
                 <li>
                     <span class="about-list__icon">❤️</span>
-                    <span><strong>Passion</strong> : chaque article est choisi avec soin pour enrichir l'expérience culinaire de vos enfants.</span>
+                    <span><strong>Passion</strong> : la même passion culinaire qui anime nos ateliers pour enfants.</span>
                 </li>
                 <li>
                     <span class="about-list__icon">🤝</span>
@@ -81,10 +106,10 @@ include ROOT_DIR . '/templates/header.php';
     </section>
 
     <!-- Où nous trouver -->
-    <section class="about-section">
-        <div class="about-section__icon">📍</div>
+    <section class="about-section about-section--highlight">
+        <div class="about-section__icon">📞</div>
         <div class="about-section__content">
-            <h2>Nous retrouver</h2>
+            <h2>Nous contacter</h2>
             <address class="about-address">
                 <strong>Les Escales Culinaires</strong><br>
                 36 rue Boieldieu<br>
@@ -103,12 +128,12 @@ include ROOT_DIR . '/templates/header.php';
         </div>
     </section>
 
-    <!-- Coming soon -->
+    <!-- CTA -->
     <section class="about-cta">
-        <h2>Bientôt disponible !</h2>
-        <p>La boutique en ligne ouvre très prochainement. En attendant, découvrez nos ateliers de cuisine pour enfants !</p>
+        <h2>Prêt(e) à commander ?</h2>
+        <p>Découvrez notre sélection de plats préparés et passez votre commande en quelques clics !</p>
         <div class="about-cta__actions">
-            <a href="<?= APP_BASE_URL ?>/ateliers/" class="btn btn--primary btn--lg">🍳 Voir les ateliers</a>
+            <a href="<?= APP_BASE_URL ?>/boutique/" class="btn btn--primary btn--lg">🛍️ Voir le catalogue</a>
             <a href="<?= APP_BASE_URL ?>/boutique/faq.php" class="btn btn--secondary btn--lg">❓ Questions fréquentes</a>
         </div>
     </section>
