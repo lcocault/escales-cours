@@ -5,9 +5,6 @@ require_once __DIR__ . '/init.php';
 $pageTitle      = 'Séances à venir';
 $sessionModel   = new SessionModel();
 $sessions       = $sessionModel->getUpcoming(Auth::isLoggedIn() ? Auth::currentUserId() : null);
-$messageModel    = new GeneralMessageModel();
-$latestMessage   = $messageModel->getLatest();
-$hasMoreMessages = $messageModel->countAll() > 1;
 
 include ROOT_DIR . '/templates/header.php';
 ?>
@@ -26,28 +23,6 @@ include ROOT_DIR . '/templates/header.php';
             </a>
         </div>
     </section>
-
-    <?php if ($latestMessage !== null): ?>
-        <section class="news-thread" aria-label="Actualités">
-            <div class="news-item news-item--<?= e($latestMessage['type']) ?>">
-                <span class="news-item__icon" aria-hidden="true"><?= [
-                    'info'    => '💬',
-                    'warning' => '⚠️',
-                    'danger'  => '🚨',
-                    'success' => '✅',
-                ][$latestMessage['type']] ?? '📢' ?></span>
-                <div class="news-item__body">
-                    <p class="news-item__date"><?= e(date('d/m/Y', strtotime($latestMessage['created_at']))) ?></p>
-                    <p class="news-item__text"><?= e($latestMessage['body']) ?></p>
-                </div>
-            </div>
-            <?php if ($hasMoreMessages): ?>
-                <p class="news-thread__more">
-                    <a href="<?= APP_BASE_URL ?>/messages.php">📋 Voir tous les messages →</a>
-                </p>
-            <?php endif; ?>
-        </section>
-    <?php endif; ?>
 
     <p class="text-center mt-2">
         <a href="<?= APP_BASE_URL ?>/all-ratings.php">⭐ Voir tous les avis des participants →</a>
