@@ -184,6 +184,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 } // end if POST
 
 $pageTitle = 'Réserver – ' . $session['title'];
+$navContext = 'sessions';
 include ROOT_DIR . '/templates/header.php';
 
 // Load packs for this session (to show a banner) – single query with availability

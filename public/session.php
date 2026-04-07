@@ -3,6 +3,7 @@
 require_once __DIR__ . '/init.php';
 
 $id = isset($_GET['id']) ? (int) $_GET['id'] : 0;
+$navContext   = 'sessions';
 $sessionModel = new SessionModel();
 $session = $sessionModel->findById($id);
 

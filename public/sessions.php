@@ -3,6 +3,7 @@
 require_once __DIR__ . '/init.php';
 
 $pageTitle      = 'Séances à venir';
+$navContext     = 'sessions';
 $sessionModel   = new SessionModel();
 $sessions       = $sessionModel->getUpcoming(Auth::isLoggedIn() ? Auth::currentUserId() : null);
 

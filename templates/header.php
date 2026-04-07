@@ -1,7 +1,13 @@
 <?php
 // templates/header.php
 // $pageTitle should be set before including this file
-$pageTitle = $pageTitle ?? 'Escales Culinaires';
+// $navContext controls which nav links are shown:
+//   'home'     – auth links only (Connexion / S'inscrire)
+//   'sessions' – Séances + concept + FAQ + Avis + auth links
+//   'shop'     – concept + FAQ + Avis + auth links (no Séances)
+//   null       – full nav (all links, default behaviour)
+$pageTitle  = $pageTitle ?? 'Escales Culinaires';
+$navContext = $navContext ?? null;
 Auth::start();
 ?>
 <!DOCTYPE html>
@@ -21,10 +27,14 @@ Auth::start();
         </a>
         <nav class="site-nav" aria-label="Navigation principale">
             <ul class="site-nav__list">
-                <li><a href="<?= APP_BASE_URL ?>/sessions.php">Séances</a></li>
-                <li><a href="<?= APP_BASE_URL ?>/about.php">Le concept</a></li>
-                <li><a href="<?= APP_BASE_URL ?>/faq.php">FAQ</a></li>
-                <li><a href="<?= APP_BASE_URL ?>/all-ratings.php">⭐ Avis</a></li>
+                <?php if ($navContext !== 'home'): ?>
+                    <?php if ($navContext !== 'shop'): ?>
+                        <li><a href="<?= APP_BASE_URL ?>/sessions.php">Séances</a></li>
+                    <?php endif; ?>
+                    <li><a href="<?= APP_BASE_URL ?>/about.php">Le concept</a></li>
+                    <li><a href="<?= APP_BASE_URL ?>/faq.php">FAQ</a></li>
+                    <li><a href="<?= APP_BASE_URL ?>/all-ratings.php">⭐ Avis</a></li>
+                <?php endif; ?>
                 <?php if (Auth::isLoggedIn()): ?>
                     <?php $basketCount = currentBasketCount(); ?>
                     <li>

@@ -7,6 +7,7 @@ $bookingModel = new BookingModel();
 $bookings = $bookingModel->getByUser(Auth::currentUserId());
 
 $pageTitle = 'Mes réservations';
+$navContext = 'sessions';
 include ROOT_DIR . '/templates/header.php';
 ?>
 <div class="container">

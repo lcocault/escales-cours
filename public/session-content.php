@@ -33,6 +33,7 @@ $stmt->execute([':sid' => $sessionId]);
 $mediaList = $stmt->fetchAll();
 
 $pageTitle = 'Contenu – ' . $session['title'];
+$navContext = 'sessions';
 include ROOT_DIR . '/templates/header.php';
 ?>
 <div class="container">
