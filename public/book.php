@@ -15,21 +15,21 @@ if (!$session) {
 
 if ((int) $session['remaining_seats'] <= 0) {
     flash('error', 'Cette séance est complète.');
-    header('Location: ' . APP_BASE_URL . '/session.php?id=' . $sessionId);
+    header('Location: ' . APP_BASE_URL . '/ateliers/seance.php?id=' . $sessionId);
     exit;
 }
 
 if (!empty($session['is_private'])) {
     if (!Auth::isAdmin() && !$sessionModel->isUserAllowed($sessionId, Auth::currentUserId())) {
         flash('error', 'Vous n\'êtes pas autorisé(e) à réserver cette séance privée.');
-        header('Location: ' . APP_BASE_URL . '/session.php?id=' . $sessionId);
+        header('Location: ' . APP_BASE_URL . '/ateliers/seance.php?id=' . $sessionId);
         exit;
     }
 }
 
 if (strtotime($session['session_date'] . ' ' . $session['end_time']) < time()) {
     flash('error', 'Cette séance est passée.');
-    header('Location: ' . APP_BASE_URL . '/session.php?id=' . $sessionId);
+    header('Location: ' . APP_BASE_URL . '/ateliers/seance.php?id=' . $sessionId);
     exit;
 }
 
@@ -53,7 +53,7 @@ if ($existing && $existing['status'] === 'pending') {
     } catch (RuntimeException $e) {
         error_log('PaymentService error: ' . $e->getMessage());
         flash('error', 'Une erreur est survenue lors de la création du paiement. Veuillez réessayer.');
-        header('Location: ' . APP_BASE_URL . '/session.php?id=' . $sessionId);
+        header('Location: ' . APP_BASE_URL . '/ateliers/seance.php?id=' . $sessionId);
         exit;
     }
     if (!empty($checkout['squareOrderId'])) {
@@ -168,7 +168,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         } catch (RuntimeException $e) {
             error_log('PaymentService error: ' . $e->getMessage());
             flash('error', 'Une erreur est survenue lors de la création du paiement. Veuillez réessayer.');
-            header('Location: ' . APP_BASE_URL . '/session.php?id=' . $sessionId);
+            header('Location: ' . APP_BASE_URL . '/ateliers/seance.php?id=' . $sessionId);
             exit;
         }
 
@@ -307,7 +307,7 @@ $availablePacks = array_filter($sessionPacks, fn($p) => (int) $p['is_available']
                 <button type="submit" name="action" value="basket" class="btn btn--warning" style="margin-left:.5rem">
                     🛒 Ajouter au panier
                 </button>
-                <a href="<?= APP_BASE_URL ?>/session.php?id=<?= $sessionId ?>" class="btn btn--secondary" style="margin-left:.5rem">Annuler</a>
+                <a href="<?= APP_BASE_URL ?>/ateliers/seance.php?id=<?= $sessionId ?>" class="btn btn--secondary" style="margin-left:.5rem">Annuler</a>
             </div>
         </form>
     </div>

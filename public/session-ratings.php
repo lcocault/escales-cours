@@ -102,6 +102,6 @@ include ROOT_DIR . '/templates/header.php';
         <?php endif; ?>
     <?php endif; ?>
 
-    <p class="mt-2"><a href="<?= APP_BASE_URL ?>/session.php?id=<?= $sessionId ?>">← Retour à la séance</a></p>
+    <p class="mt-2"><a href="<?= APP_BASE_URL ?>/ateliers/seance.php?id=<?= $sessionId ?>">← Retour à la séance</a></p>
 </div>
 <?php include ROOT_DIR . '/templates/footer.php'; ?>
