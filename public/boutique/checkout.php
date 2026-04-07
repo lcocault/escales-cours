@@ -233,15 +233,15 @@ include ROOT_DIR . '/templates/header.php';
     function updateDeliveryUI() {
         var method = document.querySelector('input[name="delivery_method"]:checked');
         if (!method) return;
-        var val = method.value;
+        var deliveryMethod = method.value;
 
         // Toggle address field
         var addrGroup = document.getElementById('address-group');
-        addrGroup.style.display = val === 'home' ? '' : 'none';
-        document.getElementById('delivery_address').required = (val === 'home');
+        addrGroup.style.display = deliveryMethod === 'home' ? '' : 'none';
+        document.getElementById('delivery_address').required = (deliveryMethod === 'home');
 
         // Update fee row and total
-        var isHome = val === 'home';
+        var isHome = deliveryMethod === 'home';
         document.getElementById('fee-row').style.display = isHome ? '' : 'none';
         var total = itemsCents + (isHome ? feeCents : 0);
         document.getElementById('total-cell').textContent = formatPrice(total);
@@ -252,14 +252,14 @@ include ROOT_DIR . '/templates/header.php';
 
         // Set minimum date and prefill
         var dateInput = document.getElementById('delivery_date');
-        var minDate = nextDates[val] || nextDates['home'];
+        var minDate = nextDates[deliveryMethod] || nextDates['home'];
         dateInput.min = minDate;
 
         // Update hint
         var hint = document.getElementById('date-hint');
-        if (val === 'market_wednesday') {
+        if (deliveryMethod === 'market_wednesday') {
             hint.textContent = '(mercredi, au moins ' + minDays + ' jours à partir d\'aujourd\'hui)';
-        } else if (val === 'market_friday') {
+        } else if (deliveryMethod === 'market_friday') {
             hint.textContent = '(vendredi, au moins ' + minDays + ' jours à partir d\'aujourd\'hui)';
         } else {
             hint.textContent = '(au moins ' + minDays + ' jours à partir d\'aujourd\'hui)';

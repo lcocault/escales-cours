@@ -193,10 +193,14 @@ class ShopOrderModel
         }
     }
 
-    /** Returns the earliest date string >= $fromTs that falls on $targetDow (0=Sun … 6=Sat). */
+    /**
+     * Returns the earliest date string >= $fromTs that falls on $targetDow (0=Sun … 6=Sat).
+     * When $fromTs already falls on $targetDow (diff = 0), that same day is returned because
+     * $fromTs already satisfies the minimum-days constraint computed by the caller.
+     */
     private static function nextWeekday(int $fromTs, int $targetDow): string
     {
-        $dow = (int) date('w', $fromTs);
+        $dow  = (int) date('w', $fromTs);
         $diff = ($targetDow - $dow + 7) % 7;
         return date('Y-m-d', $fromTs + $diff * 86400);
     }
