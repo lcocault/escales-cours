@@ -49,6 +49,7 @@ foreach ($items as $item) {
 $totalCents = array_sum(array_column($validItems, 'price_cents'));
 
 $pageTitle = 'Mon panier';
+$navContext = 'sessions';
 include ROOT_DIR . '/templates/header.php';
 ?>
 <div class="container">

@@ -2,8 +2,9 @@
 // public/pack.php – pack detail and booking entry point
 require_once __DIR__ . '/init.php';
 
-$id = isset($_GET['id']) ? (int) $_GET['id'] : 0;
-$packModel = new PackModel();
+$id        = isset($_GET['id']) ? (int) $_GET['id'] : 0;
+$navContext = 'sessions';
+$packModel  = new PackModel();
 $pack = $packModel->findById($id);
 
 if (!$pack) {

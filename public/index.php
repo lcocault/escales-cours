@@ -3,6 +3,7 @@
 require_once __DIR__ . '/init.php';
 
 $pageTitle       = 'Accueil';
+$navContext      = 'home';
 $messageModel    = new GeneralMessageModel();
 $latestMessage   = $messageModel->getLatest();
 $hasMoreMessages = $messageModel->countAll() > 1;

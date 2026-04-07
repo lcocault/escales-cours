@@ -3,6 +3,7 @@
 require_once __DIR__ . '/init.php';
 
 $pageTitle = 'FAQ – Questions fréquentes';
+$navContext = 'sessions';
 include ROOT_DIR . '/templates/header.php';
 ?>
 <div class="container">
