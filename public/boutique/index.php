@@ -54,6 +54,7 @@ include ROOT_DIR . '/templates/header.php';
                             <input type="hidden" name="csrf_token" value="<?= Auth::csrfToken() ?>">
                             <input type="hidden" name="action" value="add">
                             <input type="hidden" name="product_id" value="<?= (int) $p['id'] ?>">
+                            <input type="hidden" name="redirect_to" value="/boutique/">
                             <div style="display:flex;align-items:center;gap:.5rem;margin-top:.75rem">
                                 <label for="qty_<?= (int) $p['id'] ?>" class="sr-only">Quantité</label>
                                 <input type="number" id="qty_<?= (int) $p['id'] ?>" name="quantity"
