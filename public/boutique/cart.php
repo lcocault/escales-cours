@@ -13,7 +13,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $productId = (int) ($_POST['product_id'] ?? 0);
     $quantity  = (int) ($_POST['quantity'] ?? 1);
     $redirectPath = trim((string) ($_POST['redirect_to'] ?? '/boutique/cart.php'));
-    if (!preg_match('#^/[A-Za-z0-9._/-]*$#', $redirectPath)) {
+    if ($redirectPath === '' || $redirectPath[0] !== '/') {
+        $redirectPath = '/boutique/cart.php';
+    }
+    $allowedRedirectPaths = ['/boutique/', '/boutique/cart.php'];
+    if (!in_array($redirectPath, $allowedRedirectPaths, true)) {
         $redirectPath = '/boutique/cart.php';
     }
 
