@@ -78,7 +78,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             }
         }
     } else {
-        $externalPhotoUrl = trim($_POST['external_photo_url'] ?? '');
+        $externalPhotoUrl = $values['external_photo_url'];
         if ($externalPhotoUrl !== '') {
             if (!filter_var($externalPhotoUrl, FILTER_VALIDATE_URL)) {
                 $errors[] = 'L\'URL de la photo n\'est pas valide.';
@@ -97,7 +97,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             if ($replacePhotoSource) {
                 // Delete old photo file if any
                 $oldPhoto = $product['photo_filename'] ?? null;
-                if ($oldPhoto && ($newPhotoFilename === null || $oldPhoto !== $newPhotoFilename)) {
+                $shouldDeleteOldPhoto = $oldPhoto && $newPhotoFilename !== $oldPhoto;
+                if ($shouldDeleteOldPhoto) {
                     $oldPath = ROOT_DIR . '/public/uploads/shop/' . $oldPhoto;
                     if (is_file($oldPath)) {
                         unlink($oldPath);
@@ -214,7 +215,7 @@ function showPhotoTab(tab) {
     document.getElementById('photo').disabled = tab !== 'upload';
     document.getElementById('external_photo_url').disabled = tab !== 'url';
 }
-<?php if (!empty($values['external_photo_url']) || ($isEdit && !empty($product['external_photo_url']))): ?>
+<?php if (!empty($values['external_photo_url'])): ?>
 showPhotoTab('url');
 <?php else: ?>
 showPhotoTab('upload');
