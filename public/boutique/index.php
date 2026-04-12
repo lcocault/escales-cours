@@ -45,6 +45,8 @@ include ROOT_DIR . '/templates/header.php';
                         <p class="session-card__price" style="font-size:1.2rem;font-weight:bold;color:var(--color-primary);margin:.5rem 0">
                             <?= formatPrice((int) $p['price_cents']) ?>
                         </p>
+                        <?php $portionCount = max(1, (int) ($p['portion_count'] ?? 1)); ?>
+                        <p class="session-card__meta">🍽️ <?= $portionCount ?> portion<?= $portionCount > 1 ? 's' : '' ?></p>
 
                         <form method="post" action="<?= APP_BASE_URL ?>/boutique/cart.php">
                             <input type="hidden" name="csrf_token" value="<?= Auth::csrfToken() ?>">

@@ -102,6 +102,10 @@ include ROOT_DIR . '/templates/header.php';
                                          style="width:48px;height:48px;object-fit:cover;border-radius:4px;vertical-align:middle;margin-right:.5rem">
                                 <?php endif; ?>
                                 <?= e($p['name']) ?>
+                                <?php $portionCount = max(1, (int) ($p['portion_count'] ?? 1)); ?>
+                                <div style="font-size:.85rem;color:var(--color-muted)">
+                                    <?= $portionCount ?> portion<?= $portionCount > 1 ? 's' : '' ?>
+                                </div>
                             </td>
                             <td><?= formatPrice((int) $p['price_cents']) ?></td>
                             <td>

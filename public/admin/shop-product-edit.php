@@ -13,6 +13,7 @@ $defaults = [
     'name'         => '',
     'description'  => '',
     'price_cents'  => 0,
+    'portion_count' => 1,
     'is_available' => true,
     'external_photo_url' => '',
 ];
@@ -24,6 +25,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $values['name']         = trim($_POST['name']        ?? '');
     $values['description']  = trim($_POST['description'] ?? '');
     $values['price_cents']  = (int) round((float) str_replace(',', '.', $_POST['price_euros'] ?? '0') * 100);
+    $values['portion_count'] = (int) ($_POST['portion_count'] ?? 1);
     $values['is_available'] = isset($_POST['is_available']);
     $values['external_photo_url'] = trim($_POST['external_photo_url'] ?? '');
 
@@ -32,6 +34,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     }
     if ($values['price_cents'] < 0) {
         $errors[] = 'Le prix ne peut pas être négatif.';
+    }
+    if ($values['portion_count'] < 1) {
+        $errors[] = 'Le nombre de portions doit être au minimum de 1.';
     }
 
     $newPhotoFilename = null;
@@ -154,6 +159,12 @@ include ROOT_DIR . '/templates/header.php';
             <label for="price_euros">Prix (€) *</label>
             <input type="number" id="price_euros" name="price_euros" required min="0" step="0.01"
                    value="<?= number_format((int) $values['price_cents'] / 100, 2, '.', '') ?>">
+        </div>
+
+        <div class="form-group">
+            <label for="portion_count">Nombre de portions *</label>
+            <input type="number" id="portion_count" name="portion_count" required min="1" step="1"
+                   value="<?= max(1, (int) $values['portion_count']) ?>">
         </div>
 
         <div class="form-group form-group--checkbox">
