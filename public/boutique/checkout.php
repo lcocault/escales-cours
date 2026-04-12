@@ -24,7 +24,11 @@ foreach ($cart as $pid => $qty) {
         unset($_SESSION['shop_cart'][$pid]);
         continue;
     }
-    $qty     = max(1, (int) $qty);
+    $minOrderPortions = max(1, (int) ($product['min_order_portions'] ?? 1));
+    $qty     = max($minOrderPortions, (int) $qty);
+    if ($qty !== (int) $cart[$pid]) {
+        $_SESSION['shop_cart'][$pid] = $qty;
+    }
     $subtotal = (int) $product['price_cents'] * $qty;
     $itemsCents += $subtotal;
     $cartItems[] = [

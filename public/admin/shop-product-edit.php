@@ -14,6 +14,7 @@ $defaults = [
     'description'  => '',
     'price_cents'  => 0,
     'portion_count' => 1,
+    'min_order_portions' => 1,
     'is_available' => true,
     'external_photo_url' => '',
 ];
@@ -26,6 +27,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $values['description']  = trim($_POST['description'] ?? '');
     $values['price_cents']  = (int) round((float) str_replace(',', '.', $_POST['price_euros'] ?? '0') * 100);
     $values['portion_count'] = (int) ($_POST['portion_count'] ?? 1);
+    $values['min_order_portions'] = (int) ($_POST['min_order_portions'] ?? 1);
     $values['is_available'] = isset($_POST['is_available']);
     $values['external_photo_url'] = trim($_POST['external_photo_url'] ?? '');
 
@@ -37,6 +39,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     }
     if ($values['portion_count'] < 1) {
         $errors[] = 'Le nombre de portions doit être au minimum de 1.';
+    }
+    if ($values['min_order_portions'] < 1) {
+        $errors[] = 'Le minimum de portions par commande doit être au minimum de 1.';
     }
 
     $newPhotoFilename = null;
@@ -165,6 +170,12 @@ include ROOT_DIR . '/templates/header.php';
             <label for="portion_count">Nombre de portions *</label>
             <input type="number" id="portion_count" name="portion_count" required min="1" step="1"
                    value="<?= max(1, (int) $values['portion_count']) ?>">
+        </div>
+
+        <div class="form-group">
+            <label for="min_order_portions">Minimum de portions par commande *</label>
+            <input type="number" id="min_order_portions" name="min_order_portions" required min="1" step="1"
+                   value="<?= max(1, (int) $values['min_order_portions']) ?>">
         </div>
 
         <div class="form-group form-group--checkbox">
