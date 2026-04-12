@@ -176,10 +176,11 @@ CREATE TABLE IF NOT EXISTS shop_products (
     photo_filename VARCHAR(255),
     external_photo_url TEXT,
     price_cents    INTEGER      NOT NULL CHECK (price_cents >= 0),
-    portion_count  INTEGER      NOT NULL DEFAULT 1 CHECK (portion_count > 0),
+    portion_count  INTEGER      NOT NULL DEFAULT 1,
     is_available   BOOLEAN      NOT NULL DEFAULT TRUE,
     created_at     TIMESTAMPTZ  NOT NULL DEFAULT NOW(),
     deleted_at     TIMESTAMPTZ,
+    CONSTRAINT chk_shop_products_portion_count_positive CHECK (portion_count > 0),
     CONSTRAINT chk_shop_products_single_photo_source CHECK (
         NOT (
             photo_filename IS NOT NULL

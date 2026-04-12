@@ -1,5 +1,7 @@
 -- Migration 2026-04-12_002: add portion_count to shop_products
 
+BEGIN;
+
 ALTER TABLE shop_products
     ADD COLUMN IF NOT EXISTS portion_count INTEGER NOT NULL DEFAULT 1;
 
@@ -15,3 +17,5 @@ BEGIN
             CHECK (portion_count > 0);
     END IF;
 END $$;
+
+COMMIT;

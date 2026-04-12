@@ -68,12 +68,12 @@ class ShopProductModel
     {
         $stmt = $this->db->prepare(
             'UPDATE shop_products
-                 SET name = :name,
-                     description = :description,
-                     price_cents = :price,
-                     portion_count = :portion_count,
-                     is_available = :available
-              WHERE id = :id'
+             SET name = :name,
+                 description = :description,
+                 price_cents = :price,
+                 portion_count = :portion_count,
+                 is_available = :available
+             WHERE id = :id'
         );
         $stmt->execute([
             ':name'      => $data['name'],
