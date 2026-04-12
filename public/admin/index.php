@@ -50,6 +50,11 @@ include ROOT_DIR . '/templates/header.php';
             <div class="admin-card__label">Codes promo</div>
             <div style="color:var(--color-muted);font-size:.9rem;margin-top:.25rem"><?= $promoCount ?> code(s)</div>
         </a>
+        <a href="<?= APP_BASE_URL ?>/admin/session-announcement.php" class="admin-card" style="text-decoration:none;color:inherit">
+            <div class="admin-card__icon">📧</div>
+            <div class="admin-card__label">Annonce des séances</div>
+            <div style="color:var(--color-muted);font-size:.9rem;margin-top:.25rem">Envoi e-mail aux inscrits</div>
+        </a>
     </div>
 </div>
 <?php include ROOT_DIR . '/templates/footer.php'; ?>
