@@ -28,6 +28,7 @@ include ROOT_DIR . '/templates/header.php';
                         <th>Nom</th>
                         <th>Prix</th>
                         <th>Portions</th>
+                        <th>Min. commande</th>
                         <th>Disponibilité</th>
                         <th>Actions</th>
                     </tr>
@@ -48,6 +49,7 @@ include ROOT_DIR . '/templates/header.php';
                             <td><?= e($p['name']) ?></td>
                             <td><?= formatPrice((int) $p['price_cents']) ?></td>
                             <td><?= max(1, (int) ($p['portion_count'] ?? 1)) ?></td>
+                            <td><?= max(1, (int) ($p['min_order_portions'] ?? 1)) ?></td>
                             <td>
                                 <?php if ($p['is_available'] === true || $p['is_available'] === 't'): ?>
                                     <span class="badge" style="background:#16a34a;color:#fff">✅ Disponible</span>

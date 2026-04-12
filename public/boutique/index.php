@@ -46,7 +46,9 @@ include ROOT_DIR . '/templates/header.php';
                             <?= formatPrice((int) $p['price_cents']) ?>
                         </p>
                         <?php $portionCount = max(1, (int) ($p['portion_count'] ?? 1)); ?>
+                        <?php $minOrderPortions = max(1, (int) ($p['min_order_portions'] ?? 1)); ?>
                         <p class="session-card__meta">🍽️ <?= $portionCount ?> portion<?= $portionCount > 1 ? 's' : '' ?></p>
+                        <p class="session-card__meta">📦 Minimum commande : <?= $minOrderPortions ?> portion<?= $minOrderPortions > 1 ? 's' : '' ?></p>
 
                         <form method="post" action="<?= APP_BASE_URL ?>/boutique/cart.php">
                             <input type="hidden" name="csrf_token" value="<?= Auth::csrfToken() ?>">
@@ -55,7 +57,7 @@ include ROOT_DIR . '/templates/header.php';
                             <div style="display:flex;align-items:center;gap:.5rem;margin-top:.75rem">
                                 <label for="qty_<?= (int) $p['id'] ?>" class="sr-only">Quantité</label>
                                 <input type="number" id="qty_<?= (int) $p['id'] ?>" name="quantity"
-                                       min="1" max="20" value="1"
+                                       min="<?= $minOrderPortions ?>" max="20" value="<?= $minOrderPortions ?>"
                                        style="width:60px;padding:.3rem .5rem;border:1px solid var(--color-border);border-radius:var(--radius)">
                                 <button type="submit" class="btn btn--primary">🛒 Ajouter</button>
                             </div>

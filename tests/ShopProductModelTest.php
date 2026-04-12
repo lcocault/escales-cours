@@ -55,8 +55,10 @@ class ShopProductModelTest extends TestCase
         $this->assertSame(12, $id);
         $this->assertStringContainsString('external_photo_url', $capturedSql);
         $this->assertStringContainsString('portion_count', $capturedSql);
+        $this->assertStringContainsString('min_order_portions', $capturedSql);
         $this->assertSame('https://example.com/photo.jpg', $capturedParams[':external_photo_url']);
         $this->assertSame(1, $capturedParams[':portion_count']);
+        $this->assertSame(1, $capturedParams[':min_order_portions']);
     }
 
     public function testUpdateIncludesPortionCount(): void
@@ -85,11 +87,14 @@ class ShopProductModelTest extends TestCase
             'description' => 'Desc',
             'price_cents' => 900,
             'portion_count' => 4,
+            'min_order_portions' => 3,
             'is_available' => true,
         ]);
 
         $this->assertStringContainsString('portion_count = :portion_count', $capturedSql);
+        $this->assertStringContainsString('min_order_portions = :min_order_portions', $capturedSql);
         $this->assertSame(4, $capturedParams[':portion_count']);
+        $this->assertSame(3, $capturedParams[':min_order_portions']);
         $this->assertSame(3, $capturedParams[':id']);
     }
 

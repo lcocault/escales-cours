@@ -47,8 +47,8 @@ class ShopProductModel
     public function create(array $data): int
     {
         $stmt = $this->db->prepare(
-            'INSERT INTO shop_products (name, description, photo_filename, external_photo_url, price_cents, portion_count, is_available)
-             VALUES (:name, :description, :photo, :external_photo_url, :price, :portion_count, :available)
+            'INSERT INTO shop_products (name, description, photo_filename, external_photo_url, price_cents, portion_count, min_order_portions, is_available)
+             VALUES (:name, :description, :photo, :external_photo_url, :price, :portion_count, :min_order_portions, :available)
              RETURNING id'
         );
         $stmt->execute([
@@ -58,6 +58,7 @@ class ShopProductModel
             ':external_photo_url' => $data['external_photo_url'] ?? null,
             ':price'       => (int) $data['price_cents'],
             ':portion_count' => max(1, (int) ($data['portion_count'] ?? 1)),
+            ':min_order_portions' => max(1, (int) ($data['min_order_portions'] ?? 1)),
             ':available'   => ($data['is_available'] ?? true) ? 'TRUE' : 'FALSE',
         ]);
         return (int) $stmt->fetchColumn();
@@ -72,6 +73,7 @@ class ShopProductModel
                  description = :description,
                  price_cents = :price,
                  portion_count = :portion_count,
+                 min_order_portions = :min_order_portions,
                  is_available = :available
              WHERE id = :id'
         );
@@ -80,6 +82,7 @@ class ShopProductModel
             ':description' => $data['description'] ?? null,
             ':price'     => (int) $data['price_cents'],
             ':portion_count' => max(1, (int) ($data['portion_count'] ?? 1)),
+            ':min_order_portions' => max(1, (int) ($data['min_order_portions'] ?? 1)),
             ':available' => ($data['is_available'] ?? true) ? 'TRUE' : 'FALSE',
             ':id'        => $id,
         ]);

@@ -18,13 +18,19 @@ if (empty($cart)) {
 
 $cartItems  = [];
 $itemsCents = 0;
+$cartWasAdjustedToMinimum = false;
 foreach ($cart as $pid => $qty) {
     $product = $productModel->findById((int) $pid);
     if ($product === null) {
         unset($_SESSION['shop_cart'][$pid]);
         continue;
     }
-    $qty     = max(1, (int) $qty);
+    $minOrderPortions = max(1, (int) ($product['min_order_portions'] ?? 1));
+    $qty     = max($minOrderPortions, (int) $qty);
+    if ($qty !== (int) $cart[$pid]) {
+        $_SESSION['shop_cart'][$pid] = $qty;
+        $cartWasAdjustedToMinimum = true;
+    }
     $subtotal = (int) $product['price_cents'] * $qty;
     $itemsCents += $subtotal;
     $cartItems[] = [
@@ -34,6 +40,10 @@ foreach ($cart as $pid => $qty) {
         'quantity'        => $qty,
         'subtotal'        => $subtotal,
     ];
+}
+
+if ($cartWasAdjustedToMinimum) {
+    flash('info', 'Certaines quantités ont été ajustées pour respecter le minimum de portions par commande.');
 }
 
 if (empty($cartItems)) {
