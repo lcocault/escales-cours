@@ -119,7 +119,9 @@ class Mailer
         string $fromDate,
         string $toDate
     ): void {
-        $subject = 'Prochaines séances – du ' . $fromDate . ' au ' . $toDate;
+        $safeFrom = str_replace(["\r", "\n"], '', $fromDate);
+        $safeTo   = str_replace(["\r", "\n"], '', $toDate);
+        $subject = 'Prochaines séances – du ' . $safeFrom . ' au ' . $safeTo;
         $body    = self::upcomingSessionsAnnouncementBody($user, $sessions, $fromDate, $toDate);
         self::send($user['email'], $subject, $body);
     }

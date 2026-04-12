@@ -70,11 +70,32 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     }
 
     if ($errors === []) {
+        $sentCount   = 0;
+        $failedCount = 0;
+
         foreach ($selectedUsers as $user) {
-            Mailer::sendUpcomingSessionsAnnouncement($user, $sessions, $values['from_date'], $values['to_date']);
+            try {
+                Mailer::sendUpcomingSessionsAnnouncement($user, $sessions, $values['from_date'], $values['to_date']);
+                $sentCount++;
+            } catch (Throwable $e) {
+                $failedCount++;
+                error_log(
+                    'Session announcement send failed for user #' . (int) $user['id']
+                    . ' (' . (string) ($user['email'] ?? '') . '): '
+                    . $e->getMessage()
+                );
+            }
         }
 
-        flash('success', count($selectedUsers) . ' e-mail(s) d\'annonce envoyé(s).');
+        if ($failedCount > 0) {
+            flash(
+                'warning',
+                $sentCount . ' e-mail(s) d\'annonce envoyés, '
+                . $failedCount . ' échec(s). Consultez les logs pour le détail.'
+            );
+        } else {
+            flash('success', $sentCount . ' e-mail(s) d\'annonce envoyés.');
+        }
         header('Location: ' . APP_BASE_URL . '/admin/session-announcement.php');
         exit;
     }
