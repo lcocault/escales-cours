@@ -11,9 +11,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     Auth::verifyCsrf();
     $action    = trim($_POST['action'] ?? '');
     $productId = (int) ($_POST['product_id'] ?? 0);
-    $product = $productId > 0 ? $productModel->findById($productId) : null;
-    $minOrderPortions = max(1, $product !== null ? (int) ($product['min_order_portions'] ?? 1) : 1);
-    $quantity  = max($minOrderPortions, (int) ($_POST['quantity'] ?? $minOrderPortions));
+    $quantity  = (int) ($_POST['quantity'] ?? 1);
 
     if (!isset($_SESSION['shop_cart'])) {
         $_SESSION['shop_cart'] = [];
@@ -21,13 +19,19 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
     switch ($action) {
         case 'add':
+            $product = $productId > 0 ? $productModel->findById($productId) : null;
             if ($productId > 0 && $product !== null) {
+                $minOrderPortions = max(1, (int) ($product['min_order_portions'] ?? 1));
+                $quantity = max($minOrderPortions, $quantity);
                 $_SESSION['shop_cart'][$productId] = (int) ($_SESSION['shop_cart'][$productId] ?? 0) + $quantity;
             }
             flash('success', 'Produit ajouté au panier !');
             break;
         case 'update':
+            $product = $productId > 0 ? $productModel->findById($productId) : null;
             if ($productId > 0 && $product !== null && $quantity > 0) {
+                $minOrderPortions = max(1, (int) ($product['min_order_portions'] ?? 1));
+                $quantity = max($minOrderPortions, $quantity);
                 $_SESSION['shop_cart'][$productId] = $quantity;
             }
             break;
@@ -50,6 +54,7 @@ $totalCents = 0;
 
 if (!empty($cart)) {
     $productIds = array_keys($cart);
+    $cartWasAdjustedToMinimum = false;
     // Fetch each product; remove from cart if no longer available
     foreach ($productIds as $pid) {
         $product = $productModel->findById((int) $pid);
@@ -61,6 +66,7 @@ if (!empty($cart)) {
         $qty       = max($minOrderPortions, (int) $cart[$pid]);
         if ($qty !== (int) $cart[$pid]) {
             $_SESSION['shop_cart'][$pid] = $qty;
+            $cartWasAdjustedToMinimum = true;
         }
         $subtotal  = (int) $product['price_cents'] * $qty;
         $totalCents += $subtotal;
@@ -70,6 +76,10 @@ if (!empty($cart)) {
             'subtotal' => $subtotal,
             'min_order_portions' => $minOrderPortions,
         ];
+    }
+
+    if ($cartWasAdjustedToMinimum) {
+        flash('info', 'Certaines quantités ont été ajustées pour respecter le minimum de portions par commande.');
     }
 }
 
