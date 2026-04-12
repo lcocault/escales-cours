@@ -183,6 +183,24 @@ class SessionModel
         return $stmt->fetchAll();
     }
 
+    public function getUpcomingInPeriod(string $fromDate, string $toDate): array
+    {
+        $stmt = $this->db->prepare(
+            "SELECT id, title, theme, session_date, start_time, end_time, age_category, price_cents
+             FROM sessions
+             WHERE deleted_at IS NULL
+               AND status != 'cancelled'
+               AND session_date >= CURRENT_DATE
+               AND session_date BETWEEN :from_date AND :to_date
+             ORDER BY session_date ASC, start_time ASC"
+        );
+        $stmt->execute([
+            ':from_date' => $fromDate,
+            ':to_date'   => $toDate,
+        ]);
+        return $stmt->fetchAll();
+    }
+
     public function isUserAllowed(int $sessionId, int $userId): bool
     {
         $stmt = $this->db->prepare(

@@ -113,6 +113,19 @@ class Mailer
         self::send($user['email'], $subject, $body);
     }
 
+    public static function sendUpcomingSessionsAnnouncement(
+        array $user,
+        array $sessions,
+        string $fromDate,
+        string $toDate
+    ): void {
+        $safeFrom = str_replace(["\r", "\n"], '', $fromDate);
+        $safeTo   = str_replace(["\r", "\n"], '', $toDate);
+        $subject = 'Prochaines séances – du ' . $safeFrom . ' au ' . $safeTo;
+        $body    = self::upcomingSessionsAnnouncementBody($user, $sessions, $fromDate, $toDate);
+        self::send($user['email'], $subject, $body);
+    }
+
     private static function sessionConfirmationBody(array $user, array $session): string
     {
         $name    = htmlspecialchars($user['first_name'] . ' ' . $user['last_name']);
@@ -290,6 +303,52 @@ class Mailer
         <p>Pour réserver votre place, cliquez sur le lien ci-dessous :</p>
         <p><a href="{$sessionUrl}">Voir la séance et réserver</a></p>
         <p>À bientôt aux Escales Culinaires !</p>
+        HTML;
+    }
+
+    private static function upcomingSessionsAnnouncementBody(
+        array $user,
+        array $sessions,
+        string $fromDate,
+        string $toDate
+    ): string {
+        $name       = htmlspecialchars(trim(($user['first_name'] ?? '') . ' ' . ($user['last_name'] ?? '')));
+        $safeFrom   = htmlspecialchars($fromDate);
+        $safeTo     = htmlspecialchars($toDate);
+        $baseUrl    = APP_BASE_URL;
+        $sessionsUi = '';
+
+        foreach ($sessions as $session) {
+            $title      = htmlspecialchars((string) ($session['title'] ?? 'Séance'));
+            $date       = htmlspecialchars((string) ($session['session_date'] ?? ''));
+            $start      = htmlspecialchars((string) ($session['start_time'] ?? ''));
+            $end        = htmlspecialchars((string) ($session['end_time'] ?? ''));
+            $age        = htmlspecialchars((string) ($session['age_category'] ?? ''));
+            $priceCents = isset($session['price_cents']) ? (int) $session['price_cents'] : 0;
+            $price      = number_format($priceCents / 100, 2, ',', ' ') . ' €';
+            $sessionUrl = $baseUrl . '/session.php?id=' . (int) ($session['id'] ?? 0);
+
+            $sessionsUi .= <<<HTML
+            <li style="margin-bottom:.75rem">
+                <strong>{$title}</strong><br>
+                📅 {$date} – 🕐 {$start} à {$end}<br>
+                👧 Âge : {$age} – 💶 Tarif : {$price}<br>
+                <a href="{$sessionUrl}">Voir la séance</a>
+            </li>
+            HTML;
+        }
+
+        if ($sessionsUi === '') {
+            $sessionsUi = '<li>Aucune séance programmée sur cette période.</li>';
+        }
+
+        return <<<HTML
+        <p>Bonjour {$name},</p>
+        <p>Voici les séances prévues du <strong>{$safeFrom}</strong> au <strong>{$safeTo}</strong> :</p>
+        <ul>
+            {$sessionsUi}
+        </ul>
+        <p><a href="{$baseUrl}/">Voir toutes les séances</a></p>
         HTML;
     }
 }
