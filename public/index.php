@@ -49,11 +49,11 @@ include ROOT_DIR . '/templates/header.php';
             <span class="btn btn--primary portal-card__cta">Voir les séances →</span>
         </a>
 
-        <a href="<?= APP_BASE_URL ?>/boutique/concept.php" class="portal-card portal-card--shop portal-card--coming-soon">
+        <a href="<?= APP_BASE_URL ?>/boutique/" class="portal-card portal-card--shop">
             <span class="portal-card__icon">🛍️</span>
             <h2 class="portal-card__title">Boutique</h2>
-            <p class="portal-card__desc">Retrouvez bientôt nos produits et équipements pour cuisiner en famille !</p>
-            <span class="badge badge--coming-soon">Bientôt disponible</span>
+            <p class="portal-card__desc">Plats préparés maison à commander en ligne. Retrait au marché, en boutique ou livraison à domicile !</p>
+            <span class="btn btn--primary portal-card__cta">Voir le catalogue →</span>
         </a>
     </div>
 </div>

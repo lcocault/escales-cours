@@ -4,7 +4,7 @@
 // $navContext controls which nav links are shown:
 //   'home'     – auth links only (Connexion / S'inscrire)
 //   'sessions' – Séances + concept(/ateliers/concept.php) + FAQ(/ateliers/faq.php) + Avis + auth links
-//   'shop'     – concept(/boutique/concept.php) + FAQ(/boutique/faq.php) + Avis + auth links (no Séances)
+//   'shop'     – Catalogue + concept(/boutique/concept.php) + FAQ(/boutique/faq.php) + auth links with shop cart (no Séances)
 //   null       – full nav (all links, default behaviour)
 $pageTitle  = $pageTitle ?? 'Escales Culinaires';
 $navContext = $navContext ?? null;
@@ -33,21 +33,34 @@ Auth::start();
                         <li><a href="<?= APP_BASE_URL ?>/ateliers/concept.php">Le concept</a></li>
                         <li><a href="<?= APP_BASE_URL ?>/ateliers/faq.php">FAQ</a></li>
                     <?php else: ?>
+                        <li><a href="<?= APP_BASE_URL ?>/boutique/">Catalogue</a></li>
                         <li><a href="<?= APP_BASE_URL ?>/boutique/concept.php">Le concept</a></li>
                         <li><a href="<?= APP_BASE_URL ?>/boutique/faq.php">FAQ</a></li>
                     <?php endif; ?>
                     <li><a href="<?= APP_BASE_URL ?>/all-ratings.php">⭐ Avis</a></li>
                 <?php endif; ?>
                 <?php if (Auth::isLoggedIn()): ?>
-                    <?php $basketCount = currentBasketCount(); ?>
-                    <li>
-                        <a href="<?= APP_BASE_URL ?>/basket.php" class="basket-nav-link">
-                            🛒 Panier<?php if ($basketCount > 0): ?>
-                                <span class="basket-badge"><?= $basketCount ?></span>
-                            <?php endif; ?>
-                        </a>
-                    </li>
-                    <li><a href="<?= APP_BASE_URL ?>/my-sessions.php">Mes réservations</a></li>
+                    <?php if ($navContext === 'shop'): ?>
+                        <?php $shopCartCount = shopCartCount(); ?>
+                        <li>
+                            <a href="<?= APP_BASE_URL ?>/boutique/cart.php" class="basket-nav-link">
+                                🛒 Panier<?php if ($shopCartCount > 0): ?>
+                                    <span class="basket-badge"><?= $shopCartCount ?></span>
+                                <?php endif; ?>
+                            </a>
+                        </li>
+                        <li><a href="<?= APP_BASE_URL ?>/boutique/my-orders.php">Mes commandes</a></li>
+                    <?php else: ?>
+                        <?php $basketCount = currentBasketCount(); ?>
+                        <li>
+                            <a href="<?= APP_BASE_URL ?>/basket.php" class="basket-nav-link">
+                                🛒 Panier<?php if ($basketCount > 0): ?>
+                                    <span class="basket-badge"><?= $basketCount ?></span>
+                                <?php endif; ?>
+                            </a>
+                        </li>
+                        <li><a href="<?= APP_BASE_URL ?>/my-sessions.php">Mes réservations</a></li>
+                    <?php endif; ?>
                     <?php if (Auth::isAdmin()): ?>
                         <li><a href="<?= APP_BASE_URL ?>/admin/">Administration</a></li>
                     <?php endif; ?>
