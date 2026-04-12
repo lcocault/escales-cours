@@ -12,6 +12,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $action    = trim($_POST['action'] ?? '');
     $productId = (int) ($_POST['product_id'] ?? 0);
     $quantity  = (int) ($_POST['quantity'] ?? 1);
+    $redirectPath = trim((string) ($_POST['redirect_to'] ?? '/boutique/cart.php'));
+    if (!preg_match('#^/[A-Za-z0-9._/-]*$#', $redirectPath)) {
+        $redirectPath = '/boutique/cart.php';
+    }
 
     if (!isset($_SESSION['shop_cart'])) {
         $_SESSION['shop_cart'] = [];
@@ -43,7 +47,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     }
 
     // Redirect to avoid form re-submission
-    header('Location: ' . APP_BASE_URL . '/boutique/cart.php');
+    header('Location: ' . APP_BASE_URL . $redirectPath);
     exit;
 }
 
