@@ -54,7 +54,43 @@ class ShopProductModelTest extends TestCase
 
         $this->assertSame(12, $id);
         $this->assertStringContainsString('external_photo_url', $capturedSql);
+        $this->assertStringContainsString('portion_count', $capturedSql);
         $this->assertSame('https://example.com/photo.jpg', $capturedParams[':external_photo_url']);
+        $this->assertSame(1, $capturedParams[':portion_count']);
+    }
+
+    public function testUpdateIncludesPortionCount(): void
+    {
+        $capturedSql = '';
+        $capturedParams = [];
+
+        $stmt = $this->createMock(PDOStatement::class);
+        $stmt->method('execute')
+            ->willReturnCallback(function (array $params) use (&$capturedParams) {
+                $capturedParams = $params;
+                return true;
+            });
+
+        $pdo = $this->createMock(PDO::class);
+        $pdo->method('prepare')->willReturnCallback(function (string $sql) use (&$capturedSql, $stmt) {
+            $capturedSql = $sql;
+            return $stmt;
+        });
+
+        $this->injectPdo($pdo);
+
+        $model = new ShopProductModel();
+        $model->update(3, [
+            'name' => 'Produit',
+            'description' => 'Desc',
+            'price_cents' => 900,
+            'portion_count' => 4,
+            'is_available' => true,
+        ]);
+
+        $this->assertStringContainsString('portion_count = :portion_count', $capturedSql);
+        $this->assertSame(4, $capturedParams[':portion_count']);
+        $this->assertSame(3, $capturedParams[':id']);
     }
 
     public function testUpdatePhotoUpdatesFilenameAndExternalUrl(): void
