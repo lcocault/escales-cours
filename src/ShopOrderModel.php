@@ -11,6 +11,10 @@ class ShopOrderModel
     /** Minimum number of days before delivery date when ordering. */
     public const MIN_DAYS_BEFORE_DELIVERY = 2;
 
+    /** Market delivery pickup starts at 08:30 and needs 36h prep. */
+    public const MARKET_PICKUP_TIME = '08:30:00';
+    public const MARKET_PREPARATION_HOURS = 36;
+
     public function __construct()
     {
         $this->db = Database::getInstance();
@@ -180,15 +184,17 @@ class ShopOrderModel
      * Friday that satisfies the constraint.
      * For home / shop, it just returns today + MIN_DAYS_BEFORE_DELIVERY.
      */
-    public static function nextAvailableDate(string $deliveryMethod): string
+    public static function nextAvailableDate(string $deliveryMethod, ?int $nowTs = null, array $cancelledMarketDates = []): string
     {
-        $minTs = strtotime('+' . self::MIN_DAYS_BEFORE_DELIVERY . ' days');
+        $nowTs = $nowTs ?? time();
+        $cancelledSet = array_fill_keys($cancelledMarketDates, true);
         switch ($deliveryMethod) {
             case 'market_wednesday':
-                return self::nextWeekday($minTs, 3); // 3 = Wednesday
+                return self::nextMarketDate(3, $nowTs, $cancelledSet); // 3 = Wednesday
             case 'market_friday':
-                return self::nextWeekday($minTs, 5); // 5 = Friday
+                return self::nextMarketDate(5, $nowTs, $cancelledSet); // 5 = Friday
             default:
+                $minTs = strtotime('+' . self::MIN_DAYS_BEFORE_DELIVERY . ' days', $nowTs);
                 return date('Y-m-d', $minTs);
         }
     }
@@ -211,22 +217,153 @@ class ShopOrderModel
      *  – at least MIN_DAYS_BEFORE_DELIVERY days from today
      *  – on the correct weekday for market methods
      */
-    public static function validateDeliveryDate(string $deliveryMethod, string $dateStr): bool
+    public static function validateDeliveryDate(string $deliveryMethod, string $dateStr, ?int $nowTs = null, array $cancelledMarketDates = []): bool
     {
-        $ts = strtotime($dateStr);
+        $ts = strtotime($dateStr . ' midnight');
         if ($ts === false) {
             return false;
         }
-        $minTs = strtotime('+' . self::MIN_DAYS_BEFORE_DELIVERY . ' days midnight');
+        $nowTs = $nowTs ?? time();
+
+        if ($deliveryMethod === 'market_wednesday' || $deliveryMethod === 'market_friday') {
+            $expectedDow = ($deliveryMethod === 'market_wednesday') ? 3 : 5;
+            if ((int) date('w', $ts) !== $expectedDow) {
+                return false;
+            }
+            if (in_array($dateStr, $cancelledMarketDates, true)) {
+                return false;
+            }
+            $pickupTs = strtotime($dateStr . ' ' . self::MARKET_PICKUP_TIME);
+            if ($pickupTs === false) {
+                return false;
+            }
+            return $pickupTs >= self::marketCutoffTimestamp($nowTs);
+        }
+
+        $minTs = strtotime('+' . self::MIN_DAYS_BEFORE_DELIVERY . ' days midnight', $nowTs);
         if ($ts < $minTs) {
             return false;
         }
-        if ($deliveryMethod === 'market_wednesday' && (int) date('w', $ts) !== 3) {
-            return false;
-        }
-        if ($deliveryMethod === 'market_friday' && (int) date('w', $ts) !== 5) {
-            return false;
-        }
+
         return true;
+    }
+
+    /** Returns market pickup cutoff timestamp based on preparation delay. */
+    public static function marketCutoffTimestamp(?int $nowTs = null): int
+    {
+        return ($nowTs ?? time()) + self::MARKET_PREPARATION_HOURS * 3600;
+    }
+
+    /** Returns true when date string is a Wednesday or Friday. */
+    public static function isMarketDeliveryDate(string $dateStr): bool
+    {
+        $ts = strtotime($dateStr . ' midnight');
+        if ($ts === false) {
+            return false;
+        }
+        $dow = (int) date('w', $ts);
+        return $dow === 3 || $dow === 5;
+    }
+
+    /**
+     * Returns upcoming candidate market delivery dates (Wednesday/Friday).
+     *
+     * @return array<int, array{date:string, method:string}>
+     */
+    public static function candidateMarketDates(int $limit = 12, ?int $nowTs = null): array
+    {
+        $limit = max(1, $limit);
+        $nowTs = $nowTs ?? time();
+        $cancelledSet = [];
+
+        $next = [
+            'market_wednesday' => self::nextMarketDate(3, $nowTs, $cancelledSet),
+            'market_friday'    => self::nextMarketDate(5, $nowTs, $cancelledSet),
+        ];
+
+        $out = [];
+        while (count($out) < $limit) {
+            if ($next['market_wednesday'] <= $next['market_friday']) {
+                $date = $next['market_wednesday'];
+                $out[] = ['date' => $date, 'method' => 'market_wednesday'];
+                $next['market_wednesday'] = date('Y-m-d', strtotime($date . ' +7 days'));
+            } else {
+                $date = $next['market_friday'];
+                $out[] = ['date' => $date, 'method' => 'market_friday'];
+                $next['market_friday'] = date('Y-m-d', strtotime($date . ' +7 days'));
+            }
+        }
+
+        return $out;
+    }
+
+    /** Returns canceled market delivery dates from today onward. */
+    public function getCancelledMarketDates(): array
+    {
+        $stmt = $this->db->query(
+            'SELECT delivery_date::text
+             FROM shop_market_delivery_cancellations
+             WHERE delivery_date >= CURRENT_DATE
+             ORDER BY delivery_date ASC'
+        );
+        return $stmt->fetchAll(PDO::FETCH_COLUMN) ?: [];
+    }
+
+    /** Returns number of orders per delivery date for provided date list. */
+    public function getOrderCountsByDeliveryDates(array $dates): array
+    {
+        $dates = array_values(array_unique(array_filter($dates, static fn ($d): bool => is_string($d) && $d !== '')));
+        if (empty($dates)) {
+            return [];
+        }
+
+        $placeholders = [];
+        $params = [];
+        foreach ($dates as $i => $date) {
+            $key = ':d' . $i;
+            $placeholders[] = $key;
+            $params[$key] = $date;
+        }
+
+        $sql = 'SELECT delivery_date::text AS d, COUNT(*)::int AS c
+                FROM shop_orders
+                WHERE delivery_method IN (\'market_wednesday\', \'market_friday\')
+                  AND delivery_date IN (' . implode(',', $placeholders) . ')
+                GROUP BY delivery_date';
+        $stmt = $this->db->prepare($sql);
+        $stmt->execute($params);
+
+        $rows = $stmt->fetchAll();
+        $out = [];
+        foreach ($rows as $row) {
+            $out[(string) $row['d']] = (int) $row['c'];
+        }
+        return $out;
+    }
+
+    /** Cancels a candidate market date (insert ignore if already cancelled). */
+    public function cancelMarketDate(string $date): void
+    {
+        $stmt = $this->db->prepare(
+            'INSERT INTO shop_market_delivery_cancellations (delivery_date)
+             VALUES (:date)
+             ON CONFLICT (delivery_date) DO NOTHING'
+        );
+        $stmt->execute([':date' => $date]);
+    }
+
+    private static function nextMarketDate(int $targetDow, int $nowTs, array $cancelledSet): string
+    {
+        $cutoffTs = self::marketCutoffTimestamp($nowTs);
+        $candidate = self::nextWeekday($cutoffTs, $targetDow);
+        $pickupTs = strtotime($candidate . ' ' . self::MARKET_PICKUP_TIME);
+        if ($pickupTs === false || $pickupTs < $cutoffTs) {
+            $candidate = date('Y-m-d', strtotime($candidate . ' +7 days'));
+        }
+
+        while (isset($cancelledSet[$candidate])) {
+            $candidate = date('Y-m-d', strtotime($candidate . ' +7 days'));
+        }
+        return $candidate;
     }
 }

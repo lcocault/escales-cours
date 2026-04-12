@@ -62,6 +62,11 @@ include ROOT_DIR . '/templates/header.php';
             <div class="admin-card__label">Boutique – Commandes</div>
             <div style="color:var(--color-muted);font-size:.9rem;margin-top:.25rem"><?= $shopOrderCount ?> commande(s) active(s)</div>
         </a>
+        <a href="<?= APP_BASE_URL ?>/admin/shop-market-days.php" class="admin-card" style="text-decoration:none;color:inherit">
+            <div class="admin-card__icon">🧺</div>
+            <div class="admin-card__label">Boutique – Dates marché</div>
+            <div style="color:var(--color-muted);font-size:.9rem;margin-top:.25rem">Gestion des dates candidates</div>
+        </a>
     </div>
 </div>
 <?php include ROOT_DIR . '/templates/footer.php'; ?>
