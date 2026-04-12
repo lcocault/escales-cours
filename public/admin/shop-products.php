@@ -33,10 +33,11 @@ include ROOT_DIR . '/templates/header.php';
                 </thead>
                 <tbody>
                     <?php foreach ($products as $p): ?>
+                        <?php $productImgSrc = shopProductImageSrc($p); ?>
                         <tr>
                             <td>
-                                <?php if (!empty($p['photo_filename'])): ?>
-                                    <img src="<?= APP_BASE_URL ?>/uploads/shop/<?= e($p['photo_filename']) ?>"
+                                <?php if ($productImgSrc !== null): ?>
+                                    <img src="<?= e($productImgSrc) ?>"
                                          alt="<?= e($p['name']) ?>"
                                          style="width:60px;height:60px;object-fit:cover;border-radius:6px">
                                 <?php else: ?>

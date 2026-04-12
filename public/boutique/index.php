@@ -25,8 +25,11 @@ include ROOT_DIR . '/templates/header.php';
         <div class="sessions-grid">
             <?php foreach ($products as $p): ?>
                 <div class="session-card">
-                    <?php if (!empty($p['photo_filename'])): ?>
-                        <img src="<?= APP_BASE_URL ?>/uploads/shop/<?= e($p['photo_filename']) ?>"
+                    <?php
+                    $productImgSrc = shopProductImageSrc($p);
+                    ?>
+                    <?php if ($productImgSrc !== null): ?>
+                        <img src="<?= e($productImgSrc) ?>"
                              alt="<?= e($p['name']) ?>"
                              class="session-card__img"
                              style="width:100%;height:200px;object-fit:cover;border-radius:var(--radius) var(--radius) 0 0;display:block">

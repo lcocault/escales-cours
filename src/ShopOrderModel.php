@@ -53,7 +53,7 @@ class ShopOrderModel
     public function getItems(int $orderId): array
     {
         $stmt = $this->db->prepare(
-            'SELECT i.*, p.photo_filename
+            'SELECT i.*, p.photo_filename, p.external_photo_url
              FROM shop_order_items i
              LEFT JOIN shop_products p ON p.id = i.product_id
              WHERE i.order_id = :oid

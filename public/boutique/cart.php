@@ -93,10 +93,11 @@ include ROOT_DIR . '/templates/header.php';
                 <tbody>
                     <?php foreach ($cartItems as $item): ?>
                         <?php $p = $item['product']; ?>
+                        <?php $productImgSrc = shopProductImageSrc($p); ?>
                         <tr>
                             <td>
-                                <?php if (!empty($p['photo_filename'])): ?>
-                                    <img src="<?= APP_BASE_URL ?>/uploads/shop/<?= e($p['photo_filename']) ?>"
+                                <?php if ($productImgSrc !== null): ?>
+                                    <img src="<?= e($productImgSrc) ?>"
                                          alt="<?= e($p['name']) ?>"
                                          style="width:48px;height:48px;object-fit:cover;border-radius:4px;vertical-align:middle;margin-right:.5rem">
                                 <?php endif; ?>

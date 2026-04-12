@@ -174,10 +174,17 @@ CREATE TABLE IF NOT EXISTS shop_products (
     name           VARCHAR(255) NOT NULL,
     description    TEXT,
     photo_filename VARCHAR(255),
+    external_photo_url TEXT,
     price_cents    INTEGER      NOT NULL CHECK (price_cents >= 0),
     is_available   BOOLEAN      NOT NULL DEFAULT TRUE,
     created_at     TIMESTAMPTZ  NOT NULL DEFAULT NOW(),
-    deleted_at     TIMESTAMPTZ
+    deleted_at     TIMESTAMPTZ,
+    CONSTRAINT chk_shop_products_single_photo_source CHECK (
+        NOT (
+            photo_filename IS NOT NULL
+            AND external_photo_url IS NOT NULL
+        )
+    )
 );
 
 -- Shop orders -------------------------------------------------
