@@ -67,6 +67,13 @@ include ROOT_DIR . '/templates/header.php';
                                         <button type="submit" class="btn btn--warning btn--icon" title="Annuler la séance" aria-label="Annuler la séance">🚫</button>
                                     </form>
                                     <?php endif; ?>
+                                    <?php if (($s['status'] ?? 'pending') === 'pending'): ?>
+                                    <form method="post" action="<?= APP_BASE_URL ?>/admin/session-close.php" onsubmit="return confirm('Clôturer cette séance ?')">
+                                        <input type="hidden" name="csrf_token" value="<?= Auth::csrfToken() ?>">
+                                        <input type="hidden" name="id" value="<?= (int) $s['id'] ?>">
+                                        <button type="submit" class="btn btn--success btn--icon" title="Clôturer la séance" aria-label="Clôturer la séance">✅</button>
+                                    </form>
+                                    <?php endif; ?>
                                     <form method="post" action="<?= APP_BASE_URL ?>/admin/session-delete.php" onsubmit="return confirm('Supprimer cette séance ?')">
                                         <input type="hidden" name="csrf_token" value="<?= Auth::csrfToken() ?>">
                                         <input type="hidden" name="id" value="<?= (int) $s['id'] ?>">

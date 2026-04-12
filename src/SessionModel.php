@@ -149,6 +149,20 @@ class SessionModel
         $stmt->execute([':id' => $id]);
     }
 
+    public function closePastSession(int $id): bool
+    {
+        $stmt = $this->db->prepare(
+            "UPDATE sessions
+             SET status = 'confirmed'
+             WHERE id = :id
+               AND deleted_at IS NULL
+               AND status = 'pending'
+               AND (session_date::timestamp + end_time::interval) < NOW()"
+        );
+        $stmt->execute([':id' => $id]);
+        return $stmt->rowCount() > 0;
+    }
+
     /**
      * Returns pending sessions whose start datetime falls within the next 24 hours.
      * Used by the cron job to decide whether to confirm or cancel each session.
