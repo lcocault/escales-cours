@@ -47,14 +47,15 @@ class ShopProductModel
     public function create(array $data): int
     {
         $stmt = $this->db->prepare(
-            'INSERT INTO shop_products (name, description, photo_filename, price_cents, is_available)
-             VALUES (:name, :description, :photo, :price, :available)
+            'INSERT INTO shop_products (name, description, photo_filename, external_photo_url, price_cents, is_available)
+             VALUES (:name, :description, :photo, :external_photo_url, :price, :available)
              RETURNING id'
         );
         $stmt->execute([
             ':name'        => $data['name'],
             ':description' => $data['description'] ?? null,
             ':photo'       => $data['photo_filename'] ?? null,
+            ':external_photo_url' => $data['external_photo_url'] ?? null,
             ':price'       => (int) $data['price_cents'],
             ':available'   => ($data['is_available'] ?? true) ? 'TRUE' : 'FALSE',
         ]);
@@ -81,13 +82,20 @@ class ShopProductModel
         ]);
     }
 
-    /** Updates only the photo filename for a product. */
-    public function updatePhoto(int $id, string $filename): void
+    /** Updates the image source (uploaded filename and/or external URL) for a product. */
+    public function updatePhoto(int $id, ?string $filename, ?string $externalUrl = null): void
     {
         $stmt = $this->db->prepare(
-            'UPDATE shop_products SET photo_filename = :photo WHERE id = :id'
+            'UPDATE shop_products
+             SET photo_filename = :photo,
+                 external_photo_url = :external_photo_url
+             WHERE id = :id'
         );
-        $stmt->execute([':photo' => $filename, ':id' => $id]);
+        $stmt->execute([
+            ':photo' => $filename,
+            ':external_photo_url' => $externalUrl,
+            ':id' => $id,
+        ]);
     }
 
     /** Soft-deletes a product. */

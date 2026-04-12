@@ -138,3 +138,15 @@ function shopOrderStatusLabel(string $status): string
     ];
     return $labels[$status] ?? $status;
 }
+
+// Helper: resolves a shop product image source (external URL or uploaded file path).
+function shopProductImageSrc(array $product): ?string
+{
+    if (!empty($product['external_photo_url'])) {
+        return (string) $product['external_photo_url'];
+    }
+    if (!empty($product['photo_filename'])) {
+        return APP_BASE_URL . '/uploads/shop/' . $product['photo_filename'];
+    }
+    return null;
+}

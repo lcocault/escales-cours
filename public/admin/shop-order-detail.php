@@ -65,10 +65,11 @@ include ROOT_DIR . '/templates/header.php';
             </thead>
             <tbody>
                 <?php foreach ($items as $item): ?>
+                    <?php $productImgSrc = shopProductImageSrc($item); ?>
                     <tr>
                         <td>
-                            <?php if (!empty($item['photo_filename'])): ?>
-                                <img src="<?= APP_BASE_URL ?>/uploads/shop/<?= e($item['photo_filename']) ?>"
+                            <?php if ($productImgSrc !== null): ?>
+                                <img src="<?= e($productImgSrc) ?>"
                                      alt="" style="width:36px;height:36px;object-fit:cover;border-radius:4px;vertical-align:middle;margin-right:.5rem">
                             <?php endif; ?>
                             <?= e($item['product_name']) ?>

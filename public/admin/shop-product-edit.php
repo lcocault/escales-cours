@@ -14,6 +14,7 @@ $defaults = [
     'description'  => '',
     'price_cents'  => 0,
     'is_available' => true,
+    'external_photo_url' => '',
 ];
 $values = $isEdit ? array_merge($defaults, $product) : $defaults;
 
@@ -24,6 +25,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $values['description']  = trim($_POST['description'] ?? '');
     $values['price_cents']  = (int) round((float) str_replace(',', '.', $_POST['price_euros'] ?? '0') * 100);
     $values['is_available'] = isset($_POST['is_available']);
+    $values['external_photo_url'] = trim($_POST['external_photo_url'] ?? '');
 
     if ($values['name'] === '') {
         $errors[] = 'Le nom du produit est obligatoire.';
@@ -32,9 +34,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $errors[] = 'Le prix ne peut pas être négatif.';
     }
 
-    // Handle photo upload
     $newPhotoFilename = null;
-    if (!empty($_FILES['photo']) && $_FILES['photo']['error'] !== UPLOAD_ERR_NO_FILE) {
+    $newExternalPhotoUrl = null;
+    $replacePhotoSource = false;
+
+    // Handle photo source (uploaded file or external URL)
+    $hasPhotoUpload = !empty($_FILES['photo']) && $_FILES['photo']['error'] !== UPLOAD_ERR_NO_FILE;
+    if ($hasPhotoUpload) {
         if ($_FILES['photo']['error'] !== UPLOAD_ERR_OK) {
             $errors[] = 'Erreur lors du téléchargement de la photo (code ' . $_FILES['photo']['error'] . ').';
         } else {
@@ -65,8 +71,22 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                         $errors[] = 'Impossible de sauvegarder la photo. Vérifiez les permissions.';
                     } else {
                         $newPhotoFilename = $filename;
+                        $newExternalPhotoUrl = null;
+                        $replacePhotoSource = true;
                     }
                 }
+            }
+        }
+    } else {
+        $externalPhotoUrl = trim($_POST['external_photo_url'] ?? '');
+        if ($externalPhotoUrl !== '') {
+            if (!filter_var($externalPhotoUrl, FILTER_VALIDATE_URL)) {
+                $errors[] = 'L\'URL de la photo n\'est pas valide.';
+            } elseif (!preg_match('#^https?://#i', $externalPhotoUrl)) {
+                $errors[] = 'L\'URL de la photo doit commencer par http:// ou https://.';
+            } else {
+                $newExternalPhotoUrl = $externalPhotoUrl;
+                $replacePhotoSource = true;
             }
         }
     }
@@ -74,20 +94,23 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     if (empty($errors)) {
         if ($isEdit) {
             $productModel->update($id, $values);
-            if ($newPhotoFilename !== null) {
+            if ($replacePhotoSource) {
                 // Delete old photo file if any
                 $oldPhoto = $product['photo_filename'] ?? null;
-                if ($oldPhoto) {
+                if ($oldPhoto && ($newPhotoFilename === null || $oldPhoto !== $newPhotoFilename)) {
                     $oldPath = ROOT_DIR . '/public/uploads/shop/' . $oldPhoto;
                     if (is_file($oldPath)) {
                         unlink($oldPath);
                     }
                 }
-                $productModel->updatePhoto($id, $newPhotoFilename);
+                $productModel->updatePhoto($id, $newPhotoFilename, $newExternalPhotoUrl);
             }
             flash('success', 'Produit modifié avec succès.');
         } else {
-            $newId = $productModel->create(array_merge($values, ['photo_filename' => $newPhotoFilename]));
+            $newId = $productModel->create(array_merge($values, [
+                'photo_filename' => $newPhotoFilename,
+                'external_photo_url' => $newExternalPhotoUrl,
+            ]));
             flash('success', 'Produit créé avec succès.');
         }
         header('Location: ' . APP_BASE_URL . '/admin/shop-products.php');
@@ -142,18 +165,38 @@ include ROOT_DIR . '/templates/header.php';
         </div>
 
         <div class="form-group">
-            <label for="photo">Photo du produit (JPEG, PNG ou WebP, 8 Mo max)</label>
-            <?php if ($isEdit && !empty($product['photo_filename'])): ?>
+            <label>Photo du produit</label>
+            <?php
+            $currentImgSrc = $isEdit ? shopProductImageSrc($product) : null;
+            ?>
+            <?php if ($isEdit && $currentImgSrc !== null): ?>
                 <div style="margin-bottom:.5rem">
-                    <img src="<?= APP_BASE_URL ?>/uploads/shop/<?= e($product['photo_filename']) ?>"
+                    <img src="<?= e($currentImgSrc) ?>"
                          alt="<?= e($product['name']) ?>"
                          style="width:120px;height:120px;object-fit:cover;border-radius:8px">
                     <p style="font-size:.85rem;color:var(--color-muted);margin-top:.25rem">
-                        Photo actuelle. Sélectionnez un nouveau fichier pour la remplacer.
+                        Photo actuelle. Sélectionnez une nouvelle source pour la remplacer.
                     </p>
                 </div>
             <?php endif; ?>
-            <input type="file" id="photo" name="photo" accept="image/jpeg,image/png,image/webp">
+            <div style="display:flex;gap:.5rem;margin-bottom:1rem">
+                <button type="button" id="tab-upload" class="btn btn--secondary btn--sm"
+                        onclick="showPhotoTab('upload')" style="font-weight:bold">📁 Fichier local</button>
+                <button type="button" id="tab-url" class="btn btn--secondary btn--sm"
+                        onclick="showPhotoTab('url')">🔗 URL externe</button>
+            </div>
+            <div id="panel-upload">
+                <input type="file" id="photo" name="photo" accept="image/jpeg,image/png,image/webp">
+                <p style="font-size:.85rem;color:var(--color-muted);margin-top:.35rem">
+                    JPEG, PNG ou WebP (8 Mo max).
+                </p>
+            </div>
+            <div id="panel-url" style="display:none">
+                <input type="url" id="external_photo_url" name="external_photo_url"
+                       value="<?= e($values['external_photo_url']) ?>"
+                       placeholder="https://example.com/photo.jpg"
+                       style="width:100%;box-sizing:border-box">
+            </div>
         </div>
 
         <div style="display:flex;gap:1rem;margin-top:1.5rem">
@@ -162,4 +205,19 @@ include ROOT_DIR . '/templates/header.php';
         </div>
     </form>
 </div>
+<script>
+function showPhotoTab(tab) {
+    document.getElementById('panel-upload').style.display = tab === 'upload' ? '' : 'none';
+    document.getElementById('panel-url').style.display = tab === 'url' ? '' : 'none';
+    document.getElementById('tab-upload').style.fontWeight = tab === 'upload' ? 'bold' : '';
+    document.getElementById('tab-url').style.fontWeight = tab === 'url' ? 'bold' : '';
+    document.getElementById('photo').disabled = tab !== 'upload';
+    document.getElementById('external_photo_url').disabled = tab !== 'url';
+}
+<?php if (!empty($values['external_photo_url']) || ($isEdit && !empty($product['external_photo_url']))): ?>
+showPhotoTab('url');
+<?php else: ?>
+showPhotoTab('upload');
+<?php endif; ?>
+</script>
 <?php include ROOT_DIR . '/templates/footer.php'; ?>
