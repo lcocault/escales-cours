@@ -254,7 +254,12 @@ class ShopOrderModel
         return ($nowTs ?? time()) + self::MARKET_PREPARATION_HOURS * 3600;
     }
 
-    /** Returns true when date string is a Wednesday or Friday. */
+    /**
+     * Validates whether a date belongs to a market delivery day.
+     *
+     * @param string $dateStr Date in 'Y-m-d' format.
+     * @return bool True when parsed date is Wednesday (3) or Friday (5).
+     */
     public static function isMarketDeliveryDate(string $dateStr): bool
     {
         $ts = strtotime($dateStr . ' midnight');
@@ -297,7 +302,7 @@ class ShopOrderModel
         return $out;
     }
 
-    /** Returns canceled market delivery dates from today onward. */
+    /** Returns cancelled market delivery dates from today onward. */
     public function getCancelledMarketDates(): array
     {
         $stmt = $this->db->query(
