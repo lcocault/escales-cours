@@ -218,6 +218,13 @@ CREATE TABLE IF NOT EXISTS shop_order_items (
     quantity        INTEGER      NOT NULL CHECK (quantity > 0)
 );
 
+-- Canceled market delivery dates -----------------------------------
+CREATE TABLE IF NOT EXISTS shop_market_delivery_cancellations (
+    id            SERIAL PRIMARY KEY,
+    delivery_date DATE        NOT NULL UNIQUE,
+    created_at    TIMESTAMPTZ NOT NULL DEFAULT NOW()
+);
+
 -- Password reset tokens ---------------------------------------
 CREATE TABLE IF NOT EXISTS password_resets (
     id          SERIAL PRIMARY KEY,

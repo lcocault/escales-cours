@@ -13,6 +13,9 @@ include ROOT_DIR . '/templates/header.php';
     <?php include ROOT_DIR . '/templates/flash.php'; ?>
 
     <h1 class="page-title">📦 Commandes boutique</h1>
+    <p class="mb-2">
+        <a href="<?= APP_BASE_URL ?>/admin/shop-market-days.php" class="btn btn--secondary btn--sm">🧺 Gérer les dates marché candidates</a>
+    </p>
 
     <?php if (empty($orders)): ?>
         <p style="color:var(--color-muted)">Aucune commande pour l'instant.</p>

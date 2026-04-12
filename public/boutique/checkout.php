@@ -7,6 +7,7 @@ Auth::start();
 
 $productModel = new ShopProductModel();
 $orderModel   = new ShopOrderModel();
+$cancelledMarketDates = $orderModel->getCancelledMarketDates();
 
 // Build cart
 $cart = $_SESSION['shop_cart'] ?? [];
@@ -52,9 +53,12 @@ if (empty($cartItems)) {
     exit;
 }
 
+$nextMarketWednesday = ShopOrderModel::nextAvailableDate('market_wednesday', null, $cancelledMarketDates);
+$nextMarketFriday = ShopOrderModel::nextAvailableDate('market_friday', null, $cancelledMarketDates);
+
 $deliveryMethods = [
-    'market_wednesday' => 'Retrait marché Croix-de-Pierre – mercredi (gratuit)',
-    'market_friday'    => 'Retrait marché Croix-de-Pierre – vendredi (gratuit)',
+    'market_wednesday' => 'Retrait marché Croix-de-Pierre – mercredi ' . formatDate($nextMarketWednesday) . ' (gratuit)',
+    'market_friday'    => 'Retrait marché Croix-de-Pierre – vendredi ' . formatDate($nextMarketFriday) . ' (gratuit)',
     'shop'             => 'Retrait en boutique – 36 rue Boieldieu, Toulouse (gratuit)',
     'home'             => 'Livraison à domicile (+' . formatPrice(ShopOrderModel::HOME_DELIVERY_FEE_CENTS) . ')',
 ];
@@ -63,7 +67,7 @@ $errors = [];
 $values = [
     'delivery_method'  => 'market_wednesday',
     'delivery_address' => '',
-    'delivery_date'    => ShopOrderModel::nextAvailableDate('market_wednesday'),
+    'delivery_date'    => $nextMarketWednesday,
 ];
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
@@ -77,12 +81,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $errors[] = 'Mode de livraison invalide.';
     }
 
-    if (empty($errors) && !ShopOrderModel::validateDeliveryDate($values['delivery_method'], $values['delivery_date'])) {
-        $minDate = ShopOrderModel::nextAvailableDate($values['delivery_method']);
+    if (empty($errors) && !ShopOrderModel::validateDeliveryDate($values['delivery_method'], $values['delivery_date'], null, $cancelledMarketDates)) {
+        $minDate = ShopOrderModel::nextAvailableDate($values['delivery_method'], null, $cancelledMarketDates);
         if ($values['delivery_method'] === 'market_wednesday') {
-            $errors[] = 'La date doit être un mercredi au moins ' . ShopOrderModel::MIN_DAYS_BEFORE_DELIVERY . ' jours à venir (prochain disponible : ' . formatDate($minDate) . ').';
+            $errors[] = 'La date doit être un mercredi disponible avec au moins ' . ShopOrderModel::MARKET_PREPARATION_HOURS . 'h de préparation (prochain disponible : ' . formatDate($minDate) . ').';
         } elseif ($values['delivery_method'] === 'market_friday') {
-            $errors[] = 'La date doit être un vendredi au moins ' . ShopOrderModel::MIN_DAYS_BEFORE_DELIVERY . ' jours à venir (prochain disponible : ' . formatDate($minDate) . ').';
+            $errors[] = 'La date doit être un vendredi disponible avec au moins ' . ShopOrderModel::MARKET_PREPARATION_HOURS . 'h de préparation (prochain disponible : ' . formatDate($minDate) . ').';
         } else {
             $errors[] = 'La date de livraison doit être au moins ' . ShopOrderModel::MIN_DAYS_BEFORE_DELIVERY . ' jours à partir d\'aujourd\'hui (première date disponible : ' . formatDate($minDate) . ').';
         }
@@ -164,6 +168,9 @@ include ROOT_DIR . '/templates/header.php';
             <input type="hidden" name="csrf_token" value="<?= Auth::csrfToken() ?>">
 
             <h2 style="margin-bottom:1rem">Mode de retrait / livraison</h2>
+            <p style="color:var(--color-muted);margin-top:0">
+                Pour les retraits au marché, votre commande doit être récupérée entre 8h30 et 12h30.
+            </p>
             <div class="form-group">
                 <?php foreach ($deliveryMethods as $key => $label): ?>
                     <div class="form-group form-group--checkbox" style="margin-bottom:.5rem">
@@ -231,12 +238,13 @@ include ROOT_DIR . '/templates/header.php';
     var feeCents   = <?= ShopOrderModel::HOME_DELIVERY_FEE_CENTS ?>;
 
     var minDays = <?= ShopOrderModel::MIN_DAYS_BEFORE_DELIVERY ?>;
+    var marketPreparationHours = <?= ShopOrderModel::MARKET_PREPARATION_HOURS ?>;
 
     // Pre-compute next available dates for each method
     var nextDates = {
         'home'             : '<?= ShopOrderModel::nextAvailableDate('home') ?>',
-        'market_wednesday' : '<?= ShopOrderModel::nextAvailableDate('market_wednesday') ?>',
-        'market_friday'    : '<?= ShopOrderModel::nextAvailableDate('market_friday') ?>',
+        'market_wednesday' : '<?= ShopOrderModel::nextAvailableDate('market_wednesday', null, $cancelledMarketDates) ?>',
+        'market_friday'    : '<?= ShopOrderModel::nextAvailableDate('market_friday', null, $cancelledMarketDates) ?>',
         'shop'             : '<?= ShopOrderModel::nextAvailableDate('shop') ?>'
     };
 
@@ -268,9 +276,9 @@ include ROOT_DIR . '/templates/header.php';
         // Update hint
         var hint = document.getElementById('date-hint');
         if (deliveryMethod === 'market_wednesday') {
-            hint.textContent = '(mercredi, au moins ' + minDays + ' jours à partir d\'aujourd\'hui)';
+            hint.textContent = '(mercredi, avec au moins ' + marketPreparationHours + 'h de préparation)';
         } else if (deliveryMethod === 'market_friday') {
-            hint.textContent = '(vendredi, au moins ' + minDays + ' jours à partir d\'aujourd\'hui)';
+            hint.textContent = '(vendredi, avec au moins ' + marketPreparationHours + 'h de préparation)';
         } else {
             hint.textContent = '(au moins ' + minDays + ' jours à partir d\'aujourd\'hui)';
         }

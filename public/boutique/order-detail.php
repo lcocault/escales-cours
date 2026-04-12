@@ -30,6 +30,9 @@ include ROOT_DIR . '/templates/header.php';
             <strong>Statut :</strong> <?= e(shopOrderStatusLabel($order['status'])) ?><br>
             <strong>Livraison :</strong> <?= e(shopDeliveryLabel($order['delivery_method'])) ?><br>
             <strong>Date :</strong> <?= e(formatDate($order['delivery_date'])) ?><br>
+            <?php if (in_array($order['delivery_method'], ['market_wednesday', 'market_friday'], true)): ?>
+                <strong>Retrait marché :</strong> entre 8h30 et 12h30<br>
+            <?php endif; ?>
             <?php if ($order['delivery_method'] === 'home' && !empty($order['delivery_address'])): ?>
                 <strong>Adresse :</strong> <?= nl2br(e($order['delivery_address'])) ?><br>
             <?php endif; ?>
