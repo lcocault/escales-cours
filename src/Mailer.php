@@ -126,6 +126,33 @@ class Mailer
         self::send($user['email'], $subject, $body);
     }
 
+    public static function sendRatingReminder(
+        array $user,
+        array $session
+    ): void {
+        $subject = 'Votre avis nous intéresse – ' . $session['title'];
+        $body    = self::ratingReminderBody($user, $session);
+        self::send($user['email'], $subject, $body);
+    }
+
+    private static function ratingReminderBody(array $user, array $session): string
+    {
+        $name      = htmlspecialchars($user['first_name'] . ' ' . $user['last_name']);
+        $title     = htmlspecialchars($session['title']);
+        $date      = htmlspecialchars($session['session_date']);
+        $baseUrl   = APP_BASE_URL;
+        $ratingUrl = $baseUrl . '/rate-session.php?session_id=' . (int) $session['id'];
+
+        return <<<HTML
+        <p>Bonjour {$name},</p>
+        <p>Nous espérons que la séance <strong>{$title}</strong> du {$date} vous a plu !</p>
+        <p>Votre avis est précieux pour nous aider à améliorer nos ateliers.
+           Cela ne prend qu'une minute :</p>
+        <p><a href="{$ratingUrl}">⭐ Donner mon avis sur la séance</a></p>
+        <p>Merci d'avance, et à bientôt aux Escales Culinaires !</p>
+        HTML;
+    }
+
     private static function sessionConfirmationBody(array $user, array $session): string
     {
         $name    = htmlspecialchars($user['first_name'] . ' ' . $user['last_name']);

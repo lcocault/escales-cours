@@ -10,6 +10,12 @@ $bookingCount  = (int) $db->query("SELECT COUNT(*) FROM bookings WHERE status IN
 $messageCount  = (int) $db->query("SELECT COUNT(*) FROM general_messages WHERE deleted_at IS NULL")->fetchColumn();
 $packCount     = (int) $db->query("SELECT COUNT(*) FROM packs WHERE deleted_at IS NULL")->fetchColumn();
 $promoCount    = (int) $db->query("SELECT COUNT(*) FROM promo_codes WHERE deleted_at IS NULL")->fetchColumn();
+$pendingRatingReminders = (int) $db->query(
+    "SELECT COUNT(*) FROM bookings b
+     WHERE b.status = 'attended'
+       AND b.rating_reminder_dismissed = FALSE
+       AND NOT EXISTS (SELECT 1 FROM ratings r WHERE r.booking_id = b.id)"
+)->fetchColumn();
 
 $pageTitle = 'Administration';
 include ROOT_DIR . '/templates/header.php';
@@ -54,6 +60,11 @@ include ROOT_DIR . '/templates/header.php';
             <div class="admin-card__icon">📧</div>
             <div class="admin-card__label">Annonce des séances</div>
             <div style="color:var(--color-muted);font-size:.9rem;margin-top:.25rem">Envoi e-mail aux inscrits</div>
+        </a>
+        <a href="<?= APP_BASE_URL ?>/admin/rating-reminders.php" class="admin-card" style="text-decoration:none;color:inherit">
+            <div class="admin-card__icon">⭐</div>
+            <div class="admin-card__label">Rappels d'avis</div>
+            <div style="color:var(--color-muted);font-size:.9rem;margin-top:.25rem"><?= $pendingRatingReminders ?> sans avis</div>
         </a>
     </div>
 </div>
