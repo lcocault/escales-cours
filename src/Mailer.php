@@ -252,6 +252,13 @@ class Mailer
         HTML;
     }
 
+    public static function sendRatingReminder(array $user, array $session): void
+    {
+        $subject = 'Votre avis nous intéresse – ' . $session['title'];
+        $body    = self::ratingReminderBody($user, $session);
+        self::send($user['email'], $subject, $body);
+    }
+
     private static function attendanceConfirmationBody(array $user, array $session): string
     {
         $name       = htmlspecialchars($user['first_name'] . ' ' . $user['last_name']);
@@ -290,6 +297,23 @@ class Mailer
         <p>Pour réserver votre place, cliquez sur le lien ci-dessous :</p>
         <p><a href="{$sessionUrl}">Voir la séance et réserver</a></p>
         <p>À bientôt aux Escales Culinaires !</p>
+        HTML;
+    }
+
+    private static function ratingReminderBody(array $user, array $session): string
+    {
+        $name      = htmlspecialchars($user['first_name'] . ' ' . $user['last_name']);
+        $title     = htmlspecialchars($session['title']);
+        $date      = htmlspecialchars($session['session_date']);
+        $baseUrl   = APP_BASE_URL;
+        $ratingUrl = $baseUrl . '/rate-session.php?session_id=' . (int) $session['id'];
+
+        return <<<HTML
+        <p>Bonjour {$name},</p>
+        <p>Nous espérons que vous avez apprécié la séance <strong>{$title}</strong> du {$date} !</p>
+        <p>Votre avis nous aide à améliorer nos ateliers. Si vous avez quelques instants, nous vous invitons à laisser une évaluation :</p>
+        <p>⭐ <a href="{$ratingUrl}">Donner mon avis sur la séance</a></p>
+        <p>Merci pour votre confiance et à bientôt aux Escales Culinaires !</p>
         HTML;
     }
 }

@@ -169,4 +169,37 @@ class BookingModel
         $stmt->execute([':uid' => $userId, ':sid' => $sessionId]);
         return (int) $stmt->fetchColumn() > 0;
     }
+
+    /**
+     * Returns all attended bookings that have no rating and have not been dismissed,
+     * for sessions that have already taken place (session_date in the past).
+     */
+    public function getAttendancesWithoutRating(): array
+    {
+        $stmt = $this->db->query(
+            "SELECT b.id, b.user_id, b.session_id,
+                    u.first_name, u.last_name, u.email,
+                    s.title AS session_title, s.session_date
+             FROM bookings b
+             JOIN users    u ON u.id = b.user_id
+             JOIN sessions s ON s.id = b.session_id
+             WHERE b.status = 'attended'
+               AND b.rating_reminder_dismissed = FALSE
+               AND s.session_date < CURRENT_DATE
+               AND NOT EXISTS (
+                   SELECT 1 FROM ratings r
+                   WHERE r.booking_id = b.id
+               )
+             ORDER BY s.session_date DESC, u.last_name ASC"
+        );
+        return $stmt->fetchAll();
+    }
+
+    public function dismissRatingReminder(int $bookingId): void
+    {
+        $stmt = $this->db->prepare(
+            'UPDATE bookings SET rating_reminder_dismissed = TRUE WHERE id = :id'
+        );
+        $stmt->execute([':id' => $bookingId]);
+    }
 }

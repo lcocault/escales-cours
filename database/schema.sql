@@ -99,8 +99,9 @@ CREATE TABLE IF NOT EXISTS bookings (
     child_age           INTEGER,                -- age of the child (may differ from session age category)
     child_allergies     TEXT,                   -- food allergies (optional)
     promo_code_id       INTEGER     REFERENCES promo_codes(id) ON DELETE SET NULL,
-    discount_cents      INTEGER     NOT NULL DEFAULT 0,
-    created_at          TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+    discount_cents              INTEGER     NOT NULL DEFAULT 0,
+    rating_reminder_dismissed   BOOLEAN     NOT NULL DEFAULT FALSE,
+    created_at                  TIMESTAMPTZ NOT NULL DEFAULT NOW(),
     UNIQUE (user_id, session_id)
 );
 
