@@ -125,8 +125,10 @@ include ROOT_DIR . '/templates/header.php';
                             ? $groups . ' créneaux disponibles'
                             : $groups . ' créneau disponible';
                     }
-                    $priceRange = formatPrice(GroupBookingModel::MIN_CHILDREN * (int) $gs['price_per_child_cents'])
-                        . ' – ' . formatPrice(GroupBookingModel::MAX_CHILDREN * (int) $gs['price_per_child_cents']);
+                    $priceHomeCents    = (int) $gs['price_per_child_home_cents'];
+                    $priceEscalesCents = (int) $gs['price_per_child_escales_cents'];
+                    $priceRange = formatPrice(GroupBookingModel::MIN_CHILDREN * min($priceHomeCents, $priceEscalesCents))
+                        . ' – ' . formatPrice(GroupBookingModel::MAX_CHILDREN * max($priceHomeCents, $priceEscalesCents));
                 ?>
                 <article class="session-card">
                     <div class="session-card__header">
@@ -145,7 +147,7 @@ include ROOT_DIR . '/templates/header.php';
                             <span class="badge <?= $badgeClass ?>"><?= e($badgeText) ?></span>
                             <p class="session-card__meta mt-1">
                                 ⏰ <?= e(substr($gs['start_time'], 0, 5)) ?> – <?= e(substr($gs['end_time'], 0, 5)) ?>
-                                &nbsp;|&nbsp; 💶 <?= e(formatPrice((int) $gs['price_per_child_cents'])) ?>/enfant
+                                &nbsp;|&nbsp; 💶 <?= e(formatPrice($priceHomeCents)) ?> – <?= e(formatPrice($priceEscalesCents)) ?>/enfant
                             </p>
                         </div>
                         <a href="<?= APP_BASE_URL ?>/group-session-slot.php?id=<?= (int) $gs['id'] ?>" class="btn btn--primary btn--sm">
