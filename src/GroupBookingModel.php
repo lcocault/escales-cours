@@ -77,25 +77,26 @@ class GroupBookingModel
     {
         $stmt = $this->db->prepare(
             'INSERT INTO group_booking_requests
-                 (user_id, contact_phone, nb_children, children_ages,
+                 (user_id, group_session_slot_id, contact_phone, nb_children, children_ages,
                   preferred_date, location_type, location_address,
                   allergies, additional_info)
              VALUES
-                 (:user_id, :contact_phone, :nb_children, :children_ages,
+                 (:user_id, :group_session_slot_id, :contact_phone, :nb_children, :children_ages,
                   :preferred_date, :location_type, :location_address,
                   :allergies, :additional_info)
              RETURNING id'
         );
         $stmt->execute([
-            ':user_id'          => (int) $data['user_id'],
-            ':contact_phone'    => $data['contact_phone'] ?: null,
-            ':nb_children'      => (int) $data['nb_children'],
-            ':children_ages'    => $data['children_ages'] ?: null,
-            ':preferred_date'   => $data['preferred_date'],
-            ':location_type'    => $data['location_type'],
-            ':location_address' => $data['location_address'] ?: null,
-            ':allergies'        => $data['allergies'] ?: null,
-            ':additional_info'  => $data['additional_info'] ?: null,
+            ':user_id'                => (int) $data['user_id'],
+            ':group_session_slot_id'  => isset($data['group_session_slot_id']) ? (int) $data['group_session_slot_id'] : null,
+            ':contact_phone'          => $data['contact_phone'] ?: null,
+            ':nb_children'            => (int) $data['nb_children'],
+            ':children_ages'          => $data['children_ages'] ?: null,
+            ':preferred_date'         => $data['preferred_date'],
+            ':location_type'          => $data['location_type'],
+            ':location_address'       => $data['location_address'] ?: null,
+            ':allergies'              => $data['allergies'] ?: null,
+            ':additional_info'        => $data['additional_info'] ?: null,
         ]);
         return (int) $stmt->fetchColumn();
     }

@@ -56,7 +56,12 @@ include ROOT_DIR . '/templates/header.php';
                                     <br><span style="font-size:.85rem"><?= e($r['contact_phone']) ?></span>
                                 <?php endif; ?>
                             </td>
-                            <td><?= e(date('d/m/Y', strtotime($r['preferred_date']))) ?></td>
+                            <td>
+                                <?= e(date('d/m/Y', strtotime($r['preferred_date']))) ?>
+                                <?php if (!empty($r['group_session_slot_id'])): ?>
+                                    <br><span style="font-size:.8rem;color:var(--color-muted)">🗓️ Créneau #<?= (int) $r['group_session_slot_id'] ?></span>
+                                <?php endif; ?>
+                            </td>
                             <td><?= (int) $r['nb_children'] ?></td>
                             <td><?= $locationLabel ?></td>
                             <td><?= e(formatPrice($estimatedPrice)) ?></td>

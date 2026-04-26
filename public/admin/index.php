@@ -19,6 +19,10 @@ $pendingRatingReminders = (int) $db->query(
 $pendingGroupBookings = (int) $db->query(
     "SELECT COUNT(*) FROM group_booking_requests WHERE deleted_at IS NULL AND status = 'pending'"
 )->fetchColumn();
+$upcomingGroupSlots = (int) $db->query(
+    "SELECT COUNT(*) FROM group_session_slots
+     WHERE slot_date >= CURRENT_DATE AND deleted_at IS NULL AND status != 'cancelled'"
+)->fetchColumn();
 
 $pageTitle = 'Administration';
 include ROOT_DIR . '/templates/header.php';
@@ -73,6 +77,11 @@ include ROOT_DIR . '/templates/header.php';
             <div class="admin-card__icon">🎂</div>
             <div class="admin-card__label">Anniversaires</div>
             <div style="color:var(--color-muted);font-size:.9rem;margin-top:.25rem"><?= $pendingGroupBookings ?> en attente</div>
+        </a>
+        <a href="<?= APP_BASE_URL ?>/admin/group-session-slots.php" class="admin-card" style="text-decoration:none;color:inherit">
+            <div class="admin-card__icon">🗓️</div>
+            <div class="admin-card__label">Créneaux de groupe</div>
+            <div style="color:var(--color-muted);font-size:.9rem;margin-top:.25rem"><?= $upcomingGroupSlots ?> à venir</div>
         </a>
     </div>
 </div>

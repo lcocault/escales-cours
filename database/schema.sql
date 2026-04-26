@@ -169,23 +169,42 @@ CREATE TABLE IF NOT EXISTS pack_sessions (
     PRIMARY KEY (pack_id, session_id)
 );
 
+-- Group session slots (admin-defined bookable slots for birthday / group sessions) ------
+CREATE TABLE IF NOT EXISTS group_session_slots (
+    id                      SERIAL PRIMARY KEY,
+    title                   VARCHAR(255)    NOT NULL DEFAULT 'Atelier anniversaire',
+    description             TEXT,
+    slot_date               DATE            NOT NULL,
+    start_time              TIME            NOT NULL,
+    end_time                TIME            NOT NULL,
+    max_groups              INTEGER         NOT NULL DEFAULT 1 CHECK (max_groups > 0),
+    remaining_groups        INTEGER         NOT NULL DEFAULT 1 CHECK (remaining_groups >= 0),
+    price_per_child_cents   INTEGER         NOT NULL CHECK (price_per_child_cents >= 0),
+    status                  VARCHAR(20)     NOT NULL DEFAULT 'open'
+                                CHECK (status IN ('open', 'full', 'cancelled')),
+    created_at              TIMESTAMPTZ     NOT NULL DEFAULT NOW(),
+    deleted_at              TIMESTAMPTZ,
+    CONSTRAINT remaining_lte_max_groups CHECK (remaining_groups <= max_groups)
+);
+
 -- Group booking requests (birthday parties / private group sessions) ------
 CREATE TABLE IF NOT EXISTS group_booking_requests (
-    id               SERIAL PRIMARY KEY,
-    user_id          INTEGER      NOT NULL REFERENCES users(id) ON DELETE RESTRICT,
-    contact_phone    VARCHAR(50),
-    nb_children      INTEGER      NOT NULL CHECK (nb_children BETWEEN 4 AND 8),
-    children_ages    TEXT,                      -- free-text description of the children's ages
-    preferred_date   DATE         NOT NULL,     -- must be at least 7 days in the future at submission time
-    location_type    VARCHAR(10)  NOT NULL CHECK (location_type IN ('home', 'escales')),
-    location_address TEXT,                      -- required when location_type = 'home'
-    allergies        TEXT,
-    additional_info  TEXT,
-    status           VARCHAR(20)  NOT NULL DEFAULT 'pending'
-                         CHECK (status IN ('pending', 'confirmed', 'cancelled')),
-    admin_notes      TEXT,
-    created_at       TIMESTAMPTZ  NOT NULL DEFAULT NOW(),
-    deleted_at       TIMESTAMPTZ
+    id                      SERIAL PRIMARY KEY,
+    user_id                 INTEGER      NOT NULL REFERENCES users(id) ON DELETE RESTRICT,
+    group_session_slot_id   INTEGER      REFERENCES group_session_slots(id) ON DELETE SET NULL,
+    contact_phone           VARCHAR(50),
+    nb_children             INTEGER      NOT NULL CHECK (nb_children BETWEEN 4 AND 8),
+    children_ages           TEXT,                      -- free-text description of the children's ages
+    preferred_date          DATE         NOT NULL,     -- must be at least 7 days in the future at submission time
+    location_type           VARCHAR(10)  NOT NULL CHECK (location_type IN ('home', 'escales')),
+    location_address        TEXT,                      -- required when location_type = 'home'
+    allergies               TEXT,
+    additional_info         TEXT,
+    status                  VARCHAR(20)  NOT NULL DEFAULT 'pending'
+                                CHECK (status IN ('pending', 'confirmed', 'cancelled')),
+    admin_notes             TEXT,
+    created_at              TIMESTAMPTZ  NOT NULL DEFAULT NOW(),
+    deleted_at              TIMESTAMPTZ
 );
 
 -- Password reset tokens ---------------------------------------

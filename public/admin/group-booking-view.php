@@ -82,6 +82,24 @@ include ROOT_DIR . '/templates/header.php';
     <div class="section-block" style="max-width:700px;margin-top:1.5rem">
         <h2 style="font-size:1.1rem;margin-bottom:1rem">📋 Détails de la demande</h2>
         <table style="width:100%;border-collapse:collapse">
+            <?php if (!empty($request['group_session_slot_id'])): ?>
+            <?php
+                $slotModel = new GroupSessionSlotModel();
+                $linkedSlot = $slotModel->findById((int) $request['group_session_slot_id']);
+            ?>
+            <?php if ($linkedSlot): ?>
+            <tr>
+                <th style="text-align:left;padding:.4rem .6rem;width:35%;color:var(--color-muted)">Créneau lié</th>
+                <td style="padding:.4rem .6rem">
+                    <a href="<?= APP_BASE_URL ?>/admin/group-session-slot-edit.php?id=<?= (int) $linkedSlot['id'] ?>">
+                        <?= e($linkedSlot['title']) ?>
+                    </a>
+                    – <?= e(formatDate($linkedSlot['slot_date'])) ?>
+                    <?= e(substr($linkedSlot['start_time'], 0, 5)) ?> – <?= e(substr($linkedSlot['end_time'], 0, 5)) ?>
+                </td>
+            </tr>
+            <?php endif; ?>
+            <?php endif; ?>
             <tr>
                 <th style="text-align:left;padding:.4rem .6rem;width:35%;color:var(--color-muted)">Contact</th>
                 <td style="padding:.4rem .6rem">
