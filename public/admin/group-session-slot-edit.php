@@ -10,14 +10,15 @@ $isEdit = (bool) $slot;
 $errors = [];
 
 $defaults = [
-    'title'                 => 'Atelier anniversaire',
-    'description'           => '',
-    'slot_date'             => '',
-    'start_time'            => '',
-    'end_time'              => '',
-    'max_groups'            => 1,
-    'price_per_child_cents' => GroupBookingModel::PRICE_ESCALES_CENTS,
-    'status'                => 'open',
+    'title'                          => 'Atelier anniversaire',
+    'description'                    => '',
+    'slot_date'                      => '',
+    'start_time'                     => '',
+    'end_time'                       => '',
+    'max_groups'                     => 1,
+    'price_per_child_home_cents'     => GroupBookingModel::PRICE_HOME_CENTS,
+    'price_per_child_escales_cents'  => GroupBookingModel::PRICE_ESCALES_CENTS,
+    'status'                         => 'open',
 ];
 
 $values = $isEdit ? array_merge($defaults, $slot) : $defaults;
@@ -25,20 +26,22 @@ $values = $isEdit ? array_merge($defaults, $slot) : $defaults;
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     Auth::verifyCsrf();
 
-    $values['title']                 = trim($_POST['title']       ?? '');
-    $values['description']           = trim($_POST['description'] ?? '');
-    $values['slot_date']             = trim($_POST['slot_date']   ?? '');
-    $values['start_time']            = trim($_POST['start_time']  ?? '');
-    $values['end_time']              = trim($_POST['end_time']    ?? '');
-    $values['max_groups']            = max(1, (int) ($_POST['max_groups'] ?? 1));
-    $values['price_per_child_cents'] = (int) round((float) str_replace(',', '.', $_POST['price_per_child_euros'] ?? '0') * 100);
-    $values['status']                = trim($_POST['status'] ?? 'open');
+    $values['title']                         = trim($_POST['title']       ?? '');
+    $values['description']                   = trim($_POST['description'] ?? '');
+    $values['slot_date']                     = trim($_POST['slot_date']   ?? '');
+    $values['start_time']                    = trim($_POST['start_time']  ?? '');
+    $values['end_time']                      = trim($_POST['end_time']    ?? '');
+    $values['max_groups']                    = max(1, (int) ($_POST['max_groups'] ?? 1));
+    $values['price_per_child_home_cents']    = (int) round((float) str_replace(',', '.', $_POST['price_per_child_home_euros']    ?? '0') * 100);
+    $values['price_per_child_escales_cents'] = (int) round((float) str_replace(',', '.', $_POST['price_per_child_escales_euros'] ?? '0') * 100);
+    $values['status']                        = trim($_POST['status'] ?? 'open');
 
     if ($values['title'] === '')     $errors[] = 'Le titre est obligatoire.';
     if ($values['slot_date'] === '') $errors[] = 'La date est obligatoire.';
     if ($values['start_time'] === '') $errors[] = 'L\'heure de début est obligatoire.';
     if ($values['end_time'] === '')  $errors[] = 'L\'heure de fin est obligatoire.';
-    if ($values['price_per_child_cents'] < 0) $errors[] = 'Le tarif ne peut pas être négatif.';
+    if ($values['price_per_child_home_cents'] < 0)    $errors[] = 'Le tarif domicile ne peut pas être négatif.';
+    if ($values['price_per_child_escales_cents'] < 0) $errors[] = 'Le tarif Escales Culinaires ne peut pas être négatif.';
     if (!in_array($values['status'], ['open', 'full', 'cancelled'], true)) $errors[] = 'Statut invalide.';
 
     if (empty($errors)) {
@@ -54,7 +57,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     }
 }
 
-$priceEuros = number_format($values['price_per_child_cents'] / 100, 2, ',', '');
+$priceHomeEuros    = number_format($values['price_per_child_home_cents']    / 100, 2, ',', '');
+$priceEscalesEuros = number_format($values['price_per_child_escales_cents'] / 100, 2, ',', '');
 
 $pageTitle = $isEdit ? 'Modifier le créneau #' . $id : 'Nouveau créneau de groupe';
 include ROOT_DIR . '/templates/header.php';
@@ -119,10 +123,19 @@ include ROOT_DIR . '/templates/header.php';
                            value="<?= (int) $values['max_groups'] ?>" min="1" required>
                     <p class="form-hint">Nombre de groupes pouvant réserver ce créneau</p>
                 </div>
+            </div>
+
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:1rem;margin-top:1rem">
                 <div class="form-group">
-                    <label for="price_per_child_euros">Tarif par enfant (€) <span class="required">*</span></label>
-                    <input type="text" id="price_per_child_euros" name="price_per_child_euros"
-                           value="<?= e($priceEuros) ?>" required
+                    <label for="price_per_child_home_euros">🏠 Tarif à domicile (€/enfant) <span class="required">*</span></label>
+                    <input type="text" id="price_per_child_home_euros" name="price_per_child_home_euros"
+                           value="<?= e($priceHomeEuros) ?>" required
+                           placeholder="30,00">
+                </div>
+                <div class="form-group">
+                    <label for="price_per_child_escales_euros">📍 Tarif aux Escales (€/enfant) <span class="required">*</span></label>
+                    <input type="text" id="price_per_child_escales_euros" name="price_per_child_escales_euros"
+                           value="<?= e($priceEscalesEuros) ?>" required
                            placeholder="35,00">
                 </div>
             </div>

@@ -36,7 +36,8 @@ include ROOT_DIR . '/templates/header.php';
             <div class="session-detail__meta">
                 <span class="session-detail__meta-item">📅 <?= e(formatDate($slot['slot_date'])) ?></span>
                 <span class="session-detail__meta-item">⏰ <?= e(substr($slot['start_time'], 0, 5)) ?> – <?= e(substr($slot['end_time'], 0, 5)) ?></span>
-                <span class="session-detail__meta-item">💶 <?= e(formatPrice((int) $slot['price_per_child_cents'])) ?>/enfant</span>
+                <span class="session-detail__meta-item">🏠 <?= e(formatPrice((int) $slot['price_per_child_home_cents'])) ?>/enfant (domicile)</span>
+                <span class="session-detail__meta-item">📍 <?= e(formatPrice((int) $slot['price_per_child_escales_cents'])) ?>/enfant (Escales)</span>
                 <span class="session-detail__meta-item">
                     <?php if ($isCancelled): ?>
                         <span class="badge badge--seats-full">Annulé</span>
@@ -62,9 +63,12 @@ include ROOT_DIR . '/templates/header.php';
 
             <ul style="margin:1rem 0;padding-left:1.4rem;line-height:1.8">
                 <li>👶 <strong><?= GroupBookingModel::MIN_CHILDREN ?> à <?= GroupBookingModel::MAX_CHILDREN ?> enfants</strong></li>
-                <li>💶 <strong><?= e(formatPrice((int) $slot['price_per_child_cents'])) ?> par enfant</strong>
-                    (soit <?= e(formatPrice(GroupBookingModel::MIN_CHILDREN * (int) $slot['price_per_child_cents'])) ?>
-                    à <?= e(formatPrice(GroupBookingModel::MAX_CHILDREN * (int) $slot['price_per_child_cents'])) ?> au total)</li>
+                <li>🏠 <strong>À domicile : <?= e(formatPrice((int) $slot['price_per_child_home_cents'])) ?> par enfant</strong>
+                    (soit <?= e(formatPrice(GroupBookingModel::MIN_CHILDREN * (int) $slot['price_per_child_home_cents'])) ?>
+                    à <?= e(formatPrice(GroupBookingModel::MAX_CHILDREN * (int) $slot['price_per_child_home_cents'])) ?> au total)</li>
+                <li>📍 <strong>Aux Escales Culinaires : <?= e(formatPrice((int) $slot['price_per_child_escales_cents'])) ?> par enfant</strong>
+                    (soit <?= e(formatPrice(GroupBookingModel::MIN_CHILDREN * (int) $slot['price_per_child_escales_cents'])) ?>
+                    à <?= e(formatPrice(GroupBookingModel::MAX_CHILDREN * (int) $slot['price_per_child_escales_cents'])) ?> au total)</li>
                 <li>🥜 Le menu est adapté aux allergies des enfants</li>
             </ul>
 

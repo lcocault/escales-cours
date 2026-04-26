@@ -49,20 +49,22 @@ class GroupSessionSlotModelTest extends TestCase
 
         $model = new GroupSessionSlotModel();
         $model->create([
-            'title'                 => 'Atelier anniversaire',
-            'description'           => 'Un atelier pour fêter votre anniversaire',
-            'slot_date'             => '2026-06-15',
-            'start_time'            => '10:00',
-            'end_time'              => '12:00',
-            'max_groups'            => 1,
-            'price_per_child_cents' => 3500,
+            'title'                          => 'Atelier anniversaire',
+            'description'                    => 'Un atelier pour fêter votre anniversaire',
+            'slot_date'                      => '2026-06-15',
+            'start_time'                     => '10:00',
+            'end_time'                       => '12:00',
+            'max_groups'                     => 1,
+            'price_per_child_home_cents'     => 3000,
+            'price_per_child_escales_cents'  => 3500,
         ]);
 
         $this->assertStringContainsString('slot_date', $capturedSql);
         $this->assertStringContainsString('start_time', $capturedSql);
         $this->assertStringContainsString('end_time', $capturedSql);
         $this->assertStringContainsString('max_groups', $capturedSql);
-        $this->assertStringContainsString('price_per_child_cents', $capturedSql);
+        $this->assertStringContainsString('price_per_child_home_cents', $capturedSql);
+        $this->assertStringContainsString('price_per_child_escales_cents', $capturedSql);
     }
 
     public function testCreatePassesCorrectParameters(): void
@@ -84,20 +86,22 @@ class GroupSessionSlotModelTest extends TestCase
 
         $model = new GroupSessionSlotModel();
         $id    = $model->create([
-            'title'                 => 'Atelier anniversaire',
-            'description'           => 'Description',
-            'slot_date'             => '2026-07-20',
-            'start_time'            => '14:00',
-            'end_time'              => '16:00',
-            'max_groups'            => 2,
-            'price_per_child_cents' => 3000,
+            'title'                          => 'Atelier anniversaire',
+            'description'                    => 'Description',
+            'slot_date'                      => '2026-07-20',
+            'start_time'                     => '14:00',
+            'end_time'                       => '16:00',
+            'max_groups'                     => 2,
+            'price_per_child_home_cents'     => 3000,
+            'price_per_child_escales_cents'  => 3500,
         ]);
 
         $this->assertSame(42, $id);
         $this->assertSame('Atelier anniversaire', $capturedParams[':title']);
         $this->assertSame('2026-07-20', $capturedParams[':slot_date']);
         $this->assertSame(2, $capturedParams[':max_groups']);
-        $this->assertSame(3000, $capturedParams[':price_per_child_cents']);
+        $this->assertSame(3000, $capturedParams[':price_per_child_home_cents']);
+        $this->assertSame(3500, $capturedParams[':price_per_child_escales_cents']);
     }
 
     public function testCreateStoresNullForEmptyDescription(): void
@@ -119,13 +123,14 @@ class GroupSessionSlotModelTest extends TestCase
 
         $model = new GroupSessionSlotModel();
         $model->create([
-            'title'                 => 'Atelier',
-            'description'           => '',
-            'slot_date'             => '2026-08-01',
-            'start_time'            => '09:00',
-            'end_time'              => '11:00',
-            'max_groups'            => 1,
-            'price_per_child_cents' => 3500,
+            'title'                          => 'Atelier',
+            'description'                    => '',
+            'slot_date'                      => '2026-08-01',
+            'start_time'                     => '09:00',
+            'end_time'                       => '11:00',
+            'max_groups'                     => 1,
+            'price_per_child_home_cents'     => 3000,
+            'price_per_child_escales_cents'  => 3500,
         ]);
 
         $this->assertNull($capturedParams[':description']);
@@ -153,21 +158,23 @@ class GroupSessionSlotModelTest extends TestCase
 
         $model = new GroupSessionSlotModel();
         $model->update(5, [
-            'title'                 => 'Updated title',
-            'description'           => 'New description',
-            'slot_date'             => '2026-09-10',
-            'start_time'            => '11:00',
-            'end_time'              => '13:00',
-            'max_groups'            => 3,
-            'price_per_child_cents' => 4000,
-            'status'                => 'open',
+            'title'                          => 'Updated title',
+            'description'                    => 'New description',
+            'slot_date'                      => '2026-09-10',
+            'start_time'                     => '11:00',
+            'end_time'                       => '13:00',
+            'max_groups'                     => 3,
+            'price_per_child_home_cents'     => 2800,
+            'price_per_child_escales_cents'  => 4000,
+            'status'                         => 'open',
         ]);
 
         $this->assertSame(5, $capturedParams[':id']);
         $this->assertSame('Updated title', $capturedParams[':title']);
         $this->assertSame('2026-09-10', $capturedParams[':slot_date']);
         $this->assertSame(3, $capturedParams[':max_groups']);
-        $this->assertSame(4000, $capturedParams[':price_per_child_cents']);
+        $this->assertSame(2800, $capturedParams[':price_per_child_home_cents']);
+        $this->assertSame(4000, $capturedParams[':price_per_child_escales_cents']);
         $this->assertSame('open', $capturedParams[':status']);
     }
 

@@ -33,7 +33,8 @@ include ROOT_DIR . '/templates/header.php';
                         <th>Date</th>
                         <th>Horaires</th>
                         <th>Créneaux</th>
-                        <th>Tarif/enfant</th>
+                        <th>Tarif domicile/enfant</th>
+                        <th>Tarif Escales/enfant</th>
                         <th>Réservations</th>
                         <th>Statut</th>
                         <th>Actions</th>
@@ -56,7 +57,8 @@ include ROOT_DIR . '/templates/header.php';
                             <td><?= e(date('d/m/Y', strtotime($s['slot_date']))) ?></td>
                             <td><?= e(substr($s['start_time'], 0, 5)) ?> – <?= e(substr($s['end_time'], 0, 5)) ?></td>
                             <td><?= (int) $s['remaining_groups'] ?> / <?= (int) $s['max_groups'] ?></td>
-                            <td><?= e(formatPrice((int) $s['price_per_child_cents'])) ?></td>
+                            <td><?= e(formatPrice((int) $s['price_per_child_home_cents'])) ?></td>
+                            <td><?= e(formatPrice((int) $s['price_per_child_escales_cents'])) ?></td>
                             <td><?= (int) $s['booking_count'] ?></td>
                             <td><span class="badge <?= $sc['class'] ?>"><?= e($sc['label']) ?></span></td>
                             <td>

@@ -52,20 +52,23 @@ class GroupSessionSlotModel
         $stmt = $this->db->prepare(
             'INSERT INTO group_session_slots
                  (title, description, slot_date, start_time, end_time,
-                  max_groups, remaining_groups, price_per_child_cents)
+                  max_groups, remaining_groups,
+                  price_per_child_home_cents, price_per_child_escales_cents)
              VALUES
                  (:title, :description, :slot_date, :start_time, :end_time,
-                  :max_groups, :max_groups, :price_per_child_cents)
+                  :max_groups, :max_groups,
+                  :price_per_child_home_cents, :price_per_child_escales_cents)
              RETURNING id'
         );
         $stmt->execute([
-            ':title'                 => $data['title'],
-            ':description'           => $data['description'] ?: null,
-            ':slot_date'             => $data['slot_date'],
-            ':start_time'            => $data['start_time'],
-            ':end_time'              => $data['end_time'],
-            ':max_groups'            => (int) $data['max_groups'],
-            ':price_per_child_cents' => (int) $data['price_per_child_cents'],
+            ':title'                        => $data['title'],
+            ':description'                  => $data['description'] ?: null,
+            ':slot_date'                    => $data['slot_date'],
+            ':start_time'                   => $data['start_time'],
+            ':end_time'                     => $data['end_time'],
+            ':max_groups'                   => (int) $data['max_groups'],
+            ':price_per_child_home_cents'   => (int) $data['price_per_child_home_cents'],
+            ':price_per_child_escales_cents' => (int) $data['price_per_child_escales_cents'],
         ]);
         return (int) $stmt->fetchColumn();
     }
@@ -80,20 +83,22 @@ class GroupSessionSlotModel
                  start_time = :start_time,
                  end_time = :end_time,
                  max_groups = :max_groups,
-                 price_per_child_cents = :price_per_child_cents,
+                 price_per_child_home_cents = :price_per_child_home_cents,
+                 price_per_child_escales_cents = :price_per_child_escales_cents,
                  status = :status
              WHERE id = :id AND deleted_at IS NULL'
         );
         $stmt->execute([
-            ':id'                    => $id,
-            ':title'                 => $data['title'],
-            ':description'           => $data['description'] ?: null,
-            ':slot_date'             => $data['slot_date'],
-            ':start_time'            => $data['start_time'],
-            ':end_time'              => $data['end_time'],
-            ':max_groups'            => (int) $data['max_groups'],
-            ':price_per_child_cents' => (int) $data['price_per_child_cents'],
-            ':status'                => $data['status'],
+            ':id'                            => $id,
+            ':title'                         => $data['title'],
+            ':description'                   => $data['description'] ?: null,
+            ':slot_date'                     => $data['slot_date'],
+            ':start_time'                    => $data['start_time'],
+            ':end_time'                      => $data['end_time'],
+            ':max_groups'                    => (int) $data['max_groups'],
+            ':price_per_child_home_cents'    => (int) $data['price_per_child_home_cents'],
+            ':price_per_child_escales_cents' => (int) $data['price_per_child_escales_cents'],
+            ':status'                        => $data['status'],
         ]);
     }
 
