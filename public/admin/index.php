@@ -16,6 +16,9 @@ $pendingRatingReminders = (int) $db->query(
        AND b.rating_reminder_dismissed = FALSE
        AND NOT EXISTS (SELECT 1 FROM ratings r WHERE r.booking_id = b.id)"
 )->fetchColumn();
+$pendingGroupBookings = (int) $db->query(
+    "SELECT COUNT(*) FROM group_booking_requests WHERE deleted_at IS NULL AND status = 'pending'"
+)->fetchColumn();
 
 $pageTitle = 'Administration';
 include ROOT_DIR . '/templates/header.php';
@@ -65,6 +68,11 @@ include ROOT_DIR . '/templates/header.php';
             <div class="admin-card__icon">⭐</div>
             <div class="admin-card__label">Rappels d'avis</div>
             <div style="color:var(--color-muted);font-size:.9rem;margin-top:.25rem"><?= $pendingRatingReminders ?> sans avis</div>
+        </a>
+        <a href="<?= APP_BASE_URL ?>/admin/group-bookings.php" class="admin-card" style="text-decoration:none;color:inherit">
+            <div class="admin-card__icon">🎂</div>
+            <div class="admin-card__label">Anniversaires</div>
+            <div style="color:var(--color-muted);font-size:.9rem;margin-top:.25rem"><?= $pendingGroupBookings ?> en attente</div>
         </a>
     </div>
 </div>
