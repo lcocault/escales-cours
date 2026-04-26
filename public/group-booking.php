@@ -6,11 +6,26 @@ Auth::requireLogin();
 $userModel = new UserModel();
 $user      = $userModel->findById(Auth::currentUserId());
 
+// Optional: booking linked to a specific group session slot
+$slotId = isset($_POST['slot_id'])
+    ? (int) $_POST['slot_id']
+    : (isset($_GET['slot_id']) ? (int) $_GET['slot_id'] : 0);
+$slot   = null;
+if ($slotId > 0) {
+    $slotModel = new GroupSessionSlotModel();
+    $slot = $slotModel->findById($slotId);
+    if (!$slot || $slot['status'] === 'cancelled' || (int) $slot['remaining_groups'] <= 0) {
+        flash('error', 'Ce créneau n\'est plus disponible.');
+        header('Location: ' . APP_BASE_URL . '/');
+        exit;
+    }
+}
+
 $errors         = [];
 $contactPhone   = $user['phone'] ?? '';
 $nbChildren     = '';
 $childrenAges   = '';
-$preferredDate  = '';
+$preferredDate  = $slot ? $slot['slot_date'] : '';
 $locationType   = 'escales';
 $locationAddress = '';
 $allergies      = '';
@@ -41,7 +56,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
     if ($preferredDate === '') {
         $errors[] = 'La date souhaitée est obligatoire.';
-    } elseif (strtotime($preferredDate) < strtotime($minDate)) {
+    } elseif (!$slot && strtotime($preferredDate) < strtotime($minDate)) {
+        // When linked to a slot, skip the min-advance-days check (admin set the date)
         $errors[] = 'La date souhaitée doit être au moins '
             . GroupBookingModel::MIN_ADVANCE_DAYS . ' jours à l\'avance (à partir du '
             . date('d/m/Y', strtotime($minDate)) . ').';
@@ -58,16 +74,22 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     if (empty($errors)) {
         $model = new GroupBookingModel();
         $id = $model->create([
-            'user_id'          => Auth::currentUserId(),
-            'contact_phone'    => $contactPhone,
-            'nb_children'      => (int) $nbChildren,
-            'children_ages'    => $childrenAges,
-            'preferred_date'   => $preferredDate,
-            'location_type'    => $locationType,
-            'location_address' => $locationAddress,
-            'allergies'        => $allergies,
-            'additional_info'  => $additionalInfo,
+            'user_id'                => Auth::currentUserId(),
+            'group_session_slot_id'  => $slot ? (int) $slot['id'] : null,
+            'contact_phone'          => $contactPhone,
+            'nb_children'            => (int) $nbChildren,
+            'children_ages'          => $childrenAges,
+            'preferred_date'         => $preferredDate,
+            'location_type'          => $locationType,
+            'location_address'       => $locationAddress,
+            'allergies'              => $allergies,
+            'additional_info'        => $additionalInfo,
         ]);
+
+        // Decrement remaining groups on the slot when a booking is created
+        if ($slot) {
+            (new GroupSessionSlotModel())->decrementGroups((int) $slot['id']);
+        }
 
         $request = $model->findById($id);
 
@@ -121,8 +143,18 @@ include ROOT_DIR . '/templates/header.php';
     <?php endif; ?>
 
     <div class="form-card" style="max-width:700px">
+        <?php if ($slot): ?>
+            <div class="flash flash--info" style="margin-bottom:1rem">
+                📅 <strong>Créneau sélectionné :</strong> <?= e($slot['title']) ?>
+                – <?= e(formatDate($slot['slot_date'])) ?>
+                – <?= e(substr($slot['start_time'], 0, 5)) ?> – <?= e(substr($slot['end_time'], 0, 5)) ?>
+            </div>
+        <?php endif; ?>
         <form method="post" action="">
             <input type="hidden" name="csrf_token" value="<?= Auth::csrfToken() ?>">
+            <?php if ($slot): ?>
+                <input type="hidden" name="slot_id" value="<?= (int) $slot['id'] ?>">
+            <?php endif; ?>
 
             <p><strong>Compte :</strong> <?= e($user['first_name'] . ' ' . $user['last_name']) ?> (<?= e($user['email']) ?>)</p>
 
@@ -149,10 +181,17 @@ include ROOT_DIR . '/templates/header.php';
                 </div>
                 <div class="form-group mt-1">
                     <label for="preferred_date">Date souhaitée <span class="required">*</span></label>
-                    <input type="date" id="preferred_date" name="preferred_date"
-                           min="<?= e($minDate) ?>"
-                           value="<?= e($preferredDate) ?>" required>
-                    <p class="form-hint">Au moins <?= GroupBookingModel::MIN_ADVANCE_DAYS ?> jours à l'avance</p>
+                    <?php if ($slot): ?>
+                        <input type="date" id="preferred_date" name="preferred_date"
+                               value="<?= e($slot['slot_date']) ?>" readonly
+                               style="background:var(--color-bg-alt,#fef9f0)">
+                        <p class="form-hint">Créneau fixé par l'organisateur</p>
+                    <?php else: ?>
+                        <input type="date" id="preferred_date" name="preferred_date"
+                               min="<?= e($minDate) ?>"
+                               value="<?= e($preferredDate) ?>" required>
+                        <p class="form-hint">Au moins <?= GroupBookingModel::MIN_ADVANCE_DAYS ?> jours à l'avance</p>
+                    <?php endif; ?>
                 </div>
             </div>
 
@@ -216,7 +255,7 @@ include ROOT_DIR . '/templates/header.php';
 
             <div class="mt-3">
                 <button type="submit" class="btn btn--primary">📨 Envoyer ma demande</button>
-                <a href="<?= APP_BASE_URL ?>/" class="btn btn--secondary" style="margin-left:.5rem">Annuler</a>
+                <a href="<?= $slot ? APP_BASE_URL . '/group-session-slot.php?id=' . (int) $slot['id'] : APP_BASE_URL . '/' ?>" class="btn btn--secondary" style="margin-left:.5rem">Annuler</a>
             </div>
         </form>
     </div>

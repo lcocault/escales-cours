@@ -5,9 +5,23 @@ require_once __DIR__ . '/init.php';
 $pageTitle      = 'Séances à venir';
 $sessionModel   = new SessionModel();
 $sessions       = $sessionModel->getUpcoming(Auth::isLoggedIn() ? Auth::currentUserId() : null);
+
+$slotModel      = new GroupSessionSlotModel();
+$groupSlots     = $slotModel->getUpcoming();
+
 $messageModel    = new GeneralMessageModel();
 $latestMessage   = $messageModel->getLatest();
 $hasMoreMessages = $messageModel->countAll() > 1;
+
+// Merge regular sessions and group slots, sorted by date then time
+$allItems = [];
+foreach ($sessions as $s) {
+    $allItems[] = ['type' => 'session', 'date' => $s['session_date'], 'time' => $s['start_time'], 'data' => $s];
+}
+foreach ($groupSlots as $gs) {
+    $allItems[] = ['type' => 'group_slot', 'date' => $gs['slot_date'], 'time' => $gs['start_time'], 'data' => $gs];
+}
+usort($allItems, fn($a, $b) => strcmp($a['date'] . $a['time'], $b['date'] . $b['time']));
 
 include ROOT_DIR . '/templates/header.php';
 ?>
@@ -53,13 +67,14 @@ include ROOT_DIR . '/templates/header.php';
         <a href="<?= APP_BASE_URL ?>/all-ratings.php">⭐ Voir tous les avis des participants →</a>
     </p>
 
-    <?php if (empty($sessions)): ?>
+    <?php if (empty($allItems)): ?>
         <p class="text-center mt-3" style="color:var(--color-muted)">
             Aucune séance prévue pour le moment. Revenez bientôt !
         </p>
     <?php else: ?>
         <div class="sessions-grid">
-            <?php foreach ($sessions as $s): ?>
+            <?php foreach ($allItems as $item): ?>
+                <?php if ($item['type'] === 'session'): $s = $item['data']; ?>
                 <?php
                     $seats = (int) $s['remaining_seats'];
                     if ($seats === 0) {
@@ -98,6 +113,47 @@ include ROOT_DIR . '/templates/header.php';
                         </a>
                     </div>
                 </article>
+                <?php elseif ($item['type'] === 'group_slot'): $gs = $item['data']; ?>
+                <?php
+                    $groups = (int) $gs['remaining_groups'];
+                    if ($groups === 0) {
+                        $badgeClass = 'badge--seats-full';
+                        $badgeText  = 'Complet';
+                    } else {
+                        $badgeClass = 'badge--seats-ok';
+                        $badgeText  = $groups > 1
+                            ? $groups . ' créneaux disponibles'
+                            : $groups . ' créneau disponible';
+                    }
+                    $priceRange = formatPrice(GroupBookingModel::MIN_CHILDREN * (int) $gs['price_per_child_cents'])
+                        . ' – ' . formatPrice(GroupBookingModel::MAX_CHILDREN * (int) $gs['price_per_child_cents']);
+                ?>
+                <article class="session-card">
+                    <div class="session-card__header">
+                        <p class="session-card__date"><?= e(formatDate($gs['slot_date'])) ?></p>
+                        <h2 class="session-card__title"><?= e($gs['title']) ?> <span style="font-size:.75em;vertical-align:middle">🎂</span></h2>
+                    </div>
+                    <div class="session-card__body">
+                        <p class="session-card__theme">🎉 Atelier de groupe – anniversaire</p>
+                        <p class="session-card__age">👶 <?= GroupBookingModel::MIN_CHILDREN ?>–<?= GroupBookingModel::MAX_CHILDREN ?> enfants</p>
+                        <?php if ($gs['description']): ?>
+                            <p class="session-card__summary"><?= e($gs['description']) ?></p>
+                        <?php endif; ?>
+                    </div>
+                    <div class="session-card__footer">
+                        <div>
+                            <span class="badge <?= $badgeClass ?>"><?= e($badgeText) ?></span>
+                            <p class="session-card__meta mt-1">
+                                ⏰ <?= e(substr($gs['start_time'], 0, 5)) ?> – <?= e(substr($gs['end_time'], 0, 5)) ?>
+                                &nbsp;|&nbsp; 💶 <?= e(formatPrice((int) $gs['price_per_child_cents'])) ?>/enfant
+                            </p>
+                        </div>
+                        <a href="<?= APP_BASE_URL ?>/group-session-slot.php?id=<?= (int) $gs['id'] ?>" class="btn btn--primary btn--sm">
+                            Détails →
+                        </a>
+                    </div>
+                </article>
+                <?php endif; ?>
             <?php endforeach; ?>
         </div>
     <?php endif; ?>
