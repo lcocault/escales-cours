@@ -125,10 +125,21 @@ class GroupBookingModel
 
     /**
      * Returns the estimated total price in cents for a group booking.
+     *
+     * @param int    $nbChildren   Number of children.
+     * @param string $locationType 'home' or 'escales'.
+     * @param int|null $priceHomeCents    Per-child price for home (slot-specific); falls back to PRICE_HOME_CENTS.
+     * @param int|null $priceEscalesCents Per-child price for escales (slot-specific); falls back to PRICE_ESCALES_CENTS.
      */
-    public static function estimatePrice(int $nbChildren, string $locationType): int
-    {
-        $unitPrice = $locationType === 'home' ? self::PRICE_HOME_CENTS : self::PRICE_ESCALES_CENTS;
+    public static function estimatePrice(
+        int $nbChildren,
+        string $locationType,
+        ?int $priceHomeCents = null,
+        ?int $priceEscalesCents = null
+    ): int {
+        $homePrice    = $priceHomeCents    ?? self::PRICE_HOME_CENTS;
+        $escalesPrice = $priceEscalesCents ?? self::PRICE_ESCALES_CENTS;
+        $unitPrice    = $locationType === 'home' ? $homePrice : $escalesPrice;
         return $nbChildren * $unitPrice;
     }
 

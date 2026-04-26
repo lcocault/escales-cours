@@ -177,10 +177,11 @@ CREATE TABLE IF NOT EXISTS group_session_slots (
     slot_date               DATE            NOT NULL,
     start_time              TIME            NOT NULL,
     end_time                TIME            NOT NULL,
-    max_groups              INTEGER         NOT NULL DEFAULT 1 CHECK (max_groups > 0),
-    remaining_groups        INTEGER         NOT NULL DEFAULT 1 CHECK (remaining_groups >= 0),
-    price_per_child_cents   INTEGER         NOT NULL CHECK (price_per_child_cents >= 0),
-    status                  VARCHAR(20)     NOT NULL DEFAULT 'open'
+    max_groups                      INTEGER         NOT NULL DEFAULT 1 CHECK (max_groups > 0),
+    remaining_groups                INTEGER         NOT NULL DEFAULT 1 CHECK (remaining_groups >= 0),
+    price_per_child_home_cents      INTEGER         NOT NULL DEFAULT 3000 CHECK (price_per_child_home_cents >= 0),
+    price_per_child_escales_cents   INTEGER         NOT NULL DEFAULT 3500 CHECK (price_per_child_escales_cents >= 0),
+    status                          VARCHAR(20)     NOT NULL DEFAULT 'open'
                                 CHECK (status IN ('open', 'full', 'cancelled')),
     created_at              TIMESTAMPTZ     NOT NULL DEFAULT NOW(),
     deleted_at              TIMESTAMPTZ,

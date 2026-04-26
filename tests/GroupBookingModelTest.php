@@ -67,6 +67,28 @@ class GroupBookingModelTest extends TestCase
         $this->assertSame(GroupBookingModel::MAX_CHILDREN * GroupBookingModel::PRICE_ESCALES_CENTS, $price);
     }
 
+    public function testEstimatePriceUsesSlotSpecificHomePriceWhenProvided(): void
+    {
+        $slotHomeCents = 2500;
+        $price = GroupBookingModel::estimatePrice(4, 'home', $slotHomeCents, 3200);
+        $this->assertSame(4 * $slotHomeCents, $price);
+    }
+
+    public function testEstimatePriceUsesSlotSpecificEscalesPriceWhenProvided(): void
+    {
+        $slotEscalesCents = 3200;
+        $price = GroupBookingModel::estimatePrice(6, 'escales', 2500, $slotEscalesCents);
+        $this->assertSame(6 * $slotEscalesCents, $price);
+    }
+
+    public function testEstimatePriceFallsBackToConstantsWhenNoPricesProvided(): void
+    {
+        $priceHome    = GroupBookingModel::estimatePrice(5, 'home', null, null);
+        $priceEscales = GroupBookingModel::estimatePrice(5, 'escales', null, null);
+        $this->assertSame(5 * GroupBookingModel::PRICE_HOME_CENTS, $priceHome);
+        $this->assertSame(5 * GroupBookingModel::PRICE_ESCALES_CENTS, $priceEscales);
+    }
+
     // -------------------------------------------------------------------------
     // create() – SQL and parameters
     // -------------------------------------------------------------------------

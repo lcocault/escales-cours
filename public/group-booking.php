@@ -104,8 +104,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 }
 
 // Calculate price estimates for display
-$priceHome    = GroupBookingModel::PRICE_HOME_CENTS;
-$priceEscales = GroupBookingModel::PRICE_ESCALES_CENTS;
+// When linked to a slot, use the slot-specific prices; otherwise fall back to the default constants.
+$priceHome    = $slot ? (int) $slot['price_per_child_home_cents']    : GroupBookingModel::PRICE_HOME_CENTS;
+$priceEscales = $slot ? (int) $slot['price_per_child_escales_cents'] : GroupBookingModel::PRICE_ESCALES_CENTS;
 
 $pageTitle  = 'Réserver un atelier anniversaire';
 $navContext = 'group-booking';
@@ -262,8 +263,8 @@ include ROOT_DIR . '/templates/header.php';
 </div>
 <script>
 (function () {
-    var priceHome    = <?= json_encode(GroupBookingModel::PRICE_HOME_CENTS) ?>;
-    var priceEscales = <?= json_encode(GroupBookingModel::PRICE_ESCALES_CENTS) ?>;
+    var priceHome    = <?= json_encode($priceHome) ?>;
+    var priceEscales = <?= json_encode($priceEscales) ?>;
 
     function formatPrice(cents) {
         return (cents / 100).toFixed(2).replace('.', ',') + '\u00a0€';
